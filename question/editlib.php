@@ -689,6 +689,34 @@ class question_bank_edit_action_column extends question_bank_action_column_base 
     }
 }
 
+/**
+ * Base class for question bank columns that just contain the duplicate icon.
+ *
+ * @copyright  2013 M kassaei
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class question_bank_copy_action_column extends question_bank_action_column_base {
+    protected $strcopy;
+
+    public function init() {
+        parent::init();
+        $this->strcopy = get_string('duplicate');
+    }
+
+    public function get_name() {
+        return 'copyaction';
+    }
+
+    protected function display_content($question, $rowclasses) {
+        // To copy a question, you need permission to add a question in the same
+        // category as the existing question, and ability to access the details of
+        // the question being copied.
+        if (question_has_capability_on($question, 'add') &&
+                (question_has_capability_on($question, 'edit') || question_has_capability_on($question, 'view'))) {
+            $this->print_icon('t/copy', $this->strcopy, $this->qbank->copy_question_url($question->id));
+        }
+    }
+}
 
 /**
  * Question bank columns for the preview action icon.
@@ -938,7 +966,7 @@ class question_bank_view {
     }
 
     protected function wanted_columns() {
-        $columns = array('checkbox', 'qtype', 'questionname', 'editaction',
+        $columns = array('checkbox', 'qtype', 'questionname', 'editaction', 'copyaction',
                 'previewaction', 'moveaction', 'deleteaction', 'creatorname',
                 'modifiername');
         if (question_get_display_preference('qbshowtext', 0, PARAM_BOOL, new moodle_url(''))) {
@@ -964,6 +992,7 @@ class question_bank_view {
             new question_bank_creator_name_column($this),
             new question_bank_modifier_name_column($this),
             new question_bank_edit_action_column($this),
+            new question_bank_copy_action_column($this),
             new question_bank_preview_action_column($this),
             new question_bank_move_action_column($this),
             new question_bank_delete_action_column($this),
@@ -1218,6 +1247,10 @@ class question_bank_view {
 
     public function edit_question_url($questionid) {
         return $this->editquestionurl->out(true, array('id' => $questionid));
+    }
+
+    public function copy_question_url($questionid) {
+        return $this->editquestionurl->out(true, array('id' => $questionid, 'makecopy' => 1));
     }
 
     public function move_question_url($questionid) {
