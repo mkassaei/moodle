@@ -1320,3 +1320,5 @@ bank window's title is prominent enough*/
     direction: ltr;
     text-align: left;
 }
+
+.path-mod-quiz li.activity > div {position:relative;}
