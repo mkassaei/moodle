@@ -114,9 +114,7 @@ abstract class question_test_helper {
         $dataforformconstructor->contextid = $questiondata->contextid = $catcontext->id;
         $dataforformconstructor->category = $questiondata->category = $cat->id;
         $dataforformconstructor->formoptions = new stdClass();
-        $dataforformconstructor->formoptions->canmove = true;
         $dataforformconstructor->formoptions->cansaveasnew = true;
-        $dataforformconstructor->formoptions->movecontext = false;
         $dataforformconstructor->formoptions->canedit = true;
         $dataforformconstructor->formoptions->repeatelements = true;
         $qtype = question_bank::get_qtype($questiondata->qtype);

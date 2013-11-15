@@ -252,14 +252,11 @@ class question_type {
             if ($question->formoptions->canedit) {
                 $permissionstrs[] = get_string('permissionedit', 'question');
             }
-            if ($question->formoptions->canmove) {
-                $permissionstrs[] = get_string('permissionmove', 'question');
-            }
             if ($question->formoptions->cansaveasnew) {
                 $permissionstrs[] = get_string('permissionsaveasnew', 'question');
             }
         }
-        if (!$question->formoptions->movecontext  && count($permissionstrs)) {
+        if (count($permissionstrs)) {
             echo $OUTPUT->heading(get_string('permissionto', 'question'), 3);
             $html = '<ul>';
             foreach ($permissionstrs as $permissionstr) {

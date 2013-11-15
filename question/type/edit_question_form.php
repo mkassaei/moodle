@@ -141,17 +141,10 @@ abstract class question_edit_form extends question_wizard_form {
             // Adding question.
             $mform->addElement('questioncategory', 'category', get_string('category', 'question'),
                     array('contexts' => $contexts));
-        } else if (!($this->question->formoptions->canmove ||
-                $this->question->formoptions->cansaveasnew)) {
+        } else if (!$this->question->formoptions->cansaveasnew) {
             // Editing question with no permission to move from category.
             $mform->addElement('questioncategory', 'category', get_string('category', 'question'),
                     array('contexts' => array($this->categorycontext)));
-        } else if ($this->question->formoptions->movecontext) {
-            // Moving question to another context.
-            $mform->addElement('questioncategory', 'categorymoveto',
-                    get_string('category', 'question'),
-                    array('contexts' => $this->contexts->having_cap('moodle/question:add')));
-
         } else {
             // Editing question with permission to move from category or save as new q.
             $currentgrp = array();
@@ -235,19 +228,13 @@ abstract class question_edit_form extends question_wizard_form {
 
         $this->add_hidden_fields();
 
-        $mform->addElement('hidden', 'movecontext');
-        $mform->setType('movecontext', PARAM_BOOL);
-
         $mform->addElement('hidden', 'qtype');
         $mform->setType('qtype', PARAM_ALPHA);
 
         $buttonarray = array();
         if (!empty($this->question->id)) {
-            // Editing / moving question.
-            if ($this->question->formoptions->movecontext) {
-                $buttonarray[] = $mform->createElement('submit', 'submitbutton',
-                        get_string('moveq', 'question'));
-            } else if ($this->question->formoptions->canedit) {
+            // Editing question.
+            if ($this->question->formoptions->canedit) {
                 $buttonarray[] = $mform->createElement('submit', 'submitbutton',
                         get_string('savechanges'));
             }
@@ -265,9 +252,7 @@ abstract class question_edit_form extends question_wizard_form {
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
 
-        if ($this->question->formoptions->movecontext) {
-            $mform->hardFreezeAllVisibleExcept(array('categorymoveto', 'buttonar'));
-        } else if ((!empty($this->question->id)) && (!($this->question->formoptions->canedit ||
+        if ((!empty($this->question->id)) && (!($this->question->formoptions->canedit ||
                 $this->question->formoptions->cansaveasnew))) {
             $mform->hardFreezeAllVisibleExcept(array('categorymoveto', 'buttonar', 'currentgrp'));
         }
@@ -674,7 +659,7 @@ abstract class question_edit_form extends question_wizard_form {
         if (empty($fromform['makecopy']) && isset($this->question->id)
                 && ($this->question->formoptions->canedit ||
                         $this->question->formoptions->cansaveasnew)
-                && empty($fromform['usecurrentcat']) && !$this->question->formoptions->canmove) {
+                && empty($fromform['usecurrentcat'])) {
             $errors['currentgrp'] = get_string('nopermissionmove', 'question');
         }
 
