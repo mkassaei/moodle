@@ -317,6 +317,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $bcc = $panel->get_button_container_class();
         $output .= html_writer::start_tag('div', array('class' => "qn_buttons $bcc"));
         foreach ($panel->get_question_buttons() as $button) {
+            $output .= $panel->get_section_headings((int)substr($button->id, strlen('quiznavbutton')));
             $output .= $this->render($button);
         }
         $output .= html_writer::end_tag('div');
@@ -593,6 +594,10 @@ class mod_quiz_renderer extends plugin_renderer_base {
         }
         $table->data = array();
 
+        // Get section headings and set the sapn over the columns.
+        $sections = $attemptobj->get_quiz_sections();
+        $colspan = count($table->align);
+
         // Get the summary info for each question.
         $slots = $attemptobj->get_slots();
         foreach ($slots as $slot) {
@@ -611,6 +616,19 @@ class mod_quiz_renderer extends plugin_renderer_base {
             } else {
                 $row = array($attemptobj->get_question_number($slot) . $flag,
                                 $attemptobj->get_question_status($slot, $displayoptions->correctness));
+            }
+            // Add section headings to the summary table.
+            if ($sections) {
+                $table->align = array('center');
+                foreach ($sections as $section) {
+                    if ($section->firstslot !== (int)$slot) {
+                        continue;
+                    }
+                    $cell = new html_table_cell($section->heading);
+                    $cell->header = true;
+                    $cell->colspan = $colspan;
+                    $table->data[] = array($cell);
+                }
             }
             if ($markscolumn) {
                 $row[] = $attemptobj->get_question_mark($slot);

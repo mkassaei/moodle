@@ -913,6 +913,39 @@ class quiz_attempt {
         return $this->quba->get_question_attempt($slot);
     }
 
+    public function get_quiz_sections() {
+        // TODO: When DB structure in place, get these from DB.
+        $sections = array();
+
+        // Temp: create number of sections.
+        $section1 = new stdClass();
+        $section1->id = 1;
+        $section1->quizid = $this->get_quizid();
+        $section1->firstslot = 1;
+        $section1->heading = 'Section 1';
+        $section1->shuffle = true;
+
+        $section2 = new stdClass();
+        $section2->id = 2;
+        $section2->quizid = $this->get_quizid();
+        $section2->firstslot = 3;
+        $section2->heading = 'Section 2';
+        $section2->shuffle = false;
+
+        $section3 = new stdClass();
+        $section3->id = 3;
+        $section3->quizid = $this->get_quizid();
+        $section3->firstslot = 5;
+        $section3->heading = 'Section 3';
+        $section3->shuffle = true;
+
+        $sections[] = $section1;
+        $sections[] = $section2;
+        $sections[] = $section3;
+
+        return $sections;
+    }
+
     /**
      * Is a particular question in this attempt a real question, or something like a description.
      * @param int $slot the number used to identify this question within this attempt.
@@ -1685,6 +1718,28 @@ abstract class quiz_nav_panel_base {
 
     public function render_before_button_bits(mod_quiz_renderer $output) {
         return '';
+    }
+
+    /**
+     * Reners section headings before a given slot
+     * @param string $slot, this is the button id, eg.: 'quiznavebutton1'
+     */
+    public function get_section_headings($slot) {
+        $sections = $this->attemptobj->get_quiz_sections();
+        if (!$sections) {
+            return null;
+        }
+        $output = null;
+        foreach ($sections as $section) {
+            if ($section->firstslot !== (int)$slot) {
+                continue;
+            }
+            if ($slot > 1) {
+                $output .= html_writer::tag('br', '');
+            }
+            $output .= html_writer::tag('div', $section->heading);
+        }
+        return $output;
     }
 
     abstract public function render_end_bits(mod_quiz_renderer $output);
