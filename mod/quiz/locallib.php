@@ -1251,7 +1251,63 @@ function quiz_question_preview_button($quiz, $question, $label = false) {
     $action = new popup_action('click', $url, 'questionpreview',
             question_preview_popup_params());
 
-    return $OUTPUT->action_link($url, $image, $action, array('title' => $strpreviewquestion));
+    return $OUTPUT->action_link($url, $image, $action, array('title' => $strpreviewquestion, 'class' => 'preview'));
+}
+
+/**
+ * @param object $quiz the quiz settings
+ * @param object $question the question
+ * @return the HTML for a delete icon and link.
+ */
+function quiz_question_delete_button($quiz, $question) {
+    global $OUTPUT, $PAGE;
+
+    if (!$hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context)) {
+        return '';
+    }
+
+    $url = new moodle_url($PAGE->url, array('sesskey' => sesskey(), 'remove' => $question->slot));
+
+    $strdelete = get_string('delete');
+
+    // Build the icon.
+    $image = $OUTPUT->pix_icon('t/delete', $strdelete);
+
+    return $OUTPUT->action_link($url, $image, null, array('title' => $strdelete,
+                'class' => 'cm-edit-action editing_delete', 'data-action' => 'delete'));
+}
+
+/**
+ * @param object $quiz the quiz settings
+ * @param object $question the question
+ * @return the HTML for a delete icon and link.
+ */
+function quiz_question_page_join_button($quiz, $question, $linkpage) {
+    global $OUTPUT, $PAGE;
+
+    if (!$hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context)) {
+        return '';
+    }
+
+    $url = new moodle_url('repaginate.php', array('cmid' => $quiz->cmid, 'quizid' => $quiz->id,
+                'slot' => $question->slot, 'repag' => $linkpage, 'sesskey' => sesskey()));
+
+    if ($linkpage == 1) {
+        $title = get_string('linkpage', 'quiz');
+        $image = $OUTPUT->pix_icon('e/insert_page_break', $title); // Remove_link.
+        $action = 'linkpage';
+    } else {
+        $title = get_string('unlinkpage', 'quiz');
+        $image = $OUTPUT->pix_icon('e/remove_page_break', $title);
+        $action = 'unlinkpage';
+    }
+    // Disable the link if quiz has attempta.
+    $disabled = null;
+    if (quiz_has_attempts($quiz->id)) {
+        $disabled = "disabled";
+    }
+    return $OUTPUT->action_link($url, $image, null, array('title' => $title,
+                'class' => 'cm-edit-action editing_page_join', 'disabled' => $disabled, 'data-action' => $action));
 }
 
 /**
@@ -1874,5 +1930,45 @@ class qubaids_for_quiz extends qubaid_join {
         }
 
         parent::__construct('{quiz_attempts} quiza', 'quiza.uniqueid', $where, $params);
+    }
+}
+
+/**
+ * Creates a textual representation of a question for display.
+ *
+ * @param object $question A question object from the database questions table
+ * @param bool $showicon If true, show the question's icon with the question. False by default.
+ * @param bool $showquestiontext If true (default), show question text after question name.
+ *       If false, show only question name.
+ * @param bool $return If true (default), return the output. If false, print it.
+ */
+function quiz_question_tostring($question, $showicon = false,
+        $showquestiontext = true, $return = true) {
+    global $COURSE;
+    $result = '';
+    $result .= '<span class="questionname">';
+    if ($showicon) {
+        $result .= print_question_icon($question, true);
+        echo ' ';
+    }
+    $result .= shorten_text(format_string($question->name), 200) . '</span>';
+    if ($showquestiontext) {
+        $questiontext = question_utils::to_plain_text($question->questiontext,
+                $question->questiontextformat, array('noclean' => true, 'para' => false));
+        $questiontext = shorten_text($questiontext, 200);
+        $result .= '<span class="questiontext">';
+        if (!empty($questiontext)) {
+            $result .= s($questiontext);
+        } else {
+            $result .= '<span class="error">';
+            $result .= get_string('questiontextisempty', 'quiz');
+            $result .= '</span>';
+        }
+        $result .= '</span>';
+    }
+    if ($return) {
+        return $result;
+    } else {
+        echo $result;
     }
 }
