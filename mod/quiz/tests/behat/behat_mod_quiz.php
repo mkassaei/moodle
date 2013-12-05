@@ -54,10 +54,29 @@ class behat_mod_quiz extends behat_question_base {
         $quizname = $this->escape($quizname);
         $editquiz = $this->escape(get_string('editquiz', 'quiz'));
         $addaquestion = $this->escape(get_string('addaquestion', 'quiz'));
+        $menuxpath = "//div[contains(@class, ' page-add-actions ')][last()]//a[contains(@class, ' textmenu')]";
+        $itemxpath = "//div[contains(@class, ' page-add-actions ')][last()]//a[contains(@class, ' addquestion ')]";
         return array_merge(array(
             new Given("I follow \"$quizname\""),
             new Given("I follow \"$editquiz\""),
-            new Given("I press \"$addaquestion\""),
+            new Given("I click on \"$menuxpath\" \"xpath_element\""),
+            new Given("I click on \"$itemxpath\" \"xpath_element\""),
                 ), $this->finish_adding_question($questiontype, $questiondata));
+    }
+
+    /**
+     * Set the max mark for a question on the Edit quiz page.
+     *
+     * @When /^I set the max mark for question "(?P<question_name_string>(?:[^"]|\\")*)" to "(?P<new_mark_string>(?:[^"]|\\")*)"$/
+     * @param string $questionname the name of the question to set the max mark for.
+     * @param string $newmark the mark to set
+     */
+    public function i_set_the_max_mark_for_quiz_question($questionname, $newmark) {
+        return array(
+            new Given('I follow "' . $this->escape(get_string('editmaxmark', 'quiz')) . '"'),
+            new Given('I wait "2" seconds'),
+            new Given('I should see "' . $this->escape(get_string('edittitleinstructions')) . '"'),
+            new Given('I set the field "maxmark" to "' . $this->escape($newmark) . chr(10) . '"'),
+        );
     }
 }
