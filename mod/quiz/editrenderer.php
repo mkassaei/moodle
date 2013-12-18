@@ -86,13 +86,9 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
      * @param stdClass $course The course entry from DB
      * @return string HTML to output.
      */
-    public function section_title($section, $course) {
-        $title = get_section_name($course, $section);
-        $url = course_get_url($course, $section->section, array('navigation' => true));
-        if ($url) {
-            $title = html_writer::link($url, $title);
-        }
-        return $title;
+    public function section_heading($section, $course) {
+        $heading = \mod_quiz\structure::get_quiz_section_heading($section);
+        return $heading;
     }
 
 /**
@@ -107,18 +103,18 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
     protected function section_right_content($section, $course, $onsectionpage) {
         $o = $this->output->spacer();
 
-        if ($section->section != 0) {
-            $controls = $this->section_edit_controls($course, $section, $onsectionpage);
-            if (!empty($controls)) {
-                $o = implode('<br />', $controls);
-            }
+        if ($section->firstslot > 1) {
+//             $controls = $this->section_edit_controls($course, $section, $onsectionpage);
+//             if (!empty($controls)) {
+//                 $o = implode('<br />', $controls);
+//             }
         }
 
         return $o;
     }
 
     /**
-     * Generate the content to displayed on the left part of a section
+     * Generate the content to be displayed on the left part of a section
      * before course modules are included
      *
      * @param stdClass $section The quiz_section entry from DB
@@ -126,15 +122,8 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
      * @param bool $onsectionpage true if being printed on a section page
      * @return string HTML to output.
      */
-    protected function section_left_content($section, $course, $onsectionpage) {
+    protected function section_left_content($section) {
         $o = $this->output->spacer();
-
-        if ($section->section != 0) {
-            // Only in the non-general sections.
-            if (course_get_format($course)->is_section_current($section)) {
-                $o = get_accesshide(get_string('currentsection', 'format_'.$course->format));
-            }
-        }
 
         return $o;
     }
@@ -156,18 +145,9 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
         $currenttext = '';
         $sectionstyle = '';
 
-        if ($section->section != 0) {
-            // Only in the non-general sections.
-            if (!$section->visible) {
-                $sectionstyle = ' hidden';
-            } else if (course_get_format($course)->is_section_current($section)) {
-                $sectionstyle = ' current';
-            }
-        }
-
-        $o.= html_writer::start_tag('li', array('id' => 'section-'.$section->section,
+        $o.= html_writer::start_tag('li', array('id' => 'section-'.$section->id,
             'class' => 'section main clearfix'.$sectionstyle, 'role'=>'region',
-            'aria-label'=> get_section_name($course, $section)));
+            'aria-label'=> \mod_quiz\structure::get_quiz_section_heading($section)));
 
         $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
         $o.= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
@@ -177,16 +157,16 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
         $o.= html_writer::start_tag('div', array('class' => 'content'));
 
         // When not on a section page, we display the section titles except the general section if null
-        $hasnamenotsecpg = (!$onsectionpage && ($section->section != 0 || !is_null($section->name)));
+//         $hasnamenotsecpg = (!$onsectionpage && ($section->section != 0 || !is_null($section->heading)));
 
         // When on a section page, we only display the general section title, if title is not the default one
-        $hasnamesecpg = ($onsectionpage && ($section->section == 0 && !is_null($section->name)));
+//         $hasnamesecpg = ($onsectionpage && ($section->section == 0 && !is_null($section->name)));
 
         $classes = ' accesshide';
-        if ($hasnamenotsecpg || $hasnamesecpg) {
-            $classes = '';
-        }
-//         $o.= $this->output->heading($this->section_title($section, $course), 3, 'sectionname' . $classes);
+//         if ($hasnamenotsecpg || $hasnamesecpg) {
+//             $classes = '';
+//         }
+        $o.= $this->output->heading($this->section_heading($section, $course), 3, 'sectionname' . $classes);
 
         $o.= html_writer::start_tag('div', array('class' => 'summary'));
         $o.= $this->format_summary_text($section);
@@ -223,14 +203,11 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
      * @return string HTML to output.
      */
     protected function format_summary_text($section) {
-        $summarytext = file_rewrite_pluginfile_urls($section->questiontext, 'pluginfile.php',
-            $section->contextid, 'question', 'section', $section->id);
-        $summarytext = 'Summary not available';
 
         $options = new stdClass();
         $options->noclean = true;
         $options->overflowdiv = true;
-        return format_text($summarytext, $section->questiontextformat, $options);
+        return format_text($section->heading, FORMAT_MOODLE, $options);
     }
 
     /**
@@ -375,6 +352,7 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
      */
     public function edit_page($course, $quiz, $cm, $context) {
         global $PAGE;
+        global $Out;
 
         $modinfo = get_fast_modinfo($course);
         $course = course_get_format($course)->get_course();
@@ -385,103 +363,74 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
         echo $completioninfo->display_help_icon();
         echo $this->output->heading($this->page_title(), 2, 'accesshide');
 
+        $slots = \mod_quiz\structure::get_quiz_slots($quiz);
+        $sections = \mod_quiz\structure::get_quiz_sections($quiz);
+        $sectiontoslotids = $quiz->sectiontoslotids;
+
         // Get questions
         $questions = $this->get_questions($quiz);
         $quiz->fullquestions = $questions;
 
-        // Get quiz question order
-        $sections = explode(',', $quiz->questions);
-        $lastindex = count($sections) - 1;
-
-        // Copy activity clipboard..
-//         echo $this->course_activity_clipboard($course, 0);
-
-        // Now the list of sections..
-        echo $this->start_section_list();
-
-        foreach ($sections as $section => $qnum) {
-
-            if(!$qnum){
+        // Address missing question types.
+        foreach($slots as $slot) {
+            $questionid = $slot->questionid;
+            if(!$questionid){
                 continue;
             }
 
             // If the questiontype is missing change the question type.
-            if ($qnum && !array_key_exists($qnum, $questions)) {
+            if ($questionid && !array_key_exists($questionid, $questions)) {
                 $fakequestion = new stdClass();
-                $fakequestion->id = $qnum;
+                $fakequestion->id = $questionid;
                 $fakequestion->category = 0;
                 $fakequestion->qtype = 'missingtype';
                 $fakequestion->name = get_string('missingquestion', 'quiz');
                 $fakequestion->questiontext = ' ';
                 $fakequestion->questiontextformat = FORMAT_HTML;
                 $fakequestion->length = 1;
-                $questions[$qnum] = $fakequestion;
-                $quiz->grades[$qnum] = 0;
+                $questions[$questionid] = $fakequestion;
+                $quiz->grades[$questionid] = 0;
 
-            } else if ($qnum && !question_bank::qtype_exists($questions[$qnum]->qtype)) {
-                $questions[$qnum]->qtype = 'missingtype';
+            } else if ($questionid && !question_bank::qtype_exists($questions[$questionid]->qtype)) {
+                $questions[$questionid]->qtype = 'missingtype';
             }
-            $thissection = $questions[$qnum];
-            // For prototyping add required fields. Refactor to correct objects later
-            $thissection->section = $section;
-            $thissection->visible = 1;
-            $thissection->uservisible = 1;
-            $thissection->available = 1;
-            $thissection->indent = 1;
+        }
 
-            if ($section == 0) {
-                // 0-section is displayed a little different then the others
-                if ($thissection->questiontext or $PAGE->user_is_editing()) {
-                    echo $this->section_header($thissection, $course, false, 0);
-                    echo $this->quizrenderer->quiz_section_cm_list($quiz, $course, $thissection, 0);
-                    echo $this->quizrenderer->quiz_section_add_cm_control($course, 0, 0);
+        // Get quiz question order
+        $sections = \mod_quiz\structure::get_quiz_sections($quiz);
+
+        // Now the list of sections..
+        echo $this->start_section_list();
+
+//         foreach ($sections as $section => $qnum) {
+        $section = null;
+        foreach ($sections as $section) {
+            // For prototyping add required fields. Refactor to correct objects later
+            $section->visible = 1;
+            $section->uservisible = 1;
+            $section->available = 1;
+            $section->indent = 1;
+
+            if ($section->firstslot == 1) {
+                // 0-section is displayed a little differently than the others
+                if ($section->heading or $PAGE->user_is_editing()) {
+                    echo $this->section_header($section, $course, false, 0);
+                    echo $this->quizrenderer->quiz_section_question_list($quiz, $course, $section, 0);
+//                     echo $this->quizrenderer->quiz_section_add_question_control($quiz, $course, $section, 0, 0);
                     echo $this->section_footer();
                 }
                 continue;
             }
-            if ($section > $course->numsections) {
-                // activities inside this section are 'orphaned', this section will be printed as 'stealth' below
-                continue;
-            }
-            // Show the section if the user is permitted to access it, OR if it's not available
-            // but showavailability is turned on (and there is some available info text).
-            $showsection = $thissection->uservisible ||
-                    ($thissection->visible && !$thissection->available && $thissection->showavailability
-                    && !empty($thissection->availableinfo));
-            if (!$showsection) {
-                // Hidden section message is overridden by 'unavailable' control
-                // (showavailability option).
-                if (!$course->hiddensections && $thissection->available) {
-                    echo $this->section_hidden($section);
-                }
 
-                continue;
+            echo $this->section_header($section, $course, false, 0);
+            if ($section->uservisible) {
+                echo $this->quizrenderer->quiz_section_question_list($quiz, $course, $section, 0);
+//                 echo $this->quizrenderer->quiz_section_add_question_control($course, $section, 0);
             }
-
-            if (!$PAGE->user_is_editing() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-                // Display section summary only.
-                echo $this->section_summary($thissection, $course, null);
-            } else {
-                echo $this->section_header($thissection, $course, false, 0);
-                if ($thissection->uservisible) {
-                    echo $this->quizrenderer->quiz_section_cm_list($quiz, $course, $thissection, 0);
-                    echo $this->quizrenderer->quiz_section_add_cm_control($course, $section, 0);
-                }
-                echo $this->section_footer();
-            }
+            echo $this->section_footer();
         }
 
         if ($PAGE->user_is_editing() and has_capability('moodle/course:update', $context)) {
-            // Print stealth sections if present.
-            foreach ($modinfo->get_section_info_all() as $section => $thissection) {
-                if ($section <= $course->numsections or empty($modinfo->sections[$section])) {
-                    // this is not stealth section or it is empty
-                    continue;
-                }
-                echo $this->stealth_section_header($section);
-                echo $this->quizrenderer->quiz_section_cm_list($quiz, $course, $thissection, 0);
-                echo $this->stealth_section_footer();
-            }
 
             echo $this->end_section_list();
 
