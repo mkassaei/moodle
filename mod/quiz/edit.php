@@ -116,6 +116,11 @@ $scrollpos = optional_param('scrollpos', '', PARAM_INT);
 
 list($thispageurl, $contexts, $cmid, $cm, $quiz, $pagevars) =
         question_edit_setup('editq', '/mod/quiz/edit.php', true);
+$quiz->questions = quiz_clean_layout($quiz->questions);
+// \mod_quiz\structure::populate_structure($quiz);
+\mod_quiz\structure::update_quiz_structure_from_questions($quiz);
+\mod_quiz\structure::populate_structure($quiz);
+// \mod_quiz\structure::update_quiz_structure_from_questions($quiz);
 
 $defaultcategoryobj = question_make_default_categories($contexts->all());
 $defaultcategory = $defaultcategoryobj->id . ',' . $defaultcategoryobj->contextid;

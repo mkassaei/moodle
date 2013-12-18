@@ -1780,7 +1780,7 @@ function quiz_get_navigation_options() {
  * @param int $sr The section to link back to (used for creating the links)
  * @return The markup for the rename action, or an empty string if not available.
  */
-function quiz_get_cm_rename_action($question, $sr = null) {
+function quiz_get_question_rename_action($question, $sr = null) {
     global $PAGE, $COURSE, $OUTPUT;
 
     static $str;
@@ -1824,7 +1824,7 @@ function quiz_get_cm_rename_action($question, $sr = null) {
  * @param int $sr The section to link back to (used for creating the links)
  * @return The markup for the move action, or an empty string if not available.
  */
-function quiz_get_cm_move($question, $sr = null) {
+function quiz_get_question_move($question, $sr = null) {
     global $OUTPUT, $PAGE;
 
     static $str;
@@ -1864,7 +1864,7 @@ function quiz_get_cm_move($question, $sr = null) {
  * @param int $sr The section to link back to (used for creating the links)
  * @return array array of action_link or pix_icon objects
  */
-function quiz_get_cm_edit_actions($quiz, $question, $indent = -1, $sr = null) {
+function quiz_get_question_edit_actions($quiz, $question, $indent = -1, $sr = null) {
     global $COURSE, $SITE, $PAGE;
 
     static $str;
