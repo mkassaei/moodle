@@ -1190,14 +1190,14 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * @param array $displayoptions
      * @return string
      */
-    public function quiz_section_cm_name($quiz, $question, $displayoptions = array()) {
+    public function quiz_section_question_name($quiz, $question, $displayoptions = array()) {
         global $CFG;
         $output = '';
-        if (!$question->uservisible &&
-                (empty($question->showavailability) || empty($question->availableinfo))) {
-            // nothing to be displayed to the user
-            return $output;
-        }
+//         if (!$question->uservisible &&
+//                 (empty($question->showavailability) || empty($question->availableinfo))) {
+//             // nothing to be displayed to the user
+//             return $output;
+//         }
         $url = '';
         $url = mod_quiz_renderer::quiz_question_get_url($quiz, $question);
 
@@ -1232,7 +1232,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $accesstext = '';
         $textclasses = '';
 //         if ($question->uservisible) {
-//             $conditionalhidden = $this->is_cm_conditionally_hidden($question);
+//             $conditionalhidden = $this->is_question_conditionally_hidden($question);
 //             $accessiblebutdim = (!$question->visible || $conditionalhidden) &&
 //                 has_capability('moodle/course:viewhiddenactivities',
 //                         context_course::instance($question->course));
@@ -1270,15 +1270,16 @@ class mod_quiz_renderer extends plugin_renderer_base {
         // Display link itself.
         $activitylink = $icon . $accesstext .
                 html_writer::tag('span', $instancename . $altname, array('class' => 'instancename'));
-        if ($question->uservisible) {
+//         if ($question->uservisible) {
             $output .= html_writer::link($url, $activitylink, array('class' => $linkclasses, 'onclick' => $onclick)) .
                     $groupinglabel;
-        } else {
-            // We may be displaying this just in order to show information
-            // about visibility, without the actual link ($question->uservisible)
-            $output .= html_writer::tag('div', $activitylink, array('class' => $textclasses)) .
-                    $groupinglabel;
-        }
+//         }
+//         else {
+//             // We may be displaying this just in order to show information
+//             // about visibility, without the actual link ($question->uservisible)
+//             $output .= html_writer::tag('div', $activitylink, array('class' => $textclasses)) .
+//                     $groupinglabel;
+//         }
         return $output;
     }
 
@@ -1289,13 +1290,13 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * that module type wants to display (i.e. number of unread forum posts)
      *
      * This function calls:
-     * {@link mod_quiz_renderer::quiz_section_cm_name()}
+     * {@link mod_quiz_renderer::quiz_section_question_name()}
      * {@link cm_info::get_after_link()}
-     * {@link mod_quiz_renderer::question_section_cm_text()}
-     * {@link core_course_renderer::course_section_cm_availability()}
-     * {@link core_course_renderer::course_section_cm_completion()}
-     * {@link question_get_cm_edit_actions()}
-     * {@link mod_quiz_renderer::quiz_section_cm_edit_actions()}
+     * {@link mod_quiz_renderer::quiz_section_question_text()}
+     * {@link core_course_renderer::course_section_question_availability()}
+     * {@link core_course_renderer::course_section_question_completion()}
+     * {@link question_get_question_edit_actions()}
+     * {@link mod_quiz_renderer::quiz_section_question_edit_actions()}
      *
      * @param stdClass $course
      * @param completion_info $completioninfo
@@ -1304,7 +1305,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * @param array $displayoptions
      * @return string
      */
-    public function quiz_section_cm($quiz, $course, &$completioninfo, $question, $sectionreturn, $displayoptions = array()) {
+    public function quiz_section_question($quiz, $course, &$completioninfo, $question, $sectionreturn, $displayoptions = array()) {
         $output = '';
         // We return empty string (because quiz question will not be displayed at all)
         // if:
@@ -1317,10 +1318,10 @@ class mod_quiz_renderer extends plugin_renderer_base {
         // 2b) The 'availableinfo' is empty, i.e. the activity was
         //     hidden in a way that leaves no info, such as using the
         //     eye icon.
-        if (!$question->uservisible &&
-            (empty($question->showavailability) || empty($question->availableinfo))) {
-            return $output;
-        }
+//         if (!$question->uservisible &&
+//             (empty($question->showavailability) || empty($question->availableinfo))) {
+//             return $output;
+//         }
 
         $indentclasses = 'mod-indent';
         if (!empty($question->indent)) {
@@ -1333,7 +1334,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div');
 
         if ($this->page->user_is_editing()) {
-            $output .= quiz_get_cm_move($question, $sectionreturn);
+            $output .= quiz_get_question_move($question, $sectionreturn);
         }
 
         $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
@@ -1345,7 +1346,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div');
 
         // Display the link to the question (or do nothing if question has no url)
-        $cmname = $this->quiz_section_cm_name($quiz, $question, $displayoptions);
+        $cmname = $this->quiz_section_question_name($quiz, $question, $displayoptions);
 
         if (!empty($cmname)) {
             // Start the div for the activity title, excluding the edit icons.
@@ -1353,7 +1354,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
             $output .= $cmname;
 
             if ($this->page->user_is_editing()) {
-                $output .= ' ' . quiz_get_cm_rename_action($question, $sectionreturn);
+                $output .= ' ' . quiz_get_question_rename_action($question, $sectionreturn);
             }
 
             // Module can put text after the link (e.g. forum unread)
@@ -1369,7 +1370,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         // and for accessibility reasons, e.g. if you have a one-line label
         // it should work similarly (at least in terms of ordering) to an
         // activity.
-        $contentpart = $this->question_section_cm_text($quiz, $question, $displayoptions);
+        $contentpart = $this->quiz_section_question_text($quiz, $question, $displayoptions);
         $url = mod_quiz_renderer::quiz_question_get_url($quiz, $question);
         if (empty($url)) {
             $output .= $contentpart;
@@ -1377,12 +1378,12 @@ class mod_quiz_renderer extends plugin_renderer_base {
 
         $questionicons = '';
         if ($this->page->user_is_editing()) {
-            $editactions = quiz_get_cm_edit_actions($quiz, $question, $question->indent, $sectionreturn);
-            $questionicons .= ' '. $this->quiz_section_cm_edit_actions($editactions, $question, $displayoptions);
+            $editactions = quiz_get_question_edit_actions($quiz, $question, null, $sectionreturn);
+            $questionicons .= ' '. $this->quiz_section_question_edit_actions($editactions, $question, $displayoptions);
 //             $questionicons .= $question->get_after_edit_icons();
         }
 
-//         $questionicons .= $this->course_section_cm_completion($course, $completioninfo, $question, $displayoptions);
+//         $questionicons .= $this->course_section_question_completion($course, $completioninfo, $question, $displayoptions);
 
         if (!empty($questionicons)) {
             $output .= html_writer::span($questionicons, 'actions');
@@ -1395,7 +1396,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         }
 
         // show availability info (if module is not available)
-//         $output .= $this->course_section_cm_availability($question, $displayoptions);
+//         $output .= $this->course_section_question_availability($question, $displayoptions);
 
         $output .= html_writer::end_tag('div'); // $indentclasses
 
@@ -1410,7 +1411,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
     /**
      * Renders HTML for displaying the sequence of quiz question editing buttons
      *
-     * @see quiz_get_cm_edit_actions()
+     * @see quiz_get_question_edit_actions()
      *
      * @param action_link[] $actions Array of action_link objects
      * @param $question The question we are displaying actions for.
@@ -1423,7 +1424,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
      *     donotenhance => If set to true the action menu that gets displayed won't be enhanced by JS.
      * @return string
      */
-    public function quiz_section_cm_edit_actions($actions, $question = null, $displayoptions = array()) {
+    public function quiz_section_question_edit_actions($actions, $question = null, $displayoptions = array()) {
         global $CFG;
 
         if (empty($actions)) {
@@ -1501,30 +1502,32 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * @param array $displayoptions
      * @return string
      */
-    public function question_section_cm_text($quiz, $question, $displayoptions = array()) {
+    public function quiz_section_question_text($quiz, $question, $displayoptions = array()) {
         $output = '';
-        if (!$question->uservisible &&
-                (empty($question->showavailability) || empty($question->availableinfo))) {
-            // nothing to be displayed to the user
-            return $output;
-        }
+//         if (!$question->uservisible &&
+//                 (empty($question->showavailability) || empty($question->availableinfo))) {
+//             // nothing to be displayed to the user
+//             return $output;
+//         }
         $content = format_text($question->questiontext, FORMAT_HTML);
 //         $content = $question->get_formatted_content(array('overflowdiv' => true, 'noclean' => true));
         $accesstext = '';
         $textclasses = '';
-        if ($question->uservisible) {
-//             $conditionalhidden = $this->is_cm_conditionally_hidden($question);
-            $accessiblebutdim = (!$question->visible) &&
-                has_capability('moodle/course:viewhiddenactivities',
-                        context_course::instance($question->course));
-            if ($accessiblebutdim) {
-                $textclasses .= ' dimmed_text';
-                // Show accessibility note only if user can access the module himself.
-                $accesstext = get_accesshide(get_string('hiddenfromstudents').':'. $question->modfullname);
-            }
-        } else {
-            $textclasses .= ' dimmed_text';
-        }
+//         if ($question->uservisible) {
+// //             $conditionalhidden = $this->is_question_conditionally_hidden($question);
+//             $accessiblebutdim = (!$question->visible) &&
+//                 has_capability('moodle/course:viewhiddenactivities',
+//                         context_course::instance($question->course));
+//             if ($accessiblebutdim) {
+//                 $textclasses .= ' dimmed_text';
+//                 // Show accessibility note only if user can access the module himself.
+//                 $accesstext = get_accesshide(get_string('hiddenfromstudents').':'. $question->modfullname);
+//             }
+//         } else {
+//             $textclasses .= ' dimmed_text';
+//         }
+
+        $output .= $content;
         return $output;
     }
 
@@ -1542,7 +1545,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * Renders HTML to display one course module for display within a section.
      *
      * This function calls:
-     * {@link core_course_renderer::quiz_section_cm()}
+     * {@link core_course_renderer::quiz_section_question()}
      *
      * @param stdClass $course
      * @param completion_info $completioninfo
@@ -1551,9 +1554,9 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * @param array $displayoptions
      * @return String
      */
-    public function quiz_section_cm_list_item($quiz, $course, &$completioninfo, $question, $sectionreturn, $displayoptions = array()) {
+    public function quiz_section_question_list_item($quiz, $course, &$completioninfo, $question, $sectionreturn, $displayoptions = array()) {
         $output = '';
-        if ($questiontypehtml = $this->quiz_section_cm($quiz, $course, $completioninfo, $question, $sectionreturn, $displayoptions)) {
+        if ($questiontypehtml = $this->quiz_section_question($quiz, $course, $completioninfo, $question, $sectionreturn, $displayoptions)) {
             $questionclasses = 'activity ' . $question->qtype . ' qtype_' . $question->qtype;
             $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses, 'id' => 'module-' . $question->id));
         }
@@ -1564,7 +1567,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * Renders HTML to display a list of course modules in a course section
      * Also displays "move here" controls in Javascript-disabled mode
      *
-     * This function calls {@link core_course_renderer::quiz_section_cm()}
+     * This function calls {@link core_course_renderer::quiz_section_question()}
      *
      * @param stdClass $course course object
      * @param int|stdClass|section_info $section relative section number or section object
@@ -1572,7 +1575,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * @param int $displayoptions
      * @return void
      */
-    public function quiz_section_cm_list($quiz, $course, $section, $sectionreturn = null, $displayoptions = array()) {
+    public function quiz_section_question_list($quiz, $course, $section, $sectionreturn = null, $displayoptions = array()) {
         global $USER;
 
         $output = '';
@@ -1595,14 +1598,18 @@ class mod_quiz_renderer extends plugin_renderer_base {
         // Get the list of question types visible to user (excluding the question type being moved if there is one)
         $questionshtml = array();
         $sections = explode(',', $quiz->questions);
-        if (!empty($sections[$section->section])) {
+        $slots = \mod_quiz\structure::get_quiz_slots($quiz);
+        $sectiontoslotids = $quiz->sectiontoslotids;
+        if (!empty($sectiontoslotids[$section->id])) {
             /*
              * During prototyping questions and sections are treated as the same thing.
              * When the underlying data structure and related classes support sections
              * these can be properly implemented here.
              */
 //             foreach ($sections[$section->section] as $questionnumber => $questionid) {
-                $questionnumber = $section->id;
+            foreach ($sectiontoslotids[$section->id] as $slotid) {
+                $slot =  $slots[$slotid];
+                $questionnumber = $slot->questionid;
                 $question = $quiz->fullquestions[$questionnumber];
 
                 if ($ismoving and $question->id == $USER->activitycopy) {
@@ -1610,11 +1617,11 @@ class mod_quiz_renderer extends plugin_renderer_base {
                     continue;
                 }
 
-                if ($questiontypehtml = $this->quiz_section_cm_list_item($quiz, $course,
+                if ($questiontypehtml = $this->quiz_section_question_list_item($quiz, $course,
                         $completioninfo, $question, $sectionreturn, $displayoptions)) {
                     $questionshtml[$questionnumber] = $questiontypehtml;
                 }
-//             }
+            }
         }
 
         $sectionoutput = '';
@@ -1655,13 +1662,14 @@ class mod_quiz_renderer extends plugin_renderer_base {
      *     option 'inblock' => true, suggesting to display controls vertically
      * @return string
      */
-    function quiz_section_add_cm_control($course, $section, $sectionreturn = null, $displayoptions = array()) {
-        global $CFG;
+    function quiz_section_add_question_control($quiz, $course, $section, $sectionreturn = null, $displayoptions = array()) {
+        global $CFG, $PAGE;
 
         $vertical = !empty($displayoptions['inblock']);
 
+        $hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context);
         // check to see if user can add menus and there are modules to add
-        if (!has_capability('moodle/course:manageactivities', context_course::instance($course->id))
+        if (!has_capability('mod/quiz:manage', $PAGE->cm->context)
                 || !$this->page->user_is_editing()
                 || !($questionnames = get_module_types_names()) || empty($questionnames)) {
             return '';
@@ -1716,7 +1724,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $strresourcelabel = get_string('addresourcetosection', null, $sectionname);
         $stractivitylabel = get_string('addactivitytosection', null, $sectionname);
 
-        $output = html_writer::start_tag('div', array('class' => 'section_add_menus', 'id' => 'add_menus-section-' . $section));
+        $output = html_writer::start_tag('div', array('class' => 'section_add_menus', 'id' => 'add_menus-section-' . $section->id));
 
         if (!$vertical) {
             $output .= html_writer::start_tag('div', array('class' => 'horizontal'));
