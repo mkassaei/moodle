@@ -102,6 +102,9 @@ add_to_log($attemptobj->get_courseid(), 'quiz', 'continue attempt',
 // Get the list of questions needed by this page.
 $slots = $attemptobj->get_slots($page);
 
+// Check whether the question in this slot requires previous question to be answered before.
+$attemptobj->require_previous_question($page);
+
 // Check.
 if (empty($slots)) {
     throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'noquestionsfound');

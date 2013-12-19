@@ -403,7 +403,7 @@ class question_usage_by_activity {
      * @param question_display_options $options controls how the question is rendered.
      * @param string|null $number The question number to display. 'i' is a special
      *      value that gets displayed as Information. Null means no number is displayed.
-     * @return string HTML fragment representing the question.
+     * @return string HTML fragment ng the question.
      */
     public function render_question_at_step($slot, $seq, $options, $number = null) {
         $options->context = $this->context;
@@ -813,6 +813,39 @@ class question_usage_by_activity {
     }
 
     /**
+     * Replace a question with a dummy description question in this usage.
+     * @param int $slot the number used to identify this question within this usage.*
+     */
+    public function replace_question_with_a_description_qtye($previousslot, $slot) {
+        global $OUTPUT;
+        // Create a description qtye for the message.
+        question_bank::load_question_definition_classes('description');
+        $q = new qtype_description_question();
+        $q->id = $slot->questionid;
+        $q->name = 'Description';
+        $q->questiontext = 'You have to complete question ' . $previousslot->slot . ' first, then you would be able to see the content of this question.';
+        $q->generalfeedback = '';
+        $q->qtype = question_bank::get_qtype('description');
+        $q->options = new question_display_options();
+        $q->options->flags = 0;
+
+        $oldqa = $this->get_question_attempt($slot->slot);
+        $newqa = new question_attempt($q, $oldqa->get_usage_id(), $this->observer, $slot->maxmark);
+        //$newqa->get_question()->options->flags = 0;
+
+        print_object($q->options);
+
+        print_object($this->get_summary_information($q->options));
+        $newqa->set_database_id($oldqa->get_database_id());
+        $newqa->set_slot($slot->slot);
+        $this->questionattempts[$slot->slot] = $newqa;
+        //$this->observer->notify_attempt_deleted($oldqa);
+        //$this->observer->notify_attempt_added($newqa);
+        $this->start_question($slot->slot);
+        $this->render_question($slot->slot, $q->options);
+    }
+
+    /**
      * Regrade all the questions in this usage (without changing their max mark).
      * @param bool $finished whether each question should be forced to be finished
      *      after the regrade, or whether it may still be in progress (default false).
@@ -1006,6 +1039,8 @@ class question_usage_null_observer implements question_usage_observer {
     public function notify_modified() {
     }
     public function notify_attempt_modified(question_attempt $qa) {
+    }
+    public function notify_attempt_deleted(question_attempt $qa) {
     }
     public function notify_attempt_added(question_attempt $qa) {
     }

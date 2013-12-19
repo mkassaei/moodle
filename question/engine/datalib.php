@@ -1134,9 +1134,23 @@ class question_engine_unit_of_work implements question_usage_observer {
         }
     }
 
-    public function notify_attempt_added(question_attempt $qa) {
-        $this->attemptsadded[$qa->get_slot()] = $qa;
+    public function notify_attempt_deleted(question_attempt $qa) {
+        $slot = $qa->get_slot();
+        if (!array_key_exists($slot, $this->attemptsadded)) {
+            $this->attemptsdeleted[$slot] = $qa;
+        }
     }
+
+     public function notify_attempt_added(question_attempt $qa) {
+        $slot = $qa->get_slot();
+        if (!array_key_exists($slot, $this->attemptsadded)) {
+            $this->attemptsadded[$slot] = $qa;
+        }
+     }
+
+//     public function notify_attempt_added(question_attempt $qa) {
+//         $this->attemptsadded[$qa->get_slot()] = $qa;
+//     }
 
     public function notify_step_added(question_attempt_step $step, question_attempt $qa, $seq) {
         if (array_key_exists($qa->get_slot(), $this->attemptsadded)) {

@@ -1146,6 +1146,100 @@ class quiz_attempt {
         return new moodle_url('/mod/quiz/processattempt.php');
     }
 
+    public function get_slot_object($thisslot) {
+//         if ($thisslot < 1) {
+//             return null;
+//         }
+        $slots = $this->get_all_slots();
+        if (!$slots) {
+            return null;
+        }
+        foreach ($slots as $slot) {
+            if ($slot->slot == $thisslot) {
+                return $slot;
+            }
+        }
+        return null;
+    }
+
+    public function get_slots_on_page($page) {
+        $slots = $this->get_all_slots();
+        return $slots[$page];
+    }
+
+    public function get_all_slots() {
+        global $DB;
+        // This function assumes the new db structure.
+        // When the new db is in place, this will be a db query.
+        //$slots = $DB->get_records('mod_quiz_slots', array('quizid' => $this->get_quizid());
+
+        // However, temporarily, we use the follwoing untill the new DB structure is in place.
+        // mod_quiz_slots table looks like:
+        ///id SEQUENCE
+        // quizid INT(10) FK
+        // sectionid INT(10) FK All qustions in a section must have consecutive slot numbers.
+        // slot INT(10) Similar to question_attempt.slot
+        // page INT(10) All slots on a page must have consecutive numbers. Page numbers must be increasing.
+        // questionid INT(10) FK NULL
+        // questioncategoryid INT(10) FK NULL Either questionid is not NULL, or questioncategoryid/includesubcategories are not NULL.
+        // includesubcategories BOOL NULL
+        // maxmark NUMBER(12.7)
+        // requireprevious BOOL
+        $oldslots = $this->get_slots();
+        $slots = array();
+        $sequesnce = 1;
+        Foreach ($oldslots as $key => $oldslot) {
+            $slot = new stdClass();
+            $slot->id = $sequesnce;
+            $slot->quizid = $this->get_quizid();
+            $slot->sectionid = 1;
+            $slot->slot = $oldslot;
+            $slot->page = $key;
+            $slot->questionid = $this->get_questionid($oldslot);
+            $slot->questioncategoryid = $this->get_question_categoryid($slot->questionid);
+            $slot->includesubcategories = true;
+            $slot->maxmark = $this->get_question_mark($oldslot);
+            $slot->requireprevious = false;
+            if ($slot->slot == 5) { // TODO: This would not be hardcoded
+                $slot->requireprevious = true;
+            }
+            $slots[] = $slot;
+            $sequesnce++;
+        }
+        return $slots;
+    }
+
+    /**
+     * Process replace question action
+     * @param int $slot
+     * @param int $timestamp
+     */
+    public function process_replace_question_with_a_description_qtye($previousslot, $slot, $timestamp) {
+        global $DB;
+        $this->quba->replace_question_with_a_description_qtye($previousslot, $slot);
+    }
+
+    protected function get_questionid($slot) {
+        $qa = $this->get_question_attempt($slot);
+        return $qa->get_question()->id;
+    }
+
+    protected function get_question_categoryid($questionid) {
+        global $DB;
+        return $DB->get_field('question', 'category', array('id' => $questionid));
+    }
+
+    public function require_previous_question($page) {
+        $slotsonthispage = $this->get_slots_on_page($page);
+        $currentslotnumber = 5;
+        $previousslot = $this->get_slot_object($currentslotnumber -1);
+        $slot = $this->get_slot_object($currentslotnumber);
+
+        if ($slot->requireprevious && $previousslot && ($this->get_question_status($previousslot->slot, false) != 'Complete')) {
+            $this->quba->replace_question_with_a_description_qtye($previousslot, $slot, time());
+        }
+    }
+
     /**
      * @param int $slot indicates which question to link to.
      * @param int $page if specified, the URL of this particular page of the attempt, otherwise
