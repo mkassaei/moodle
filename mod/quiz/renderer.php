@@ -317,7 +317,8 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $bcc = $panel->get_button_container_class();
         $output .= html_writer::start_tag('div', array('class' => "qn_buttons $bcc"));
         foreach ($panel->get_question_buttons() as $button) {
-            $output .= $panel->get_section_headings((int)substr($button->id, strlen('quiznavbutton')));
+            $slot = (int)substr($button->id, strlen('quiznavbutton'));
+            $output .= $panel->get_section_headings($slot);
             $output .= $this->render($button);
         }
         $output .= html_writer::end_tag('div');

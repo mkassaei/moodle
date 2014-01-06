@@ -816,14 +816,18 @@ class question_usage_by_activity {
      * Replace a question with a dummy description question in this usage.
      * @param int $slot the number used to identify this question within this usage.*
      */
-    public function replace_question_with_a_description_qtye($previousslot, $slot) {
+    public function replace_question_with_a_description_qtye($attemptid, $page, $slot) {
         global $OUTPUT;
+        print_object($attemptid);
         // Create a description qtye for the message.
         question_bank::load_question_definition_classes('description');
         $q = new qtype_description_question();
         $q->id = $slot->questionid;
         $q->name = 'Description';
-        $q->questiontext = 'You have to complete question ' . $previousslot->slot . ' first, then you would be able to see the content of this question.';
+        $url= new moodle_url('/mod/quiz/attempt.php', array('attempt' => $attemptid, 'page' => $page -1));
+        $link = html_writer::link($url, 'previous question');
+        $q->questiontext = "You have to complete $link first, then you would be able to see the content of this question.";
+
         $q->generalfeedback = '';
         $q->qtype = question_bank::get_qtype('description');
         $q->options = new question_display_options();
@@ -831,16 +835,9 @@ class question_usage_by_activity {
 
         $oldqa = $this->get_question_attempt($slot->slot);
         $newqa = new question_attempt($q, $oldqa->get_usage_id(), $this->observer, $slot->maxmark);
-        //$newqa->get_question()->options->flags = 0;
-
-        print_object($q->options);
-
-        print_object($this->get_summary_information($q->options));
         $newqa->set_database_id($oldqa->get_database_id());
         $newqa->set_slot($slot->slot);
         $this->questionattempts[$slot->slot] = $newqa;
-        //$this->observer->notify_attempt_deleted($oldqa);
-        //$this->observer->notify_attempt_added($newqa);
         $this->start_question($slot->slot);
         $this->render_question($slot->slot, $q->options);
     }
