@@ -818,7 +818,7 @@ class question_usage_by_activity {
      */
     public function replace_question_with_a_description_qtye($attemptid, $page, $slot) {
         global $OUTPUT;
-        print_object($attemptid);
+
         // Create a description qtye for the message.
         question_bank::load_question_definition_classes('description');
         $q = new qtype_description_question();
