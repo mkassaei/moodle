@@ -208,8 +208,8 @@ M.mod_quiz.nav.init = function(Y) {
         }, 'a.endtestlink');
     }
 
-    if (M.core_question_flags) {
-        M.core_question_flags.add_listener(M.mod_quiz.nav.update_flag_state);
+    if (M.question.flags) {
+        M.question.flags.add_listener(M.mod_quiz.nav.update_flag_state);
     }
 };
 

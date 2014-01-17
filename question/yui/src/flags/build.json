@@ -1,0 +1,10 @@
+{
+  "name": "moodle-question-flags",
+  "builds": {
+    "moodle-question-flags": {
+      "jsfiles": [
+        "flags.js"
+      ]
+    }
+  }
+}

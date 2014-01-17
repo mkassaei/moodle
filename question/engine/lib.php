@@ -690,11 +690,6 @@ abstract class question_flags {
         if ($done) {
             return;
         }
-        $module = array(
-            'name' => 'core_question_flags',
-            'fullpath' => '/question/flags.js',
-            'requires' => array('base', 'dom', 'event-delegate', 'io-base'),
-        );
         $actionurl = $CFG->wwwroot . '/question/toggleflag.php';
         $flagtext = array(
             0 => get_string('clickflag', 'question'),
@@ -714,9 +709,10 @@ abstract class question_flags {
                // 'text' => get_string('clickunflag', 'question'),
             ),
         );
-        $PAGE->requires->js_init_call('M.core_question_flags.init',
-                array($actionurl, $flagattributes, $flagtext), false, $module);
-        $done = true;
+
+        $PAGE->requires->yui_module("moodle-question-flags", "M.question.flags.init",
+                array($actionurl, $flagattributes, $flagtext));
+         $done = true;
     }
 }
 

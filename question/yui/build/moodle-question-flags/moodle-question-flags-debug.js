@@ -1,3 +1,5 @@
+YUI.add('moodle-question-flags', function (Y, NAME) {
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,18 +27,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-M.core_question_flags = {
-    flagattributes: null,
+M.question = M.question || {};
+
+M.question.flags = {
+    flagattributes: [],
     actionurl: null,
-    flagtext: null,
+    flagtext: [],
     listeners: [],
 
-    init: function(Y, actionurl, flagattributes, flagtext) {
-        M.core_question_flags.flagattributes = flagattributes;
-        M.core_question_flags.actionurl = actionurl;
-        M.core_question_flags.flagtext = flagtext;
+    init: function(actionurl, flagattributes, flagtext) {
+        M.question.flags.flagattributes = flagattributes;
+        M.question.flags.actionurl = actionurl;
+        M.question.flags.flagtext = flagtext;
 
-        Y.all('div.questionflag').each(function(flagdiv, i) {
+        Y.all("div.questionflag").each(function(flagdiv) {
             var checkbox = flagdiv.one('input[type=checkbox]');
             if (!checkbox) {
                 return;
@@ -50,7 +54,7 @@ M.core_question_flags = {
             // Create an image input to replace the img tag.
             var image = Y.Node.create('<input type="image" class="questionflagimage" />');
             var flagtext = Y.Node.create('<span class="questionflagtext">.</span>');
-            M.core_question_flags.update_flag(input, image, flagtext);
+            M.question.flags.update_flag(input, image, flagtext);
 
             checkbox.remove();
             flagdiv.one('label').remove();
@@ -58,36 +62,34 @@ M.core_question_flags = {
             flagdiv.append(image);
             flagdiv.append(flagtext);
         });
-
         Y.delegate('click', function(e) {
             var input = this.one('input.questionflagvalue');
             input.set('value', 1 - input.get('value'));
-            M.core_question_flags.update_flag(input, this.one('input.questionflagimage'),
+            M.question.flags.update_flag(input, this.one('input.questionflagimage'),
                     this.one('span.questionflagtext'));
             var postdata = this.one('input.questionflagpostdata').get('value') +
                     input.get('value');
-
             e.halt();
-            Y.io(M.core_question_flags.actionurl , {method: 'POST', 'data': postdata});
-            M.core_question_flags.fire_listeners(postdata);
+            Y.io(M.question.flags.actionurl , {method: 'POST', 'data': postdata});
+            M.question.flags.fire_listeners(postdata);
         }, document.body, 'div.questionflag');
     },
 
     update_flag: function(input, image, flagtext) {
         var value = input.get('value');
-        image.setAttrs(M.core_question_flags.flagattributes[value]);
-        flagtext.replaceChild(flagtext.create(M.core_question_flags.flagtext[value]),
+        image.setAttrs(M.question.flags.flagattributes[value]);
+        flagtext.replaceChild(flagtext.create(M.question.flags.flagtext[value]),
                 flagtext.get('firstChild'));
-        flagtext.set('title', M.core_question_flags.flagattributes[value].title);
+        flagtext.set('title', M.question.flags.flagattributes[value].title);
     },
 
     add_listener: function(listener) {
-        M.core_question_flags.listeners.push(listener);
+        M.question.flags.listeners.push(listener);
     },
 
     fire_listeners: function(postdata) {
-        for (var i = 0; i < M.core_question_flags.listeners.length; i++) {
-            M.core_question_flags.listeners[i](
+        for (var i = 0; i < M.question.flags.listeners.length; i++) {
+            M.question.flags.listeners[i](
                 postdata.match(/\bqubaid=(\d+)\b/)[1],
                 postdata.match(/\bslot=(\d+)\b/)[1],
                 postdata.match(/\bnewstate=(\d+)\b/)[1]
@@ -95,3 +97,6 @@ M.core_question_flags = {
         }
     }
 };
+
+
+}, '@VERSION@', {"requires": ["base", "dom", "event-delegate", "io-form"]});

@@ -1,0 +1,10 @@
+{
+  "moodle-question-flags": {
+    "requires": [
+            "base",
+            "dom",
+            "event-delegate",
+            "io-form"
+    ]
+  }
+}
