@@ -330,11 +330,11 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
 
         list($usql, $params) = $DB->get_in_or_equal(explode(',', $quiz->questions));
         $params[] = $quiz->id;
-        $questions = $DB->get_records_sql("SELECT q.*, qc.contextid, qqi.grade as maxmark
+        $questions = $DB->get_records_sql("SELECT q.*, qc.contextid, qqi.maxmark
                               FROM {question} q
                               JOIN {question_categories} qc ON qc.id = q.category
-                              JOIN {quiz_question_instances} qqi ON qqi.question = q.id
-                             WHERE q.id $usql AND qqi.quiz = ?", $params);
+                              JOIN {quiz_question_instances} qqi ON qqi.questionid = q.id
+                             WHERE q.id $usql AND qqi.quizid = ?", $params);
 
         return $questions;
     }
@@ -365,7 +365,7 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
 
         $slots = \mod_quiz\structure::get_quiz_slots($quiz);
         $sections = \mod_quiz\structure::get_quiz_sections($quiz);
-        $sectiontoslotids = $quiz->sectiontoslotids;
+        //$sectiontoslotids = $quiz->sectiontoslotids;
 
         // Get questions
         $questions = $this->get_questions($quiz);
