@@ -1531,7 +1531,9 @@ class mod_quiz_renderer extends plugin_renderer_base {
             $questionclasses = 'activity ' . $question->qtype . ' qtype_' . $question->qtype;
             $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses, 'id' => 'module-' . $question->id));
         }
-        return $output;
+        $editactions = quiz_get_edit_menu_actions($quiz, $question);
+        $icon = html_writer::tag('div', $this->quiz_add_menu_actions($quiz, $question));
+        return $output . $icon;
     }
 
     /**
