@@ -135,6 +135,9 @@ if (!$course) {
     print_error('invalidcourseid', 'error');
 }
 
+// TODO: Following code related to questionbank needs to be removed from this file
+// since it has been moved to /question/questionbank.php and js related functionality
+// will be done in /question/yui/src/questionbank/js/questionbank.js
 $questionbank = new quiz_question_bank_view($contexts, $thispageurl, $course, $cm, $quiz);
 $questionbank->set_quiz_has_attempts($quizhasattempts);
 
