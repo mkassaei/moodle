@@ -1227,6 +1227,40 @@ function quiz_question_preview_button($quiz, $question, $label = false) {
 }
 
 /**
+ * @param object $quiz The quiz object of the quiz in question
+ * @param object $question the question
+ * @return the HTML for a marked out of question grade field.
+ */
+function quiz_question_marked_out_of_field($quiz, $question) {
+
+    global $OUTPUT;
+    $strsave = get_string('save', 'quiz');
+    $strmaxmark = get_string('markedoutof', 'question');
+    $questionurl = mod_quiz_renderer::quiz_question_get_url($quiz, $question);
+
+    $html = '';
+    $html.='<form method="post" action="edit.php" class="quizsavegradesform"><div>';
+    $html.='<label for=""inputq' . $question->id . '">' . $strmaxmark . '</label>:';
+    $html.='<input type="hidden" name="sesskey" value="' . sesskey() . '" />';
+    $html.=html_writer::input_hidden_params($questionurl);
+    $html.='<input type="text" name="g' . $question->id .
+                            '" id="inputq' . $question->id .
+                            '" size="' . ($quiz->decimalpoints + 2) .
+                            '" value="' . (0 + $quiz->grades[$question->id]) .
+                            '" />';
+    $html.='<input type="hidden" name="savechanges" value="save" />';
+    $html.='<input type="submit" value="' . $strsave . '" class="pointssubmitbutton" />';
+    if ($question->qtype == 'random') {
+        $html.='<a href="' . $questionurl->out() .
+                '" class="configurerandomquestion">' .
+                get_string("configurerandomquestion", "quiz") . '</a>';
+    }
+    $html.='</div></form>';
+    return $html;
+}
+
+
+/**
  * @param object $attempt the attempt.
  * @param object $context the quiz context.
  * @return int whether flags should be shown/editable to the current user for this attempt.

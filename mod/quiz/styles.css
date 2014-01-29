@@ -1341,5 +1341,7 @@ bank window's title is prominent enough*/
 .path-mod-quiz ul.slots li.section .right {float:right;}
 .path-mod-quiz ul.slots li.section .left,
 .path-mod-quiz ul.slots li.section .right {width:40px;text-align:center;padding: 6px 0;}
-.path-mod-quiz ul.slots li.section .right img.icon { padding: 0 0 4px 0;}
-.path-mod-quiz ul.slots li.section .left .section-handle img.icon { padding:0; vertical-align: baseline; }
+.path-mod-quiz ul.slots li.section .right img.icon {padding: 0 0 4px 0;}
+.path-mod-quiz ul.slots li.section .left .section-handle img.icon {padding:0; vertical-align: baseline;}
+
+#page-mod-quiz-edit ul.slots li.activity div.activityinstance .questiontext {font-weight: bold; margin-left: 5px;}
