@@ -2020,7 +2020,7 @@ function quiz_get_edit_menu_actions($quiz, $question) {
     $returnurl = '';///mod/quiz/edit.php';
     $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid, 'qbanktool' => 1);
     $actions['questionbankcontents'] = new action_menu_link_secondary(
-        new moodle_url('/mod/quiz//edit.php.php', $params),
+        new moodle_url('/question/questionbank.php', $params),
         new pix_icon('t/edit', $str->questionbankcontents, 'moodle', array('class' => 'iconsmall', 'title' => '')),
         $str->questionbankcontents, array('class' => 'editing_questionbankcontents', 'data-action' => 'questionbankcontents')
     );
