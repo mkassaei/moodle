@@ -1209,7 +1209,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         }
 
         //Accessibility: for files get description via icon, this is very ugly hack!
-        $instancename = format_string($question->name);
+        $instancename = quiz_question_tostring($question);
         $altname = $question->name;
         // Avoid unnecessary duplication: if e.g. a forum name already
         // includes the word forum (or Forum, etc) then it is unhelpful
@@ -1362,6 +1362,8 @@ class mod_quiz_renderer extends plugin_renderer_base {
 
             $output .= quiz_question_preview_button($quiz, $question);
 
+            $output .= quiz_question_marked_out_of_field($quiz, $question);
+
             // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
             $output .= html_writer::end_tag('div'); // .activityinstance
         }
@@ -1386,6 +1388,31 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         return $output;
+    }
+
+    public function quiz_add_menu_actions($quiz, $question) {
+        global $CFG;
+
+        $actions = quiz_get_edit_menu_actions($quiz, $question);
+        if (empty($actions)) {
+            return '';
+        }
+        $menu = new action_menu();
+        $menu->set_alignment(action_menu::BL, action_menu::BL);
+        $menu->set_menu_trigger(html_writer::tag('span', 'add', array('class' => 'add-menu')));// TODO: To be replace by an icon
+
+        foreach ($actions as $action) {
+            if ($action instanceof action_menu_link) {
+                $action->add_class('add-menu');
+            }
+            $menu->add($action);
+        }
+        $menu->attributes['class'] .= ' section-cm-edit-actions commands';
+
+        // Prioritise the menu ahead of all other actions.
+        $menu->prioritise = true;
+
+        return $this->render($menu);
     }
 
     /**
