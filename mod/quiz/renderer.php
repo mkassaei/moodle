@@ -1605,8 +1605,11 @@ class mod_quiz_renderer extends plugin_renderer_base {
                     $sectionoutput .= html_writer::tag('li', html_writer::link($movingurl, $this->output->render($movingpix)),
                             array('class' => 'movehere', 'title' => $strmovefull));
                 }
-
+                // Get some useful question info.
+                list($sectionid, $page, $slotnumber, $maxmark) = $this->get_question_info($quiz, $questionnumber);
+                $sectionoutput .= get_string('page') . ' '. ($page + 1);
                 $sectionoutput .= $questiontypehtml;
+                $sectionoutput = html_writer::tag('div', $sectionoutput,  array('class' => 'pagelayout'));
             }
 
             if ($ismoving) {
@@ -1914,6 +1917,27 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $module->help = '';
         return $this->course_modchooser_module($module, array('moduletypetitle'));
     }
+
+    /**
+     *
+     * @param object $quiz
+     * @param int $questionid
+     * @return array, a list (sectionid, page-number, slot-number, maxmark)
+     */
+    protected function get_question_info($quiz, $questionid) {
+        if (!$quiz->slots) {
+            // Possible, printout a notification or an error, but that should not happen.
+            return array();
+        }
+        foreach ($quiz->slots as $slotid => $slot) {
+            if ((int)$slot->questionid === (int)$questionid) {
+                return array($slot->sectionid, $slot->page, $slot->id, $slot->maxmark);
+            }
+        }
+        return array();
+    }
+    
+    
 }
 
 class mod_quiz_links_to_other_attempts implements renderable {
