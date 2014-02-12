@@ -1988,9 +1988,10 @@ function quiz_get_edit_menu_actions($quiz, $question) {
     $actions = array();
 
     // Add a section heading.
-    $params = array('cmid' => $quiz->cmid);
+    $returnurl = '/mod/quiz/edit.php';
+    $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid, 'quizid' => $quiz->id, 'courseid' => $quiz->course);
     $actions['addasectionheading'] = new action_menu_link_secondary(
-        new moodle_url($baseurl, $params),
+        new moodle_url('/mod/quiz/section.php', $params),
         new pix_icon('t/add', $str->addasectionheading, 'moodle', array('class' => 'iconsmall', 'title' => '')),
         $str->addasectionheading, array('class' => 'editing_addasectionheading', 'data-action' => 'addasectionheading')
     );
