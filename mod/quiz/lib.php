@@ -1964,11 +1964,18 @@ function quiz_get_question_edit_actions($quiz, $question, $indent = -1, $sr = nu
  *
  */
 function quiz_get_edit_menu_actions($quiz, $question) {
-    global $PAGE;
+    global $DB, $PAGE;
 
     // No permission to edit anything.
     if (!has_capability('mod/quiz:manage', $PAGE->cm->context)) {
             return array();
+    }
+
+    if (!$quiz->fullquestions) {
+        $context = context_module::instance($quiz->cmid);
+        $questioncategoryid = $DB->get_field('question_categories', 'id', array('contextid' => $context->id));
+    } else {
+        $questioncategoryid = $question->category;
     }
 
     static $str;
@@ -1982,6 +1989,8 @@ function quiz_get_edit_menu_actions($quiz, $question) {
 
     $baseurl = '/mod/quiz/edit.php';
 
+    // Get section, page, slotnumber and maxmark.
+    //list($sectionid, $page, $slotnumber, $maxmark) = get_question_info($quiz, $question->id);
     $actions = array();
 
     // Add a section heading.
@@ -1995,7 +2004,7 @@ function quiz_get_edit_menu_actions($quiz, $question) {
     // Add a new question to the quiz.
     $returnurl = '/mod/quiz/edit.php';
     $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid, 'courseid' => $quiz->course,
-                    'category' => $question->category, 'appendqnumstring' => 'addquestion');
+                    'category' => $questioncategoryid, 'appendqnumstring' => 'addquestion');
     $actions['addaquestion'] = new action_menu_link_secondary(
         new moodle_url('/question/question.php', $params),
         new pix_icon('t/add', $str->addaquestion, 'moodle', array('class' => 'iconsmall', 'title' => '')),

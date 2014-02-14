@@ -396,6 +396,11 @@ class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
             }
         }
 
+        // Display the add icon menu.
+        if (!$quiz->fullquestions) {
+            echo html_writer::tag('span', $this->quiz_add_menu_actions($quiz, ''));
+        }
+
         // Get quiz question order
         $sections = \mod_quiz\structure::get_quiz_sections($quiz);
 

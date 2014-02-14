@@ -23,6 +23,8 @@
  */
 
 
+use calendartype_gregorian\structure;
+
 defined('MOODLE_INTERNAL') || die();
 
 
@@ -1339,6 +1341,16 @@ class mod_quiz_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
 
+        // Print slot number.
+        // TODO: We have to write a function to deal with description questions.
+        // Currently there is a functionality that translates the slotnumber of a
+        // description question to 'i' for information. That could be confusing when
+        // you have lots of description questions, in particular if you have consecative
+        // description question types. We can either have the slot number prefixes the 'i'
+        // or use 'i' followed by a number (when morethan one) which can be incremented.
+        $slotnumber = $this->get_question_info($quiz, $question->id, 'slot');
+        $output .= html_writer::tag('span', $slotnumber, array('class' => 'slotnumber'));
+
         // This div is used to indent the content.
         $output .= html_writer::div('', $indentclasses);
 
@@ -1528,12 +1540,12 @@ class mod_quiz_renderer extends plugin_renderer_base {
     public function quiz_section_question_list_item($quiz, $course, &$completioninfo, $question, $sectionreturn, $displayoptions = array()) {
         $output = '';
         if ($questiontypehtml = $this->quiz_section_question($quiz, $course, $completioninfo, $question, $sectionreturn, $displayoptions)) {
-            $questionclasses = 'activity ' . $question->qtype . ' qtype_' . $question->qtype;
+            $questionclasses = 'activity ' . $question->qtype . 'qtype_' . $question->qtype;
             $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses, 'id' => 'module-' . $question->id));
         }
-        $editactions = quiz_get_edit_menu_actions($quiz, $question);
-        $icon = html_writer::tag('div', $this->quiz_add_menu_actions($quiz, $question));
-        return $output . $icon;
+        $page = get_string('page') . ' ' . $this->get_question_info($quiz, $question->id, 'page');
+        $icon = html_writer::tag('span', $this->quiz_add_menu_actions($quiz, $question));
+        return $page . $output . $icon;
     }
 
     /**
@@ -1605,9 +1617,6 @@ class mod_quiz_renderer extends plugin_renderer_base {
                     $sectionoutput .= html_writer::tag('li', html_writer::link($movingurl, $this->output->render($movingpix)),
                             array('class' => 'movehere', 'title' => $strmovefull));
                 }
-                // Get some useful question info.
-                list($sectionid, $page, $slotnumber, $maxmark) = $this->get_question_info($quiz, $questionnumber);
-                $sectionoutput .= get_string('page') . ' '. ($page + 1);
                 $sectionoutput .= $questiontypehtml;
                 $sectionoutput = html_writer::tag('div', $sectionoutput,  array('class' => 'pagelayout'));
             }
@@ -1924,20 +1933,60 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * @param int $questionid
      * @return array, a list (sectionid, page-number, slot-number, maxmark)
      */
-    protected function get_question_info($quiz, $questionid) {
-        if (!$quiz->slots) {
+    protected function get_section($quiz, $sectionid) {
+        if (!$sectionid) {
             // Possible, printout a notification or an error, but that should not happen.
-            return array();
+            return null;
         }
-        foreach ($quiz->slots as $slotid => $slot) {
-            if ((int)$slot->questionid === (int)$questionid) {
-                return array($slot->sectionid, $slot->page, $slot->id, $slot->maxmark);
+        $sections = \mod_quiz\structure::get_quiz_sections($quiz);
+        if (!$sections) {
+            return null;
+        }
+        Foreach ($sections as $key => $section) {
+            if ((int)$section->id === (int)$sectionid) {
+                return \mod_quiz\structure::get_quiz_section_heading($section);
             }
         }
-        return array();
+        return null;
     }
-    
-    
+
+    /**
+     *
+     * @param object $quiz
+     * @param int $questionid
+     * @param string, 'all' for returning list (sectionid, page-number, slot-number, maxmark),
+     * 'section' for returning section heding, 'page' for returning page number,
+     * 'slot' for returning slot-number and 'mark' for returning maxmark.
+     * @return array, a list (sectionid, page-number, slot-number, maxmark), or the value for the given string
+     */
+    protected function get_question_info($quiz, $questionid, $info = 'all') {
+        if (!$quiz->slots) {
+            // Possible, printout a notification or an error, but that should not happen.
+            return null;
+        }
+        // TODO: If slots are organised with keys as questionids, I could get rid of the loop.
+        foreach ($quiz->slots as $slotid => $slot) {
+            if ((int)$slot->questionid === (int)$questionid) {
+                if ($info === 'all') {
+                    return array($slot->sectionid, $slot->page, $slot->id, $slot->maxmark);
+                }
+                if ($info === 'section') {
+                    return $this->get_section($quiz, $slot->sectionid);
+                }
+                if ($info === 'page') {
+                    // Page number stored from 0 and therfore we need to use +1.
+                    return $slot->page + 1;
+                }
+                if ($info === 'slot') {
+                    return $slot->slot;
+                }
+                if ($info === 'mark') {
+                    return $slot->maxmark;
+                }
+            }
+        }
+        return null;
+    }
 }
 
 class mod_quiz_links_to_other_attempts implements renderable {

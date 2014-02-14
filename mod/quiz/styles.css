@@ -1327,6 +1327,14 @@ bank window's title is prominent enough*/
     float: left;
     text-align: right;
 }
+#page-mod-quiz-edit .slotnumber{
+    text-align: center;
+    margin-left: 0.3em;
+    margin-right: 0.3em;
+    border: 1px solid #bbb;
+    padding: 2px;
+}
+
 /** Edit Quiz **/
 .path-mod-quiz ul.slots li.section {border: 0;}
 .path-mod-quiz ul.slots li.section .content {background-color:#FAFAFA;padding:5px 10px;}
