@@ -1601,7 +1601,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
 
         // Get the list of question types visible to user (excluding the question type being moved if there is one)
         $questionshtml = array();
-        $sections = explode(',', $quiz->questions);
+//         $sections = explode(',', $quiz->questions);
         $slots = \mod_quiz\structure::get_quiz_slots($quiz);
         $sectiontoslotids = $quiz->sectiontoslotids;
         if (!empty($sectiontoslotids[$section->id])) {
