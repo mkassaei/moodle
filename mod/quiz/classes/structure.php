@@ -70,7 +70,9 @@ class structure {
     }
 
     public static function populate_structure($quiz) {
-        self::update_quiz_structure_from_questions($quiz);
+        self::populate_quiz_slots($quiz);
+        self::populate_quiz_questionids($quiz);
+//         self::update_quiz_structure_from_questions($quiz);
         self::populate_quiz_sections($quiz);
         self::populate_slot_to_sectionids($quiz);
         self::populate_slots_with_sectionids($quiz);
@@ -121,6 +123,35 @@ class structure {
     }
 
     /**
+     * Populate quiz slots for the given quiz from the DB
+     * to be changed
+     * @param object $quiz
+     * @return array
+     */
+    public static function populate_quiz_slots($quiz){
+        global $DB;
+        $records = $DB->get_records('quiz_slots', array('quizid' => $quiz->id));
+        $quiz->slots = $records;
+        return $records;
+    }
+
+    /**
+     * Populate quiz questionids from slots array
+     * to be changed
+     * @param object $quiz
+     * @return void
+     */
+    public static function populate_quiz_questionids($quiz){
+        $slots = self::get_quiz_slots($quiz);
+        $questionids = array();
+        foreach ($slots as $slot) {
+            $questionids[] = $slot->questionid;
+        }
+
+        $quiz->questionids = $questionids;
+    }
+
+    /**
      * Populate quiz slots using the $quiz->questions string
      * to be changed
      * @param object $quiz
@@ -131,6 +162,7 @@ class structure {
         // Rows are in the format array(id, quizid, slot, page, questionid, maxmark)
         // Reflecting a $quiz->question string of '1,0,2,3,4,5,6,0,7,0,8,0,0'
         $questions = explode(',', $quiz->questions);
+
 
         $records = array();
         $currentpagenumber = 0;
