@@ -1246,7 +1246,7 @@ function quiz_question_marked_out_of_field($quiz, $question) {
     $html.='<input type="text" name="g' . $question->id .
                             '" id="inputq' . $question->id .
                             '" size="' . ($quiz->decimalpoints + 2) .
-                            '" value="' . (0 + $quiz->grades[$question->id]) .
+                            '" value="' . (0 + $question->maxmark) .
                             '" />';
     $html.='<input type="hidden" name="savechanges" value="save" />';
     $html.='<input type="submit" value="' . $strsave . '" class="pointssubmitbutton" />';
