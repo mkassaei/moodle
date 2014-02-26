@@ -1541,11 +1541,12 @@ class mod_quiz_renderer extends plugin_renderer_base {
     public function quiz_section_question_list_item($quiz, $course, &$completioninfo, $question, $sectionreturn, $displayoptions = array()) {
         $output = '';
         $pagenumber = $this->get_question_info($quiz, $question->id, 'page');
+        $slotid = $this->get_question_info($quiz, $question->id, 'slotid');
         $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
         $output .= html_writer::tag('span', $page, array('class' => 'pagenumber'));
         if ($questiontypehtml = $this->quiz_section_question($quiz, $course, $completioninfo, $question, $sectionreturn, $displayoptions)) {
-            $questionclasses = 'activity ';// . $question->qtype . 'qtype_' . $question->qtype;
-            $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses . ' xsecondcolumn', 'id' => 'module-' . $question->id));
+            $questionclasses = 'activity ' . $question->qtype . 'qtype_' . $question->qtype;
+            $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses, 'id' => 'module-' . $slotid));
         }
         return $output;
     }
@@ -1615,16 +1616,15 @@ class mod_quiz_renderer extends plugin_renderer_base {
         if (!empty($questionshtml) || $ismoving) {
             foreach ($questionshtml as $questionnumber => $questiontypehtml) {
                 if ($ismoving) {
-                    $movingurl = new moodle_url('/course/mod.php', array('moveto' => $questionnumber, 'sesskey' => sesskey()));
+                    $movingurl = new moodle_url('/quiz/edit.php', array('moveto' => $questionnumber, 'sesskey' => sesskey()));
                     $sectionoutput .= html_writer::tag('li', html_writer::link($movingurl, $this->output->render($movingpix)),
                             array('class' => 'movehere', 'title' => $strmovefull));
                 }
                 $sectionoutput .= $questiontypehtml;
-                //$sectionoutput = html_writer::tag('div', $sectionoutput,  array('class' => 'pagelayout'));
             }
 
             if ($ismoving) {
-                $movingurl = new moodle_url('/course/mod.php', array('movetosection' => $section->id, 'sesskey' => sesskey()));
+                $movingurl = new moodle_url('/quiz/edit.php', array('movetosection' => $section->id, 'sesskey' => sesskey()));
                 $sectionoutput .= html_writer::tag('li', html_writer::link($movingurl, $this->output->render($movingpix)),
                         array('class' => 'movehere', 'title' => $strmovefull));
             }
@@ -1983,6 +1983,9 @@ class mod_quiz_renderer extends plugin_renderer_base {
                 }
                 if ($info === 'mark') {
                     return $slot->maxmark;
+                }
+                if ($info === 'slotid') {
+                    return $slot->id;
                 }
             }
         }
