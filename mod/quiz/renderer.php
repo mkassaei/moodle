@@ -1384,6 +1384,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         if ($this->page->user_is_editing()) {
             $editactions = quiz_get_question_edit_actions($quiz, $question, null, $sectionreturn);
             $questionicons .= ' '. $this->quiz_section_question_edit_actions($editactions, $question, $displayoptions);
+            $questionicons .= ' '. $this->quiz_add_menu_actions($quiz, $question);
 //             $questionicons .= $question->get_after_edit_icons();
 
             $output .= html_writer::span($questionicons, 'actions');
@@ -1410,7 +1411,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
             return '';
         }
         $menu = new action_menu();
-        $menu->set_alignment(action_menu::BL, action_menu::BL);
+        $menu->set_alignment(action_menu::BR, action_menu::BR);
         $menu->set_menu_trigger(html_writer::tag('span', 'add', array('class' => 'add-menu')));// TODO: To be replace by an icon
 
         foreach ($actions as $action) {
@@ -1539,13 +1540,14 @@ class mod_quiz_renderer extends plugin_renderer_base {
      */
     public function quiz_section_question_list_item($quiz, $course, &$completioninfo, $question, $sectionreturn, $displayoptions = array()) {
         $output = '';
+        $pagenumber = $this->get_question_info($quiz, $question->id, 'page');
+        $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
+        $output .= html_writer::tag('span', $page, array('class' => 'pagenumber'));
         if ($questiontypehtml = $this->quiz_section_question($quiz, $course, $completioninfo, $question, $sectionreturn, $displayoptions)) {
-            $questionclasses = 'activity ' . $question->qtype . 'qtype_' . $question->qtype;
-            $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses, 'id' => 'module-' . $question->id));
+            $questionclasses = 'activity ';// . $question->qtype . 'qtype_' . $question->qtype;
+            $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses . ' xsecondcolumn', 'id' => 'module-' . $question->id));
         }
-        $page = get_string('page') . ' ' . $this->get_question_info($quiz, $question->id, 'page');
-        $icon = html_writer::tag('span', $this->quiz_add_menu_actions($quiz, $question));
-        return $page . $output . $icon;
+        return $output;
     }
 
     /**
@@ -1582,7 +1584,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
 
         // Get the list of question types visible to user (excluding the question type being moved if there is one)
         $questionshtml = array();
-//         $sections = explode(',', $quiz->questions);
+        //$sections = explode(',', $quiz->questions);
         $slots = \mod_quiz\structure::get_quiz_slots($quiz);
         $sectiontoslotids = $quiz->sectiontoslotids;
         if (!empty($sectiontoslotids[$section->id])) {
@@ -1618,7 +1620,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
                             array('class' => 'movehere', 'title' => $strmovefull));
                 }
                 $sectionoutput .= $questiontypehtml;
-                $sectionoutput = html_writer::tag('div', $sectionoutput,  array('class' => 'pagelayout'));
+                //$sectionoutput = html_writer::tag('div', $sectionoutput,  array('class' => 'pagelayout'));
             }
 
             if ($ismoving) {
@@ -1974,8 +1976,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
                     return $this->get_section($quiz, $slot->sectionid);
                 }
                 if ($info === 'page') {
-                    // Page number stored from 0 and therfore we need to use +1.
-                    return $slot->page + 1;
+                    return $slot->page;
                 }
                 if ($info === 'slot') {
                     return $slot->slot;

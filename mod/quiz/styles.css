@@ -1326,13 +1326,31 @@ bank window's title is prominent enough*/
 #page-mod-quiz-edit .add-menu {
     float: left;
     text-align: right;
+    max-height: 7px;
+}
+#page-mod-quiz-edit .add-menu-left {
+    position:relative;
+    right:10em;
+}
+#page-mod-quiz-edit .tablerow {
+    display:table;
+}
+#page-mod-quiz-edit .pagenumber {
+    float: left;
+    display: inline;
+    margin-left: -4em;
+}
+#page-mod-quiz-edit .secondcolumn {
+    text-align: left;
+    display: table-cell;
+    width: 93%%
 }
 #page-mod-quiz-edit .slotnumber{
+    background-color: #D3D3D3;
     text-align: center;
-    margin-left: 0.3em;
-    margin-right: 0.3em;
-    border: 1px solid #bbb;
-    padding: 2px;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    padding: 2px 5px 2px 5px;
 }
 
 /** Edit Quiz **/
