@@ -47,6 +47,7 @@ $visible    = optional_param('visible', 0, PARAM_INT);
 $pageaction = optional_param('action', '', PARAM_ALPHA); // Used to simulate a DELETE command
 $title      = optional_param('title', '', PARAM_TEXT);
 
+global $Out;
 $PAGE->set_url('/mod/quiz/rest.php', array('courseId'=>$courseid,'quizId'=>$quizid,'class'=>$class));
 
 //NOTE: when making any changes here please make sure it is using the same access control as mod/quiz/edit.php !!
@@ -84,6 +85,17 @@ switch($requestmethod) {
 
             case 'resource':
                 switch ($field) {
+                    case 'move':
+                        require_capability('mod/quiz:manage', $PAGE->cm->context);
+                        if (!$slot = $DB->get_record('quiz_slots', array('quizid'=>$quiz->id, 'id'=>$id))) {
+                            throw new moodle_exception('AJAX commands.php: Bad slot ID '.$id);
+                        }
+                        \mod_quiz\structure::move_slot($quiz, $id, $beforeid);
+                        $isvisible = true;
+
+                        // Just something to tell the browser everything is ok.
+                        echo json_encode(array('visible' => (bool) $isvisible));
+                        break;
                     case 'gettitle':
                         require_capability('mod/quiz:manage', $PAGE->cm->context);
                         $question = $DB->get_record('question', array('id' => $id), '*', MUST_EXIST);
