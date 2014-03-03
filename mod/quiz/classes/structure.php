@@ -141,7 +141,7 @@ class structure {
      * @param object $quiz
      * @return array
      */
-    public static function save_quiz_slot_order($quiz){
+    public static function save_quiz_slot_order($quiz) {
         global $DB;
 
         $records = self::get_quiz_slots($quiz);
@@ -237,6 +237,8 @@ class structure {
         self::populate_quiz_slots($quiz, 'slot');
         $records = self::get_quiz_slots($quiz);
 
+        $keyvalues = self::get_original_pagination(self::get_quiz_slots($quiz));
+
         // iterate through the slots.
         $slot = 1;
         $slottomove = $records[$id];
@@ -248,18 +250,18 @@ class structure {
 
             if($record->id == $idbefore){
                 $slottomove->slot = $slot;
-                $slottomove->page = $slottomove->slot;
+                $slottomove->page = $keyvalues[$slottomove->slot];
                 $slot++;
             }
             $record->slot = $slot;
 
-            $record->page = $record->slot;
+            $record->page = $keyvalues[$record->slot];
             $slot++;
         }
 
         if($idbefore == 0){
             $slottomove->slot = $slot;
-            $slottomove->page = $slottomove->slot;
+            $slottomove->page = $keyvalues[$slottomove->slot];
         }
 
         // Update the db
@@ -334,6 +336,22 @@ class structure {
         }
 
         $quiz->sectiontoslotids = $sectiontoslotids;
+    }
+
+    /**
+     * Return an array which refers to the original pagination
+     * where the slot number is the key and the page number is the value
+     * @param object $slots
+     */
+    public static function get_original_pagination($slots) {
+        if (!$slots) {
+            return;
+        }
+        $keyvalues = array();
+        foreach ($slots as $slotid => $slot) {
+            $keyvalues[$slot->slot] = $slot->page;
+        }
+        return $keyvalues;
     }
 
 }
