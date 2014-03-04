@@ -1384,9 +1384,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
             $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
             $output .= $cmname;
 
-            if ($this->page->user_is_editing()) {
-                $output .= ' ' . quiz_get_question_rename_action($question, $sectionreturn);
-            }
+
 
             // Module can put text after the link (e.g. forum unread)
 //             $output .= $question->get_after_link();
@@ -1394,6 +1392,10 @@ class mod_quiz_renderer extends plugin_renderer_base {
             $output .= quiz_question_preview_button($quiz, $question);
 
             $output .= quiz_question_marked_out_of_field($quiz, $question);
+
+            if ($this->page->user_is_editing()) {
+                $output .= ' ' . quiz_get_question_regrade_action($question, $sectionreturn);
+            }
 
             // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
             $output .= html_writer::end_tag('div'); // .activityinstance
