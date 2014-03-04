@@ -1780,13 +1780,13 @@ function quiz_get_navigation_options() {
 }
 
 /**
- * Returns the rename action.
+ * Returns the regrade action.
  *
  * @param $question The question to produce editing buttons for
  * @param int $sr The section to link back to (used for creating the links)
- * @return The markup for the rename action, or an empty string if not available.
+ * @return The markup for the regrade action, or an empty string if not available.
  */
-function quiz_get_question_rename_action($question, $sr = null) {
+function quiz_get_question_regrade_action($question, $sr = null) {
     global $PAGE, $COURSE, $OUTPUT;
 
     static $str;
@@ -1795,7 +1795,7 @@ function quiz_get_question_rename_action($question, $sr = null) {
     $hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context);
 
     if (!isset($str)) {
-        $str = get_strings(array('edittitle'));
+        $str = get_strings(array('editmaxmark'), 'question');
     }
 
     if (!isset($baseurl)) {
@@ -1813,9 +1813,9 @@ function quiz_get_question_rename_action($question, $sr = null) {
                 new moodle_url($baseurl, array('update' => $question->id)),
                 $OUTPUT->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
                 array(
-                    'class' => 'editing_title',
-                    'data-action' => 'edittitle',
-                    'title' => $str->edittitle,
+                    'class' => 'editing_maxmark',
+                    'data-action' => 'editmaxmark',
+                    'title' => $str->editmaxmark,
                 )
             )
         );
