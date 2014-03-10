@@ -1335,12 +1335,6 @@ class mod_quiz_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('div');
 
-        if ($this->page->user_is_editing()) {
-            $output .= quiz_get_question_move($question, $sectionreturn);
-        }
-
-        $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
-
         // Print slot number.
         // TODO: We have to write a function to deal with description questions.
         // Currently there is a functionality that translates the slotnumber of a
@@ -1349,6 +1343,21 @@ class mod_quiz_renderer extends plugin_renderer_base {
         // description question types. We can either have the slot number prefixes the 'i'
         // or use 'i' followed by a number (when morethan one) which can be incremented.
         $slotnumber = $this->get_question_info($quiz, $question->id, 'slot');
+
+        //
+        $pagenumber = $this->get_question_info($quiz, $question->id, 'page');
+        $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
+        $Pagenumbercss = 'pagenumbervisible';
+        $prevpage = $this->get_previous_page($quiz, $slotnumber -1);
+        if ($prevpage == $pagenumber) {
+            $Pagenumbercss = 'pagenumberhidden';
+        }
+        $output .= html_writer::tag('div', $page,  array('class' => $Pagenumbercss));
+        if ($this->page->user_is_editing()) {
+            $output .= quiz_get_question_move($question, $sectionreturn);
+        }
+
+        $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
         $output .= html_writer::tag('span', $slotnumber, array('class' => 'slotnumber'));
 
         // This div is used to indent the content.
@@ -1542,10 +1551,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
      */
     public function quiz_section_question_list_item($quiz, $course, &$completioninfo, $question, $sectionreturn, $displayoptions = array()) {
         $output = '';
-        $pagenumber = $this->get_question_info($quiz, $question->id, 'page');
         $slotid = $this->get_question_info($quiz, $question->id, 'slotid');
-        $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
-        $output .= html_writer::tag('span', $page, array('class' => 'pagenumber'));
         if ($questiontypehtml = $this->quiz_section_question($quiz, $course, $completioninfo, $question, $sectionreturn, $displayoptions)) {
             $questionclasses = 'activity ' . $question->qtype . 'qtype_' . $question->qtype;
             $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses, 'id' => 'module-' . $slotid));
@@ -1993,8 +1999,20 @@ class mod_quiz_renderer extends plugin_renderer_base {
         }
         return null;
     }
-}
 
+    protected function get_previous_page($quiz, $prevslotnumber) {
+        if ($prevslotnumber < 1) {
+            return 0;
+        }
+        foreach ($quiz->slots as $slotid => $slot) {
+            if ($slot->slot == $prevslotnumber) {
+                return $slot->page;
+            }
+        }
+        return 0;
+    }
+
+}
 class mod_quiz_links_to_other_attempts implements renderable {
     /**
      * @var array string attempt number => url, or null for the current attempt.
