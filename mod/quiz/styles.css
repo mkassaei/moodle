@@ -1335,10 +1335,16 @@ bank window's title is prominent enough*/
 #page-mod-quiz-edit .tablerow {
     display:table;
 }
-#page-mod-quiz-edit .pagenumber {
+#page-mod-quiz-edit .pagenumbervisible {
     float: left;
     display: inline;
     margin-left: -4em;
+}
+#page-mod-quiz-edit .pagenumberhidden {
+    float: left;
+    display: inline;
+    margin-left: -4em;
+    opacity: 0.1;
 }
 #page-mod-quiz-edit .secondcolumn {
     text-align: left;
