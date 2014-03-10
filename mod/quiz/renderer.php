@@ -596,7 +596,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $table->data = array();
 
         // Get section headings and set the sapn over the columns.
-        $sections = $attemptobj->get_quiz_sections();
+        $sections = \mod_quiz\structure::get_quiz_sections($attemptobj->get_quiz());
         $colspan = count($table->align);
 
         // Get the summary info for each question.
