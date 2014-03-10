@@ -470,7 +470,7 @@ $USER->editing = 1;
 // Prevent caching of this page to stop confusion when changing page after making AJAX changes
     $PAGE->set_cacheable(false);
 
-$ajaxenabled = ajaxenabled();
+$ajaxenabled = true; // TODO MDL-40987.
 
 $completion = new completion_info($course);
 if ($completion->is_enabled() && $ajaxenabled) {
