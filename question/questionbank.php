@@ -68,10 +68,6 @@ add_to_log($cm->course, 'quiz', 'editquestions',
 // You need mod/quiz:manage in addition to question capabilities to access this page.
 require_capability('mod/quiz:manage', $contexts->lowest());
 
-if (empty($quiz->grades)) {
-    $quiz->grades = quiz_get_all_question_grades($quiz);
-}
-
 // Process commands ============================================================
 
 // Get the list of question ids had their check-boxes ticked.
