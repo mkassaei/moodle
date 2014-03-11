@@ -15,32 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Base renderer for outputting edit quiz form.
+ * Renderer outputting the quiz editing UI.
  *
- * @package quiz
- * @copyright 2013 Colin Chambers
+ * @package mod_quiz
+ * @copyright 2013 The Open University.
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @since Moodle 2.6
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * This is a convenience renderer which can be used by section based formats
- * to reduce code duplication. It is not necessary for all course formats to
- * use this and its likely to change in future releases.
+ * Renderer outputting the quiz editing UI.
  *
- * @package core
- * @copyright 2012 Dan Poltawski
+ * @copyright 2013 The Open University.
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @since Moodle 2.3
+ * @since Moodle 2.7
  */
-class mod_quiz_edit_section_renderer extends mod_quiz_renderer {
-/** @var contains instance of core course renderer */
+class mod_quiz_edit_renderer extends plugin_renderer_base {
+    /** @var contains instance of core course renderer. */
     protected $quizeditrenderer;
 
-/** @var contains instance of core course renderer */
+    /** @var contains instance of core course renderer. */
     protected $courserenderer;
 
     /**

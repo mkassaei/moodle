@@ -418,17 +418,7 @@ $questionbank->process_actions($thispageurl, $cm);
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_pagetype('mod-quiz-edit');
 
-// Preload course format renderer before output starts.
-// This is a little hacky but necessary since
-// format.php is not included until after output starts
-require_once($CFG->dirroot.'/mod/quiz/editrenderer.php');
-if (class_exists('mod_quiz_edit_section_renderer')) {
-    // call get_renderer only if renderer is defined in format plugin
-    // otherwise an exception would be thrown
-//     $PAGE->get_renderer('quiz_edit_section');
-
-    $output = $PAGE->get_renderer('mod_quiz', 'edit_section');
-}
+$output = $PAGE->get_renderer('mod_quiz', 'edit');
 
 $PAGE->requires->skip_link_to('questionbank',
         get_string('skipto', 'access', get_string('questionbank', 'question')));
