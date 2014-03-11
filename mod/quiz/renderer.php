@@ -1344,15 +1344,6 @@ class mod_quiz_renderer extends plugin_renderer_base {
         // or use 'i' followed by a number (when morethan one) which can be incremented.
         $slotnumber = $this->get_question_info($quiz, $question->id, 'slot');
 
-        //
-        $pagenumber = $this->get_question_info($quiz, $question->id, 'page');
-        $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
-        $Pagenumbercss = 'pagenumbervisible';
-        $prevpage = $this->get_previous_page($quiz, $slotnumber -1);
-        if ($prevpage == $pagenumber) {
-            $Pagenumbercss = 'pagenumberhidden';
-        }
-        $output .= html_writer::tag('div', $page,  array('class' => $Pagenumbercss));
         if ($this->page->user_is_editing()) {
             $output .= quiz_get_question_move($question, $sectionreturn);
         }
@@ -1552,6 +1543,15 @@ class mod_quiz_renderer extends plugin_renderer_base {
     public function quiz_section_question_list_item($quiz, $course, &$completioninfo, $question, $sectionreturn, $displayoptions = array()) {
         $output = '';
         $slotid = $this->get_question_info($quiz, $question->id, 'slotid');
+        $slotnumber = $this->get_question_info($quiz, $question->id, 'slot');
+        $pagenumber = $this->get_question_info($quiz, $question->id, 'page');
+        $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
+        $Pagenumbercss = ''; // TODO: to add appropriate CSS here
+        $prevpage = $this->get_previous_page($quiz, $slotnumber -1);
+        if ($prevpage != $pagenumber) {
+            $output .= html_writer::tag('div', $page,  array('class' => $Pagenumbercss));
+        }
+
         if ($questiontypehtml = $this->quiz_section_question($quiz, $course, $completioninfo, $question, $sectionreturn, $displayoptions)) {
             $questionclasses = 'activity ' . $question->qtype . 'qtype_' . $question->qtype;
             $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses, 'id' => 'module-' . $slotid));
