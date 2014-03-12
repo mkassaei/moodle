@@ -23,8 +23,6 @@
  */
 
 
-use calendartype_gregorian\structure;
-
 defined('MOODLE_INTERNAL') || die();
 
 
