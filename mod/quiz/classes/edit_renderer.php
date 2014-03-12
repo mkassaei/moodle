@@ -51,7 +51,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $this->quizrenderer = $this->page->get_renderer('mod_quiz');
     }
 
-/**
+    /**
      * Generate the starting container html for a list of sections
      * @return string HTML to output.
      */
@@ -87,7 +87,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         return $heading;
     }
 
-/**
+    /**
      * Generate the content to displayed on the right part of a section
      * before course modules are included
      *
@@ -100,6 +100,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $o = $this->output->spacer();
 
         if ($section->firstslot > 1) {
+            // TODO MDL-43089 what is this?
 //             $controls = $this->section_edit_controls($course, $section, $onsectionpage);
 //             if (!empty($controls)) {
 //                 $o = implode('<br />', $controls);
@@ -135,7 +136,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function section_header($section, $course, $onsectionpage, $sectionreturn=null) {
-        global $PAGE;
 
         $o = '';
         $currenttext = '';
@@ -227,9 +227,8 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @return array of links with edit controls
      */
     protected function section_edit_controls($course, $section, $onsectionpage = false) {
-        global $PAGE;
 
-        if (!$PAGE->user_is_editing()) {
+        if (!$this->page->user_is_editing()) {
             return array();
         }
 
@@ -245,6 +244,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $controls = array();
 
         $url = clone($baseurl);
+            // TODO MDL-43089 ?
 //         if (has_capability('moodle/course:sectionvisibility', $coursecontext)) {
 //             if ($section->visible) { // Show the hide/show eye.
 //                 $strhidefromothers = get_string('hidefromothers', 'format_'.$course->format);
@@ -292,7 +292,8 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         return $controls;
     }
 
-    protected function get_questions($quiz){
+    protected function get_questions($quiz) {
+        // TODO MDL-43089 method like this should not be in the renderer.
         global $DB;
         $questions = array();
         if (!$quiz->questionids) {
@@ -309,9 +310,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         return $questions;
     }
 
-    /*
-     * Edit Page
-     */
     /**
      * Generates the edit page
      *
@@ -321,8 +319,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @param int $context The page context ID
      */
     public function edit_page($course, $quiz, $cm, $context) {
-        global $PAGE;
-        global $Out;
 
         $modinfo = get_fast_modinfo($course);
         $course = course_get_format($course)->get_course();
@@ -339,7 +335,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         quiz_print_status_bar($quiz);
 
         $tabindex = 0;
-        quiz_print_grading_form($quiz, $PAGE->url, $tabindex);
+        quiz_print_grading_form($quiz, $this->page->url, $tabindex);
 
         $notifystrings = array();
         if (quiz_has_attempts($quiz->id)) {
@@ -361,14 +357,14 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $slots = \mod_quiz\structure::get_quiz_slots($quiz);
         $sections = \mod_quiz\structure::get_quiz_sections($quiz);
 
-        // Get questions
+        // Get questions.
         $questions = $this->get_questions($quiz);
         $quiz->fullquestions = $questions;
 
         // Address missing question types.
-        foreach($slots as $slot) {
+        foreach ($slots as $slot) {
             $questionid = $slot->questionid;
-            if(!$questionid){
+            if (!$questionid) {
                 continue;
             }
 
@@ -395,24 +391,24 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             echo html_writer::tag('span', $this->quiz_add_menu_actions($quiz, ''));
         }
 
-        // Get quiz question order
+        // Get quiz question order.
         $sections = \mod_quiz\structure::get_quiz_sections($quiz);
 
-        // Now the list of sections..
+        // Now the list of sections.
         echo $this->start_section_list();
 
 //         foreach ($sections as $section => $qnum) {
         $section = null;
         foreach ($sections as $section) {
-            // For prototyping add required fields. Refactor to correct objects later
+            // For prototyping add required fields. Refactor to correct objects later.
             $section->visible = 1;
             $section->uservisible = 1;
             $section->available = 1;
             $section->indent = 1;
 
             if ($section->firstslot == 1) {
-                // 0-section is displayed a little differently than the others
-                if ($section->heading or $PAGE->user_is_editing()) {
+                // 0-section is displayed a little differently than the others.
+                if ($section->heading or $this->page->user_is_editing()) {
                     echo $this->section_header($section, $course, false, 0);
                     echo $this->quizrenderer->quiz_section_question_list($quiz, $course, $section, 0);
 //                     echo $this->quizrenderer->quiz_section_add_question_control($quiz, $course, $section, 0, 0);
