@@ -1199,7 +1199,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
 //             return $output;
 //         }
         $url = '';
-        $url = mod_quiz_renderer::quiz_question_get_url($quiz, $question);
+        $url = $this->get_edit_question_url($quiz, $question);
 
 //         $this->url = $modviews[$this->modname]
 //                 ? new moodle_url('/mod/' . $this->modname . '/view.php', array('id'=>$this->id))
@@ -1355,7 +1355,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $slotnumber = $this->get_question_info($quiz, $question->id, 'slot');
 
         if ($this->page->user_is_editing()) {
-            $output .= quiz_get_question_move($question, $sectionreturn);
+            $output .= $this->question_move($question, $sectionreturn);
         }
 
         $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
@@ -1385,7 +1385,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
             $output .= $this->marked_out_of_field($quiz, $question);
 
             if ($this->page->user_is_editing()) {
-                $output .= ' ' . quiz_get_question_regrade_action($question, $sectionreturn);
+                $output .= ' ' . $this->regrade_action($question, $sectionreturn);
             }
 
             // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
@@ -1394,9 +1394,9 @@ class mod_quiz_renderer extends plugin_renderer_base {
 
         $questionicons = '';
         if ($this->page->user_is_editing()) {
-            $editactions = quiz_get_question_edit_actions($quiz, $question, null, $sectionreturn);
+            $editactions = $this->question_edit_actions($quiz, $question, null, $sectionreturn);
             $questionicons .= ' '. $this->quiz_section_question_edit_actions($editactions, $question, $displayoptions);
-            $questionicons .= ' '. $this->quiz_add_menu_actions($quiz, $question);
+            $questionicons .= ' '. $this->add_menu_actions($quiz, $question);
 //             $questionicons .= $question->get_after_edit_icons();
 
             $output .= html_writer::span($questionicons, 'actions');
@@ -1415,10 +1415,268 @@ class mod_quiz_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    public function quiz_add_menu_actions($quiz, $question) {
+    /**
+     * Returns the regrade action.
+     *
+     * @param stdClass $question The question to produce editing buttons for
+     * @param int $sr The section to link back to (used for creating the links)
+     * @return The markup for the regrade action, or an empty string if not available.
+     */
+    public function regrade_action($question, $sr = null) {
+        global $PAGE, $COURSE, $OUTPUT;
+
+        static $baseurl;
+
+        $hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context);
+
+        if (!isset($baseurl)) {
+            $baseurl = new moodle_url('/quiz/question.php', array('sesskey' => sesskey()));
+        }
+
+        if ($sr !== null) {
+            $baseurl->param('sr', $sr);
+        }
+
+        // AJAX edit title.
+        if ($hasmanagequiz && course_ajax_enabled($COURSE)) {
+            return html_writer::span(
+                html_writer::link(
+                    new moodle_url($baseurl, array('update' => $question->id)),
+                    $OUTPUT->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
+                    array(
+                        'class' => 'editing_maxmark',
+                        'data-action' => 'editmaxmark',
+                        'title' => get_string('editmaxmark', 'quiz'),
+                    )
+                )
+            );
+        }
+        return '';
+    }
+
+    /**
+     * Returns the move action.
+     *
+     * @param object $question The module to produce a move button for
+     * @param int $sr The section to link back to (used for creating the links)
+     * @return The markup for the move action, or an empty string if not available.
+     */
+    public function question_move($question, $sr = null) {
+        global $OUTPUT, $PAGE;
+
+        static $str;
+        static $baseurl;
+
+        $hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context);
+
+        if (!isset($str)) {
+            $str = get_strings(array('move'));
+        }
+
+        if (!isset($baseurl)) {
+            $baseurl = new moodle_url('/course/mod.php', array('sesskey' => sesskey()));
+
+            if ($sr !== null) {
+                $baseurl->param('sr', $sr);
+            }
+        }
+
+        if ($hasmanagequiz) {
+            $pixicon = 'i/dragdrop';
+
+            return html_writer::link(
+                new moodle_url($baseurl, array('copy' => $question->id)),
+                $OUTPUT->pix_icon($pixicon, $str->move, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                array('class' => 'editing_move', 'data-action' => 'move')
+            );
+        }
+        return '';
+    }
+
+    /**
+     * Returns the list of all editing actions that current user can perform on the module
+     *
+     * @param object $question The module to produce editing buttons for
+     * @param int $indent The current indenting (default -1 means no move left-right actions)
+     * @param int $sr The section to link back to (used for creating the links)
+     * @return array array of action_link or pix_icon objects
+     */
+    public function question_edit_actions($quiz, $question, $indent = -1, $sr = null) {
+        global $COURSE, $SITE, $PAGE;
+
+        static $str;
+
+        // No permission to edit anything.
+        $hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context);
+
+        if (!isset($str)) {
+            $str = get_strings(array('delete', 'move', 'moveright', 'moveleft',
+                'editsettings', 'duplicate', 'hide', 'show'), 'moodle');
+            $str->assign         = get_string('assignroles', 'role');
+            $str->groupsnone     = get_string('clicktochangeinbrackets', 'moodle', get_string("groupsnone"));
+            $str->groupsseparate = get_string('clicktochangeinbrackets', 'moodle', get_string("groupsseparate"));
+            $str->groupsvisible  = get_string('clicktochangeinbrackets', 'moodle', get_string("groupsvisible"));
+        }
+
+    //     $baseurl = new moodle_url('/course/mod.php', array('sesskey' => sesskey()));
+        $baseurl = $this->get_edit_question_url($quiz, $question);
+
+        if ($sr !== null) {
+            $baseurl->param('sr', $sr);
+        }
+        $actions = array();
+
+        // Update.
+        if ($hasmanagequiz) {
+            $actions['update'] = new action_menu_link_secondary(
+                new moodle_url($baseurl, array('update' => $question->id)),
+                new pix_icon('t/edit', $str->editsettings, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                $str->editsettings,
+                array('class' => 'editing_update', 'data-action' => 'update')
+            );
+        }
+
+        // Indent.
+        if ($hasmanagequiz) {
+            $indentlimits = new stdClass();
+            $indentlimits->min = 0;
+            $indentlimits->max = 16;
+            if (right_to_left()) {   // Exchange arrows on RTL
+                $rightarrow = 't/left';
+                $leftarrow  = 't/right';
+            } else {
+                $rightarrow = 't/right';
+                $leftarrow  = 't/left';
+            }
+
+            if ($indent >= $indentlimits->max) {
+                $enabledclass = 'hidden';
+            } else {
+                $enabledclass = '';
+            }
+            $actions['moveright'] = new action_menu_link_secondary(
+                new moodle_url($baseurl, array('id' => $question->id, 'indent' => '1')),
+                new pix_icon($rightarrow, $str->moveright, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                $str->moveright,
+                array('class' => 'editing_moveright ' . $enabledclass, 'data-action' => 'moveright', 'data-keepopen' => true)
+            );
+
+            if ($indent <= $indentlimits->min) {
+                $enabledclass = 'hidden';
+            } else {
+                $enabledclass = '';
+            }
+            $actions['moveleft'] = new action_menu_link_secondary(
+                new moodle_url($baseurl, array('id' => $question->id, 'indent' => '-1')),
+                new pix_icon($leftarrow, $str->moveleft, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                $str->moveleft,
+                array('class' => 'editing_moveleft ' . $enabledclass, 'data-action' => 'moveleft', 'data-keepopen' => true)
+            );
+
+        }
+
+        // Delete.
+        if ($hasmanagequiz) {
+            $actions['delete'] = new action_menu_link_secondary(
+                new moodle_url($baseurl, array('delete' => $question->id)),
+                new pix_icon('t/delete', $str->delete, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                $str->delete,
+                array('class' => 'editing_delete', 'data-action' => 'delete')
+            );
+        }
+
+        return $actions;
+    }
+
+    /**
+     * Retuns the list of adding actions
+     * @param object $quiz, the quiz object
+     * @param objet $question, the question object
+     *
+     */
+    public function edit_menu_actions($quiz, $question) {
+        global $DB, $PAGE;
+
+        // No permission to edit anything.
+        if (!has_capability('mod/quiz:manage', $PAGE->cm->context)) {
+                return array();
+        }
+
+        if (!$quiz->fullquestions) {
+            $context = context_module::instance($quiz->cmid);
+            $questioncategoryid = $DB->get_field('question_categories', 'id', array('contextid' => $context->id));
+        } else {
+            $questioncategoryid = $question->category;
+        }
+
+        static $str;
+        if (!isset($str)) {
+            $str = get_strings(array('addasectionheading',
+                                     'addaquestion',
+                                    'addarandomquestion',
+                                    'addarandomselectedquestion',
+                                    'questionbankcontents'), 'quiz');
+       }
+
+        $baseurl = '/mod/quiz/edit.php';
+
+        // Get section, page, slotnumber and maxmark.
+        //list($sectionid, $page, $slotnumber, $maxmark) = get_question_info($quiz, $question->id);
+        $actions = array();
+
+        // Add a section heading.
+        $params = array('cmid' => $quiz->cmid);
+        $actions['addasectionheading'] = new action_menu_link_secondary(
+            new moodle_url($baseurl, $params),
+            new pix_icon('t/add', $str->addasectionheading, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            $str->addasectionheading, array('class' => 'editing_addasectionheading', 'data-action' => 'addasectionheading')
+        );
+
+        // Add a new question to the quiz.
+        $returnurl = '/mod/quiz/edit.php';
+        $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid, 'courseid' => $quiz->course,
+                        'category' => $questioncategoryid, 'appendqnumstring' => 'addquestion');
+        $actions['addaquestion'] = new action_menu_link_secondary(
+            new moodle_url('/question/question.php', $params),
+            new pix_icon('t/add', $str->addaquestion, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            $str->addaquestion, array('class' => 'editing_addaquestion', 'data-action' => 'addaquestion')
+        );
+
+        // Add a random question.
+        $returnurl = new moodle_url('/mod/quiz/edit.php', array('cmid' => $quiz->cmid));
+        $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid);
+        $actions['addarandomquestion'] = new action_menu_link_secondary(
+            new moodle_url('/mod/quiz/addrandom.php', $params),
+            new pix_icon('t/add', $str->addarandomquestion, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            $str->addarandomquestion, array('class' => 'editing_addarandomquestion', 'data-action' => 'addarandomquestion')
+        );
+
+        // Add a random selected question.
+        // TODO: We have to refine the functionality when adding random selected questions.
+        $returnurl = new moodle_url('/mod/quiz/edit.php', array('cmid' => $quiz->cmid));
+        $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid);
+        $actions['addarandomselectedquestion'] = new action_menu_link_secondary(
+            new moodle_url('/mod/quiz/addrandom.php', $params),
+            new pix_icon('t/add', $str->addarandomselectedquestion, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            $str->addarandomselectedquestion, array('class' => 'editing_addarandomselectedquestion', 'data-action' => 'addarandomselectedquestion')
+        );
+
+        // Call question bank.
+        // TODO: we have to write the code for qbank to be displayed as popup.
+        $returnurl = '';///mod/quiz/edit.php';
+        $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid, 'qbanktool' => 1);
+        $actions['questionbankcontents'] = new action_menu_link_secondary(
+            new moodle_url('/question/questionbank.php', $params),
+            new pix_icon('t/edit', $str->questionbankcontents, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            $str->questionbankcontents, array('class' => 'editing_questionbankcontents', 'data-action' => 'questionbankcontents')
+        );
+        return $actions;
+    }
+
+    public function add_menu_actions($quiz, $question) {
         global $CFG;
 
-        $actions = quiz_get_edit_menu_actions($quiz, $question);
+        $actions = $this->edit_menu_actions($quiz, $question);
         if (empty($actions)) {
             return '';
         }
@@ -1527,14 +1785,13 @@ class mod_quiz_renderer extends plugin_renderer_base {
         return $this->render($menu);
     }
 
-    static public function quiz_question_get_url($quiz, $question) {
-        global $PAGE;
+    protected function get_edit_question_url($quiz, $question) {
+        // TODO MDL-43089 this should not be in the renderer.
         $questionparams = array(
-                        'returnurl' => $PAGE->url->out_as_local_url(),
+                        'returnurl' => $this->page->url->out_as_local_url(),
                         'cmid' => $quiz->cmid,
                         'id' => $question->id);
-        $url = new moodle_url('/question/question.php', $questionparams);
-        return $url;
+        return new moodle_url('/question/question.php', $questionparams);
     }
 
     /**
