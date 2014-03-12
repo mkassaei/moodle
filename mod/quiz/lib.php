@@ -1783,14 +1783,9 @@ function quiz_get_navigation_options() {
 function quiz_get_question_regrade_action($question, $sr = null) {
     global $PAGE, $COURSE, $OUTPUT;
 
-    static $str;
     static $baseurl;
 
     $hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context);
-
-    if (!isset($str)) {
-        $str = get_strings(array('editmaxmark'), 'question');
-    }
 
     if (!isset($baseurl)) {
         $baseurl = new moodle_url('/quiz/question.php', array('sesskey' => sesskey()));
@@ -1809,7 +1804,7 @@ function quiz_get_question_regrade_action($question, $sr = null) {
                 array(
                     'class' => 'editing_maxmark',
                     'data-action' => 'editmaxmark',
-                    'title' => $str->editmaxmark,
+                    'title' => get_string('editmaxmark', 'quiz'),
                 )
             )
         );
