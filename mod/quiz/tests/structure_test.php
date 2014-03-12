@@ -29,6 +29,19 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/quiz/attemptlib.php');
 require_once($CFG->dirroot . '/mod/quiz/editlib.php');
 
+
+class mod_quiz_testable_structure extends \mod_quiz\structure {
+    public function set_quiz_slots(array $slots) {
+        $this->slots = $slots;
+    }
+
+    public function set_quiz_sections(array $sections) {
+        $this->sections = $sections;
+    }
+
+}
+
+
 /**
  * Unit tests for quiz events.
  *
@@ -45,7 +58,7 @@ class mod_quiz_structure_testcase extends advanced_testcase {
 
         $this->resetAfterTest(true);
 
-        // Create a course
+        // Create a course.
         $course = $this->getDataGenerator()->create_course();
 
         // Make a quiz.
@@ -67,118 +80,53 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         quiz_add_quiz_question($saq->id, $quiz);
         quiz_add_quiz_question($numq->id, $quiz);
 
-        $this->sections = $this->get_dummy_quiz_sections($quiz);
-
-        return array($quiz);
+        return $quiz;
     }
 
     public function test_create() {
         $structure = \mod_quiz\structure::create();
 
-        $this->assertInstanceOf('\stdClass', $structure);
+        $this->assertInstanceOf('\mod_quiz\structure', $structure);
     }
 
-    public function test_get_quiz_slots(){
+    public function test_get_quiz_slots() {
         // Get empty quiz.
         $quiz = $this->get_dummy_quiz();
+        $structure = new mod_quiz_testable_structure();
 
         // When no slots exist or slots propery is not set.
-        $slots = \mod_quiz\structure::get_quiz_slots($quiz);
+        $slots = $structure->get_quiz_slots();
         $this->assertInternalType('array', $slots);
         $this->assertCount(0, $slots);
 
         // Append slots to the quiz.
-        $this->slots = $this->get_dummy_quiz_slots($quiz);
-        $quiz->slots = $this->slots;
+        $testslots = $this->get_dummy_quiz_slots($quiz);
+        $structure->set_quiz_slots($testslots);
 
         // Are the correct slots returned?
-        $slots = \mod_quiz\structure::get_quiz_slots($quiz);
-        $this->assertCount(count($this->slots), $slots);
-        $this->assertEquals($this->slots, $slots);
+        $slots = $structure->get_quiz_slots();
+        $this->assertEquals($testslots, $slots);
     }
 
-    public function test_set_quiz_slots(){
-        // Get empty quiz and test data.
-        $quiz = $this->get_dummy_quiz();
-        $this->slots = $this->get_dummy_quiz_slots($quiz);
-
-        // Set sections
-        \mod_quiz\structure::set_quiz_slots($quiz, $this->slots);
-
-        // Are the correct slots returned?
-        $slots = \mod_quiz\structure::get_quiz_slots($quiz);
-        $this->assertCount(count($this->slots), $slots);
-        $this->assertEquals($this->slots, $slots);
-    }
-
-    public function test_get_quiz_sections(){
-        // Get empty quiz.
-        $quiz = $this->get_dummy_quiz();
+    public function test_get_quiz_sections() {
 
         // When no sections exist or sections propery is not set.
-        $sections = \mod_quiz\structure::get_quiz_sections($quiz);
+        $quiz = $this->get_dummy_quiz();
+        $structure = new mod_quiz_testable_structure();
+
+        $sections = $structure->get_quiz_sections();
         $this->assertInternalType('array', $sections);
         $this->assertCount(0, $sections);
 
         // Append sections to the quiz.
-        $this->sections = $this->get_dummy_quiz_sections($quiz);
-        $quiz->sections = $this->sections;
+        $testsections = $this->get_dummy_quiz_sections($quiz);
+        $structure->set_quiz_sections($testsections);
 
         // Are the correct sections returned?
-        $sections = \mod_quiz\structure::get_quiz_sections($quiz);
-        $this->assertCount(count($this->sections), $sections);
-        $this->assertEquals($this->sections, $sections);
+        $sections = $structure->get_quiz_sections();
+        $this->assertCount(count($testsections), $sections);
+        $this->assertEquals($testsections, $sections);
     }
-
-    public function test_set_quiz_sections(){
-        // Get empty quiz.
-        $quiz = $this->get_dummy_quiz();
-        $this->sections = $this->get_dummy_quiz_sections($quiz);
-
-        // Set sections
-        \mod_quiz\structure::set_quiz_sections($quiz, $this->sections);
-
-        // Are the correct sections returned?
-        $sections = \mod_quiz\structure::get_quiz_sections($quiz);
-        $this->assertCount(count($this->sections), $sections);
-        $this->assertEquals($this->sections, $sections);
-    }
-
-    public function test_populate_quiz_sections(){
-        /**
-         * The database structure doesn't yet exist.
-         */
-        // test empty quiz
-        $quiz = $this->get_dummy_quiz();
-        $sections = \mod_quiz\structure::get_quiz_sections($quiz);
-        $this->assertInternalType('array', $sections);
-        $this->assertCount(0, $sections);
-
-        list($quiz) = $this->prepare_quiz_data();
-
-        \mod_quiz\structure::populate_quiz_sections($quiz);
-        $sections = \mod_quiz\structure::get_quiz_sections($quiz);
-        $this->assertCount(count($this->sections), $sections);
-
-    }
-
-    public function test_update_quiz_structure_from_questions() {
-        // test empty quiz
-        $quiz = $this->get_dummy_quiz();
-        \mod_quiz\structure::update_quiz_structure_from_questions($quiz);
-
-        // Are slots created correctly from $quiz->questions?
-        $this->slots = $this->get_dummy_quiz_slots($quiz);
-        $this->assertCount(count($this->slots), \mod_quiz\structure::get_quiz_slots($quiz));
-
-        $sections = \mod_quiz\structure::get_quiz_sections($quiz);
-        $this->assertInternalType('array', $sections);
-        $this->assertCount(0, $sections);
-    }
-
-    /**
-     * Setup functions
-     */
 
     /**
      * Create a basic quiz object for testing
@@ -187,27 +135,21 @@ class mod_quiz_structure_testcase extends advanced_testcase {
     public function get_dummy_quiz() {
         $quiz = new stdClass();
         $quiz->id = 1;
-        $quiz->questions = $this->get_dummy_questions_string();
-
         return $quiz;
     }
 
     /**
      * Populate quiz slots with dummy data while the database is waiting
-     * to be changed
      * @param object $quiz
      * @return array
      */
     public function get_dummy_quiz_slots($quiz) {
-        // TODO: When DB structure in place, get these from DB.
-
         // Define the data.
         $data = array();
-        // Rows are in the format array(id, quizid, slot, page, questionid, maxmark)
-        // Reflecting a $quiz->question string of '1,0,2,3,4,5,6,0,7,0,8,0,0'
         $uniqueid = 1;
         $pagenumber = 0;
 
+        // Rows are in the format array(id, quizid, slot, page, questionid, maxmark)
         $data[] = array($uniqueid++, $quiz->id, 1, $pagenumber, 1, 100);
         $data[] = array($uniqueid++, $quiz->id, 2, ++$pagenumber, 2, 100);
         $data[] = array($uniqueid++, $quiz->id, 3, $pagenumber, 3, 100);
@@ -219,7 +161,7 @@ class mod_quiz_structure_testcase extends advanced_testcase {
 
         // Translate data into records.
         $records = array();
-        foreach($data as $row) {
+        foreach ($data as $row) {
             $record = new \stdClass();
             $record->id = $row[0];
             $record->quizid = $row[1];
@@ -240,16 +182,14 @@ class mod_quiz_structure_testcase extends advanced_testcase {
      * @return array
      */
     public function get_dummy_quiz_sections($quiz) {
-        // TODO: When DB structure in place, get these from DB.
+        // TODO MDL-43089: When DB structure in place, get these from DB.
         $data = array();
-        // Rows are in the format array(id, quizid, firstslot, heading, shuffle)
+        // Rows are in the format array(id, quizid, firstslot, heading, shuffle).
         $data[] = array(1, $quiz->id, 1, 'Section 1', true);
-        $data[] = array(2, $quiz->id, 3, 'Section 2', false);
-        $data[] = array(3, $quiz->id, 5, 'Section 3', true);
         $records = array();
 
         // Temp: create number of sections.
-        foreach($data as $row) {
+        foreach ($data as $row) {
             $record = new \stdClass();
             $record->id = $row[0];
             $record->quizid = $row[1];
@@ -261,13 +201,4 @@ class mod_quiz_structure_testcase extends advanced_testcase {
 
         return $records;
     }
-
-    /**
-     * Mimic the original questions property of the quiz object
-     * @return string
-     */
-    public function get_dummy_questions_string(){
-        return '1,0,2,3,4,5,6,0,7,0,8,0,0';
-    }
-
 }
