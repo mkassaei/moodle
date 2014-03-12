@@ -1286,6 +1286,18 @@ class mod_quiz_renderer extends plugin_renderer_base {
     }
 
     /**
+     * @param object $quiz The quiz object of the quiz in question
+     * @param object $question the question
+     * @return the HTML for a marked out of question grade field.
+     */
+    function marked_out_of_field($quiz, $question) {
+        $output = '';
+        $maxmark = html_writer::span(0 + $question->maxmark, 'instancemaxmark');
+        $output .= html_writer::span($maxmark);
+        return $output;
+    }
+
+    /**
      * Renders HTML to display one question in a quiz section
      *
      * This includes link, content, availability, completion info and additional information
@@ -1372,7 +1384,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
 
             $output .= quiz_question_preview_button($quiz, $question);
 
-            $output .= quiz_question_marked_out_of_field($quiz, $question);
+            $output .= $this->marked_out_of_field($quiz, $question);
 
             if ($this->page->user_is_editing()) {
                 $output .= ' ' . quiz_get_question_regrade_action($question, $sectionreturn);
