@@ -185,8 +185,8 @@ YUI.add('moodle-mod_quiz-dragdrop', function(Y) {
 
             // Prepare request parameters
             params.sesskey = M.cfg.sesskey;
-            params.courseId = this.get('courseid');
-            params.quizId = this.get('quizid');
+            params.courseid = this.get('courseid');
+            params.quizid = this.get('quizid');
             params['class'] = 'section';
             params.field = 'move';
             params.id = dragnodeid;
@@ -393,8 +393,8 @@ YUI.add('moodle-mod_quiz-dragdrop', function(Y) {
 
             // Prepare request parameters
             params.sesskey = M.cfg.sesskey;
-            params.courseId = this.get('courseid');
-            params.quizId = this.get('quizid');
+            params.courseid = this.get('courseid');
+            params.quizid = this.get('quizid');
             params['class'] = 'resource';
             params.field = 'move';
             params.id = Number(Y.Moodle.core_course.util.cm.getId(dragnode));

@@ -29,41 +29,41 @@
 namespace mod_quiz;
 
 class structure {
-    public static function create(){
+    public static function create() {
         $structure = new \stdClass();
         return $structure;
     }
 
     public static function get_quiz_slots($quiz) {
-        if(!property_exists($quiz, 'slots')){
+        if (!property_exists($quiz, 'slots')) {
             return array();
         }
         return $quiz->slots;
     }
 
     public static function set_quiz_slots($quiz, $slots) {
-        if(!gettype($slots) == 'array'){
+        if (!gettype($slots) == 'array') {
             return;
         }
         $quiz->slots = $slots;
     }
 
     public static function get_quiz_sections($quiz) {
-        if(!property_exists($quiz, 'sections')){
+        if (!property_exists($quiz, 'sections')) {
             return array();
         }
         return $quiz->sections;
     }
 
     public static function set_quiz_sections($quiz, $sections) {
-        if(!gettype($sections) == 'array'){
+        if (!gettype($sections) == 'array') {
             return;
         }
         $quiz->sections = $sections;
     }
 
     public static function get_quiz_section_heading($section) {
-        if(!property_exists($section, 'heading')){
+        if (!property_exists($section, 'heading')) {
             return '';
         }
         return $section->heading;
@@ -89,14 +89,14 @@ class structure {
         // For now present dummy data.
         $data = array();
         $uniqueid = 1;
-        // Rows are in the format array(id, quizid, firstslot, heading, shuffle)
+        // Rows are in the format array(id, quizid, firstslot, heading, shuffle).
         $data[] = array($uniqueid++, $quiz->id, 1, 'Section 1', true);
 //         $data[] = array($uniqueid++, $quiz->id, 3, 'Section 2', false);
 //         $data[] = array($uniqueid++, $quiz->id, 5, 'Section 3', true);
         $records = array();
 
         // Temp: create number of sections.
-        foreach($data as $row) {
+        foreach ($data as $row) {
             $record = new \stdClass();
             $record->id = $row[0];
             $record->quizid = $row[1];
@@ -128,7 +128,7 @@ class structure {
      * @param object $quiz
      * @return array
      */
-    public static function populate_quiz_slots($quiz, $sort='slot'){
+    public static function populate_quiz_slots($quiz, $sort='slot') {
         global $DB;
         $records = $DB->get_records('quiz_slots', array('quizid' => $quiz->id), $sort);
         $quiz->slots = $records;
@@ -146,14 +146,14 @@ class structure {
 
         $records = self::get_quiz_slots($quiz);
 
-        // Start a transaction because we are performing multiple related updates
+        // Start a transaction because we are performing multiple related updates.
         $transaction = $DB->start_delegated_transaction();
 
         $count = count($records);
-        // iterate through the slots.
-        foreach($records as $record){
+        // Iterate through the slots.
+        foreach ($records as $record) {
             // To avoid unique constraint on quizid and slot set matching slot to a number
-            // greater than existing slots for the quiz
+            // greater than existing slots for the quiz.
             $sql = 'UPDATE {quiz_slots} SET slot = '.($record->slot+$count).' WHERE quizid='.$quiz->id.' AND slot='.$record->slot;
             $DB->execute($sql);
 
@@ -161,7 +161,7 @@ class structure {
 
         }
 
-        // End transaction
+        // End transaction.
         $transaction->allow_commit();
     }
 
@@ -171,7 +171,7 @@ class structure {
      * @param object $quiz
      * @return void
      */
-    public static function populate_quiz_questionids($quiz){
+    public static function populate_quiz_questionids($quiz) {
         $slots = self::get_quiz_slots($quiz);
         $questionids = array();
         foreach ($slots as $slot) {
@@ -187,22 +187,21 @@ class structure {
      * @param object $quiz
      * @return array
      */
-    public static function determine_slots_from_questions($quiz){
-        //Determine slots from questions.
+    public static function determine_slots_from_questions($quiz) {
+        // Determine slots from questions.
         // Rows are in the format array(id, quizid, slot, page, questionid, maxmark)
-        // Reflecting a $quiz->question string of '1,0,2,3,4,5,6,0,7,0,8,0,0'
+        // Reflecting a $quiz->question string of '1,0,2,3,4,5,6,0,7,0,8,0,0'.
         $questions = explode(',', $quiz->questions);
-
 
         $records = array();
         $currentpagenumber = 0;
         $currentslotid = 0;
         $currentslotnumber = 0;
 
-        foreach($questions as $questionid) {
+        foreach ($questions as $questionid) {
 
-            // New pages have id=0
-            if(!$questionid){
+            // New pages have id = 0.
+            if (!$questionid) {
                 $currentpagenumber++;
                 continue;
             }
@@ -231,24 +230,24 @@ class structure {
      * @param int $idbefore id of slot to come after slot being moved
      * @return array
      */
-    public static function move_slot($quiz, $id, $idbefore){
+    public static function move_slot($quiz, $id, $idbefore) {
 
-        // Get the current slots for the current quiz ordered by slot
+        // Get the current slots for the current quiz ordered by slot.
         self::populate_quiz_slots($quiz, 'slot');
         $records = self::get_quiz_slots($quiz);
 
         $keyvalues = self::get_original_pagination(self::get_quiz_slots($quiz));
 
-        // iterate through the slots.
+        // Iterate through the slots.
         $slot = 1;
         $slottomove = $records[$id];
-        foreach($records as $record){
+        foreach ($records as $record) {
 
-            if($record->id == $id){
+            if ($record->id == $id) {
                 continue;
             }
 
-            if($record->id == $idbefore){
+            if ($record->id == $idbefore) {
                 $slottomove->slot = $slot;
                 $slottomove->page = $keyvalues[$slottomove->slot];
                 $slot++;
@@ -259,12 +258,12 @@ class structure {
             $slot++;
         }
 
-        if($idbefore == 0){
+        if ($idbefore == 0) {
             $slottomove->slot = $slot;
             $slottomove->page = $keyvalues[$slottomove->slot];
         }
 
-        // Update the db
+        // Update the db.
         self::save_quiz_slot_order($quiz);
     }
 
@@ -272,7 +271,7 @@ class structure {
         global $DB;
         $slots = array();
         $sequesnce = 1;
-        Foreach ($oldslots as $key => $oldslot) {
+        foreach ($oldslots as $key => $oldslot) {
             $slot = new \stdClass();
             $slot->id = $sequesnce;
             $slot->quizid = $attemptobj->get_quizid();
@@ -284,7 +283,7 @@ class structure {
             $slot->includesubcategories = true;
             $slot->maxmark = $attemptobj->get_question_mark($oldslot);
             $slot->requireprevious = false;
-            if ($slot->slot == 5) { // TODO: This would not be hardcoded
+            if ($slot->slot == 5) { // TODO: This would not be hardcoded.
                 $slot->requireprevious = true;
             }
             $slots[] = $slot;
@@ -323,12 +322,12 @@ class structure {
         $sectiontoslotids = array();
         $currentslottosectionid = 1;
         foreach ($slots as $slot) {
-            if(array_key_exists($slot->slot, $quiz->slottosectionids)) {
+            if (array_key_exists($slot->slot, $quiz->slottosectionids)) {
                 $sectionid = $quiz->slottosectionids[$slot->slot];
             }
 
             $slot->sectionid = $sectionid;
-            if(!array_key_exists($slot->sectionid, $sectiontoslotids)) {
+            if (!array_key_exists($slot->sectionid, $sectiontoslotids)) {
                 $sectiontoslotids[$slot->sectionid] = array();
             }
 

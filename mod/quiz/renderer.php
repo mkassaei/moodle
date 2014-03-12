@@ -1208,7 +1208,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
             return $output;
         }
 
-        //Accessibility: for files get description via icon, this is very ugly hack!
+        // Accessibility: for files get description via icon, this is very ugly hack!
         $instancename = quiz_question_tostring($question);
         $altname = $question->name;
         // Avoid unnecessary duplication: if e.g. a forum name already
@@ -1288,7 +1288,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
      * @param object $question the question
      * @return the HTML for a marked out of question grade field.
      */
-    function marked_out_of_field($quiz, $question) {
+    public function marked_out_of_field($quiz, $question) {
         $output = '';
         $maxmark = html_writer::span(0 + $question->maxmark, 'instancemaxmark');
         $output .= html_writer::span($maxmark);
@@ -1813,10 +1813,10 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $slotnumber = $this->get_question_info($quiz, $question->id, 'slot');
         $pagenumber = $this->get_question_info($quiz, $question->id, 'page');
         $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
-        $Pagenumbercss = ''; // TODO: to add appropriate CSS here
+        $pagenumberclass = ''; // TODO MDL-43089 to add appropriate class name here
         $prevpage = $this->get_previous_page($quiz, $slotnumber -1);
         if ($prevpage != $pagenumber) {
-            $output .= html_writer::tag('div', $page,  array('class' => $Pagenumbercss));
+            $output .= html_writer::tag('div', $page,  array('class' => $pagenumberclass));
         }
 
         if ($questiontypehtml = $this->quiz_section_question($quiz, $course, $completioninfo, $question, $sectionreturn, $displayoptions)) {
@@ -1924,7 +1924,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
      *     option 'inblock' => true, suggesting to display controls vertically
      * @return string
      */
-    function quiz_section_add_question_control($quiz, $course, $section, $sectionreturn = null, $displayoptions = array()) {
+    public function quiz_section_add_question_control($quiz, $course, $section, $sectionreturn = null, $displayoptions = array()) {
         global $CFG, $PAGE;
 
         $vertical = !empty($displayoptions['inblock']);
@@ -2040,7 +2040,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         return $output;
     }
 
-/**
+    /**
      * Build the HTML for the module chooser javascript popup
      *
      * @param array $modules A set of modules as returned form @see
@@ -2219,7 +2219,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         if (!$sections) {
             return null;
         }
-        Foreach ($sections as $key => $section) {
+        foreach ($sections as $key => $section) {
             if ((int)$section->id === (int)$sectionid) {
                 return \mod_quiz\structure::get_quiz_section_heading($section);
             }

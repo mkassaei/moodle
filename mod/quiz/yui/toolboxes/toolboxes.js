@@ -91,8 +91,8 @@ YUI.add('moodle-mod_quiz-toolboxes', function(Y) {
             }
 
             data.sesskey = M.cfg.sesskey;
-            data.courseId = this.get('courseid');
-            data.quizId = this.get('quizid');
+            data.courseid = this.get('courseid');
+            data.quizid = this.get('quizid');
 
             var uri = M.cfg.wwwroot + this.get('ajaxurl');
 
