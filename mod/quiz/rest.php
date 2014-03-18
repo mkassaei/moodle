@@ -91,7 +91,8 @@ switch($requestmethod) {
                         if (!$slot = $DB->get_record('quiz_slots', array('quizid'=>$quiz->id, 'id'=>$id))) {
                             throw new moodle_exception('AJAX commands.php: Bad slot ID '.$id);
                         }
-                        \mod_quiz\structure::move_slot($quiz, $id, $beforeid);
+                        \mod_quiz\structure::create_for($quiz)->move_slot(
+                                $quiz, $id, $beforeid);
                         $isvisible = true;
 
                         // Just something to tell the browser everything is ok.
