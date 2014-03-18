@@ -117,7 +117,7 @@ $scrollpos = optional_param('scrollpos', '', PARAM_INT);
 list($thispageurl, $contexts, $cmid, $cm, $quiz, $pagevars) =
         question_edit_setup('editq', '/mod/quiz/edit.php', true);
 // $quiz->questions = quiz_clean_layout($quiz->questions);
-\mod_quiz\structure::populate_structure($quiz);
+$structure = \mod_quiz\structure::create_for($quiz);
 
 $defaultcategoryobj = question_make_default_categories($contexts->all());
 $defaultcategory = $defaultcategoryobj->id . ',' . $defaultcategoryobj->contextid;
@@ -488,16 +488,15 @@ if ($completion->is_enabled() && $ajaxenabled) {
 // Course wrapper start.
 echo html_writer::start_tag('div', array('class'=>'course-content'));
 
-$output->edit_page($course, $quiz, $cm, $contexts);
+$output->edit_page($course, $quiz, $structure, $cm, $contexts);
 
 // Content wrapper end.
-    echo html_writer::end_tag('div');
+echo html_writer::end_tag('div');
 
 // get information about course modules and existing module types
 // format.php in course formats may rely on presence of these variables
 $modinfo = get_fast_modinfo($course);
 
-$modnamesused = $modinfo->get_used_module_names();
 $qtypes = question_bank::get_all_qtypes();
 $qtypenamesused = array();
 foreach ($qtypes as $qtypename => $qtypedata) {
