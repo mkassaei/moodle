@@ -65,29 +65,6 @@ function quiz_has_question_use($quiz, $slot) {
 }
 
 /**
- * Remove a question from a quiz
- * @param object $quiz the quiz object.
- * @param int $questionid The id of the question to be deleted.
- */
-function quiz_remove_slot($quiz, $slotnumber) {
-    global $DB;
-
-    $slot = $DB->get_record('quiz_slots', array('quizid' => $quiz->id, 'slot' => $slotnumber));
-    $maxslot = $DB->get_field_sql('SELECT MAX(slot) FROM {quiz_slots} WHERE quizid = ?', array($quiz->id));
-    if (!$slot) {
-        return;
-    }
-
-    $trans = $DB->start_delegated_transaction();
-    $DB->delete_records('quiz_slots', array('id' => $slot->id));
-    for ($i = $slot->slot + 1; $i <= $maxslot; $i++) {
-        $DB->set_field('quiz_slots', 'slot', $i - 1,
-                array('quizid' => $quiz->id, 'slot' => $i));
-    }
-    $trans->allow_commit();
-}
-
-/**
  * Remove an empty page from the quiz layout. If that is not possible, do nothing.
  * @param object $quiz the quiz settings.
  * @param int $pagenumber the page number to delete.
@@ -1469,18 +1446,4 @@ function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledm
 //     dndupload_add_to_course($course, $enabledmodules);
 
     return true;
-}
-
-function quiz_remove_question_from_quiz($quiz, $questionid){
-    global $DB;
-    // Remove a question from the quiz.
-    // We require the user to have the 'use' capability on the question,
-    // so that then can add it back if they remove the wrong one by mistake,
-    // but, if the question is missing, it can always be removed.
-    if ($DB->record_exists('question', array('id' => $questionid))) {
-        quiz_require_question_use($questionid);
-    }
-    quiz_remove_question($quiz, $questionid);
-    quiz_delete_previews($quiz);
-    quiz_update_sumgrades($quiz);
 }
