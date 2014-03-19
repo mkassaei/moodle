@@ -186,8 +186,6 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         $data = array();
         // Rows are in the format array(id, quizid, firstslot, heading, shuffle).
         $data[] = array(1, $quiz->id, 1, 'Section 1', true);
-        $data[] = array(2, $quiz->id, 3, 'Section 2', false);
-        $data[] = array(3, $quiz->id, 5, 'Section 3', true);
         $records = array();
 
         // Temp: create number of sections.
