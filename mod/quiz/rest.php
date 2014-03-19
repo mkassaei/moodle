@@ -53,7 +53,7 @@ $PAGE->set_url('/mod/quiz/rest.php',
 require_sesskey();
 $quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
 $cm = get_coursemodule_from_instance('quiz', $quiz->id, $quiz->course);
-require_login($course, false, $cm);
+require_login($courseid, false, $cm);
 $structure = \mod_quiz\structure::create_for($quiz);
 $modcontext = context_module::instance($cm->id);
 
@@ -102,7 +102,7 @@ switch($requestmethod) {
                             quiz_update_all_final_grades($quiz);
                             quiz_update_grades($quiz, 0, true);
                         }
-                        echo json_encode(array('instancemaxmark' => $slot->maxmark));
+                        echo json_encode(array('instancemaxmark' => $maxmark));
                         break;
                 }
                 break;
