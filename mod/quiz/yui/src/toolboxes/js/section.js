@@ -162,9 +162,18 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         lightbox.show();
         this.send_request(data, lightbox);
     }
-}, {
+},  {
     NAME : 'mod_quiz-section-toolbox',
     ATTRS : {
+        courseid : {
+            'value' : 0
+        },
+        quizid : {
+            'value' : 0
+        },
+        format : {
+            'value' : 'topics'
+        }
     }
 });
 

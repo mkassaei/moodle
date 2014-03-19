@@ -9,7 +9,7 @@
  */
 
 // The CSS classes we use.
-var CSS = {
+    var CSS = {
         ACTIVITYINSTANCE : 'activityinstance',
         AVAILABILITYINFODIV : 'div.availabilityinfo',
         CONTENTWITHOUTLINK : 'contentwithoutlink',
@@ -17,7 +17,7 @@ var CSS = {
         DIMCLASS : 'dimmed',
         DIMMEDTEXT : 'dimmed_text',
         EDITINSTRUCTIONS : 'editinstructions',
-        EDITINGTITLE: 'editor_displayed',
+        EDITINGMAXMARK: 'editor_displayed',
         HIDE : 'hide',
         MODINDENTCOUNT : 'mod-indent-',
         MODINDENTHUGE : 'mod-indent-huge',
@@ -31,23 +31,24 @@ var CSS = {
     SELECTOR = {
         ACTIONAREA: '.actions',
         ACTIONLINKTEXT : '.actionlinktext',
-        ACTIVITYACTION : 'a.cm-edit-action[data-action], a.editing_title',
+        ACTIVITYACTION : 'a.cm-edit-action[data-action], a.editing_maxmark',
         ACTIVITYFORM : '.' + CSS.ACTIVITYINSTANCE + ' form',
         ACTIVITYICON : 'img.activityicon',
         ACTIVITYINSTANCE : '.' + CSS.ACTIVITYINSTANCE,
         ACTIVITYLINK: '.' + CSS.ACTIVITYINSTANCE + ' > a',
         ACTIVITYLI : 'li.activity',
-        ACTIVITYTITLE : 'input[name=title]',
+        ACTIVITYTITLE : 'input[name=maxmark]',
         COMMANDSPAN : '.commands',
         CONTENTAFTERLINK : 'div.contentafterlink',
         CONTENTWITHOUTLINK : 'div.contentwithoutlink',
-        EDITTITLE: 'a.editing_title',
+        EDITMAXMARK: 'a.editing_maxmark',
         HIDE : 'a.editing_hide',
         HIGHLIGHT : 'a.editing_highlight',
         INSTANCENAME : 'span.instancename',
+        INSTANCEMAXMARK : 'span.instancemaxmark',
         MODINDENTDIV : '.mod-indent',
         MODINDENTOUTER : '.mod-indent-outer',
-        PAGECONTENT : 'body',
+        PAGECONTENT : 'div#page-content',
         SECTIONLI : 'li.section',
         SHOW : 'a.'+CSS.SHOW,
         SHOWHIDE : 'a.editing_showhide'
@@ -98,7 +99,8 @@ Y.extend(TOOLBOX, Y.Base, {
         }
 
         data.sesskey = M.cfg.sesskey;
-        data.courseId = this.get('courseid');
+        data.courseid = this.get('courseid');
+        data.quizid = this.get('quizid');
 
         var uri = M.cfg.wwwroot + this.get('ajaxurl');
 

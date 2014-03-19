@@ -11,7 +11,7 @@ YUI.add('moodle-mod_quiz-toolboxes', function (Y, NAME) {
  */
 
 // The CSS classes we use.
-var CSS = {
+    var CSS = {
         ACTIVITYINSTANCE : 'activityinstance',
         AVAILABILITYINFODIV : 'div.availabilityinfo',
         CONTENTWITHOUTLINK : 'contentwithoutlink',
@@ -19,7 +19,7 @@ var CSS = {
         DIMCLASS : 'dimmed',
         DIMMEDTEXT : 'dimmed_text',
         EDITINSTRUCTIONS : 'editinstructions',
-        EDITINGTITLE: 'editor_displayed',
+        EDITINGMAXMARK: 'editor_displayed',
         HIDE : 'hide',
         MODINDENTCOUNT : 'mod-indent-',
         MODINDENTHUGE : 'mod-indent-huge',
@@ -33,23 +33,24 @@ var CSS = {
     SELECTOR = {
         ACTIONAREA: '.actions',
         ACTIONLINKTEXT : '.actionlinktext',
-        ACTIVITYACTION : 'a.cm-edit-action[data-action], a.editing_title',
+        ACTIVITYACTION : 'a.cm-edit-action[data-action], a.editing_maxmark',
         ACTIVITYFORM : '.' + CSS.ACTIVITYINSTANCE + ' form',
         ACTIVITYICON : 'img.activityicon',
         ACTIVITYINSTANCE : '.' + CSS.ACTIVITYINSTANCE,
         ACTIVITYLINK: '.' + CSS.ACTIVITYINSTANCE + ' > a',
         ACTIVITYLI : 'li.activity',
-        ACTIVITYTITLE : 'input[name=title]',
+        ACTIVITYTITLE : 'input[name=maxmark]',
         COMMANDSPAN : '.commands',
         CONTENTAFTERLINK : 'div.contentafterlink',
         CONTENTWITHOUTLINK : 'div.contentwithoutlink',
-        EDITTITLE: 'a.editing_title',
+        EDITMAXMARK: 'a.editing_maxmark',
         HIDE : 'a.editing_hide',
         HIGHLIGHT : 'a.editing_highlight',
         INSTANCENAME : 'span.instancename',
+        INSTANCEMAXMARK : 'span.instancemaxmark',
         MODINDENTDIV : '.mod-indent',
         MODINDENTOUTER : '.mod-indent-outer',
-        PAGECONTENT : 'body',
+        PAGECONTENT : 'div#page-content',
         SECTIONLI : 'li.section',
         SHOW : 'a.'+CSS.SHOW,
         SHOWHIDE : 'a.editing_showhide'
@@ -100,7 +101,8 @@ Y.extend(TOOLBOX, Y.Base, {
         }
 
         data.sesskey = M.cfg.sesskey;
-        data.courseId = this.get('courseid');
+        data.courseid = this.get('courseid');
+        data.quizid = this.get('quizid');
 
         var uri = M.cfg.wwwroot + this.get('ajaxurl');
 
@@ -260,12 +262,12 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
      * An Array of events added when editing a title.
      * These should all be detached when editing is complete.
      *
-     * @property edittitleevents
+     * @property editmaxmarkevents
      * @protected
      * @type Array
      * @protected
      */
-    edittitleevents: [],
+    editmaxmarkevents: [],
 
     /**
      * Initialize the resource toolbox
@@ -908,7 +910,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             var editform = Y.Node.create('<form action="#" />');
             var editinstructions = Y.Node.create('<span class="'+CSS.EDITINSTRUCTIONS+'" id="id_editinstructions" />')
                 .set('innerHTML', M.util.get_string('edittitleinstructions', 'moodle'));
-            var editor = Y.Node.create('<input name="title" type="text" class="'+CSS.TITLEEDITOR+'" />').setAttrs({
+            var editor = Y.Node.create('<input name="maxmark" type="text" class="'+CSS.TITLEEDITOR+'" />').setAttrs({
                 'value' : maxmarktext,
                 'autocomplete' : 'off',
                 'aria-describedby' : 'id_editinstructions',
@@ -965,7 +967,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             var data = {
                 'class'   : 'resource',
                 'field'   : 'updatemaxmark',
-                'title'   : newmaxmark,
+                'maxmark'   : newmaxmark,
                 'id'      : Y.Moodle.core_course.util.cm.getId(activity)
             };
             this.send_request(data, spinner, function(response) {
@@ -999,28 +1001,27 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
      * @method edit_maxmark_clear
      * @param {Node} activity  The activity whose maxmark we were altering.
      */
+    
     edit_maxmark_clear : function(activity) {
-        // Detach all listen events to prevent duplicate triggers
-        var thisevent;
-        while (thisevent !== this.editmaxmarkevents.shift()) {
-            thisevent.detach();
-        }
-        var editform = activity.one(SELECTOR.ACTIVITYFORM),
-            instructions = activity.one('#id_editinstructions');
-        if (editform) {
-            editform.replace(editform.getData('anchor'));
-        }
-        if (instructions) {
-            instructions.remove();
-        }
+      // Detach all listen events to prevent duplicate triggers
+      new Y.EventHandle(this.editmaxmarkevents).detach();
 
-        // Remove the editing class again to revert the display.
-        activity.removeClass(CSS.EDITINGMAXMARK);
+      var editform = activity.one(SELECTOR.ACTIVITYFORM),
+          instructions = activity.one('#id_editinstructions');
+      if (editform) {
+          editform.replace(editform.getData('anchor'));
+      }
+      if (instructions) {
+          instructions.remove();
+      }
 
-        // Refocus the link which was clicked originally so the user can continue using keyboard nav.
-        Y.later(100, this, function() {
-            activity.one(SELECTOR.EDITMAXMARK).focus();
-        });
+      // Remove the editing class again to revert the display.
+      activity.removeClass(CSS.EDITINGMAXMARK);
+
+      // Refocus the link which was clicked originally so the user can continue using keyboard nav.
+      Y.later(100, this, function() {
+          activity.one(SELECTOR.EDITMAXMARK).focus();
+      });
     }
 },
 {
@@ -1251,9 +1252,18 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         lightbox.show();
         this.send_request(data, lightbox);
     }
-}, {
+},  {
     NAME : 'mod_quiz-section-toolbox',
     ATTRS : {
+        courseid : {
+            'value' : 0
+        },
+        quizid : {
+            'value' : 0
+        },
+        format : {
+            'value' : 'topics'
+        }
     }
 });
 

@@ -56,12 +56,12 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
      * An Array of events added when editing a title.
      * These should all be detached when editing is complete.
      *
-     * @property edittitleevents
+     * @property editmaxmarkevents
      * @protected
      * @type Array
      * @protected
      */
-    edittitleevents: [],
+    editmaxmarkevents: [],
 
     /**
      * Initialize the resource toolbox
@@ -704,7 +704,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             var editform = Y.Node.create('<form action="#" />');
             var editinstructions = Y.Node.create('<span class="'+CSS.EDITINSTRUCTIONS+'" id="id_editinstructions" />')
                 .set('innerHTML', M.util.get_string('edittitleinstructions', 'moodle'));
-            var editor = Y.Node.create('<input name="title" type="text" class="'+CSS.TITLEEDITOR+'" />').setAttrs({
+            var editor = Y.Node.create('<input name="maxmark" type="text" class="'+CSS.TITLEEDITOR+'" />').setAttrs({
                 'value' : maxmarktext,
                 'autocomplete' : 'off',
                 'aria-describedby' : 'id_editinstructions',
@@ -761,7 +761,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             var data = {
                 'class'   : 'resource',
                 'field'   : 'updatemaxmark',
-                'title'   : newmaxmark,
+                'maxmark'   : newmaxmark,
                 'id'      : Y.Moodle.core_course.util.cm.getId(activity)
             };
             this.send_request(data, spinner, function(response) {
@@ -795,28 +795,27 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
      * @method edit_maxmark_clear
      * @param {Node} activity  The activity whose maxmark we were altering.
      */
+    
     edit_maxmark_clear : function(activity) {
-        // Detach all listen events to prevent duplicate triggers
-        var thisevent;
-        while (thisevent !== this.editmaxmarkevents.shift()) {
-            thisevent.detach();
-        }
-        var editform = activity.one(SELECTOR.ACTIVITYFORM),
-            instructions = activity.one('#id_editinstructions');
-        if (editform) {
-            editform.replace(editform.getData('anchor'));
-        }
-        if (instructions) {
-            instructions.remove();
-        }
+      // Detach all listen events to prevent duplicate triggers
+      new Y.EventHandle(this.editmaxmarkevents).detach();
 
-        // Remove the editing class again to revert the display.
-        activity.removeClass(CSS.EDITINGMAXMARK);
+      var editform = activity.one(SELECTOR.ACTIVITYFORM),
+          instructions = activity.one('#id_editinstructions');
+      if (editform) {
+          editform.replace(editform.getData('anchor'));
+      }
+      if (instructions) {
+          instructions.remove();
+      }
 
-        // Refocus the link which was clicked originally so the user can continue using keyboard nav.
-        Y.later(100, this, function() {
-            activity.one(SELECTOR.EDITMAXMARK).focus();
-        });
+      // Remove the editing class again to revert the display.
+      activity.removeClass(CSS.EDITINGMAXMARK);
+
+      // Refocus the link which was clicked originally so the user can continue using keyboard nav.
+      Y.later(100, this, function() {
+          activity.one(SELECTOR.EDITMAXMARK).focus();
+      });
     }
 },
 {
