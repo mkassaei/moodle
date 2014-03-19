@@ -130,7 +130,10 @@ switch($requestmethod) {
         switch ($class) {
             case 'resource':
                 require_capability('mod/quiz:manage', $PAGE->cm->context);
-                quiz_remove_question_from_quiz($quiz, $id);
+                if (!$slot = $DB->get_record('quiz_slots', array('quizid'=>$quiz->id, 'id'=>$id))) {
+                    throw new moodle_exception('AJAX commands.php: Bad slot ID '.$id);
+                }
+                \mod_quiz\structure::create_for($quiz)->remove_slot($quiz, $slot->slot);
                 break;
         }
         break;

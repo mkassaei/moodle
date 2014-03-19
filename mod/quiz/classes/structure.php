@@ -189,4 +189,27 @@ class structure {
                 array('id' => $movingslot->id));
         $trans->allow_commit();
     }
+
+    /**
+     * Remove a question from a quiz
+     * @param object $quiz the quiz object.
+     * @param int $questionid The id of the question to be deleted.
+     */
+    function remove_slot($quiz, $slotnumber) {
+        global $DB;
+
+        $slot = $DB->get_record('quiz_slots', array('quizid' => $quiz->id, 'slot' => $slotnumber));
+        $maxslot = $DB->get_field_sql('SELECT MAX(slot) FROM {quiz_slots} WHERE quizid = ?', array($quiz->id));
+        if (!$slot) {
+            return;
+        }
+
+        $trans = $DB->start_delegated_transaction();
+        $DB->delete_records('quiz_slots', array('id' => $slot->id));
+        for ($i = $slot->slot + 1; $i <= $maxslot; $i++) {
+            $DB->set_field('quiz_slots', 'slot', $i - 1,
+                    array('quizid' => $quiz->id, 'slot' => $i));
+        }
+        $trans->allow_commit();
+    }
 }

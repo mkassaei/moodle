@@ -313,7 +313,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
         // Get questions.
         $questions = $DB->get_records_sql(
-                "SELECT q.*, qc.contextid, slot.maxmark
+                "SELECT q.*, qc.contextid, slot.maxmark, slot.slot
                    FROM {question} q
                    JOIN {question_categories} qc ON qc.id = q.category
                    JOIN {quiz_slots} slot ON slot.questionid = q.id
@@ -840,6 +840,10 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
     //     $baseurl = new moodle_url('/course/mod.php', array('sesskey' => sesskey()));
         $baseurl = $this->get_edit_question_url($quiz, $question);
 
+        // TODO MDL-43089 fix this hack.
+        global $thispageurl;
+        $pageurl = new moodle_url($thispageurl, array('sesskey' => sesskey()));
+
         if ($sr !== null) {
             $baseurl->param('sr', $sr);
         }
@@ -855,49 +859,10 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             );
         }
 
-        // Indent.
-        if ($hasmanagequiz) {
-            $indentlimits = new stdClass();
-            $indentlimits->min = 0;
-            $indentlimits->max = 16;
-            if (right_to_left()) {   // Exchange arrows on RTL
-                $rightarrow = 't/left';
-                $leftarrow  = 't/right';
-            } else {
-                $rightarrow = 't/right';
-                $leftarrow  = 't/left';
-            }
-
-            if ($indent >= $indentlimits->max) {
-                $enabledclass = 'hidden';
-            } else {
-                $enabledclass = '';
-            }
-            $actions['moveright'] = new action_menu_link_secondary(
-                new moodle_url($baseurl, array('id' => $question->id, 'indent' => '1')),
-                new pix_icon($rightarrow, $str->moveright, 'moodle', array('class' => 'iconsmall', 'title' => '')),
-                $str->moveright,
-                array('class' => 'editing_moveright ' . $enabledclass, 'data-action' => 'moveright', 'data-keepopen' => true)
-            );
-
-            if ($indent <= $indentlimits->min) {
-                $enabledclass = 'hidden';
-            } else {
-                $enabledclass = '';
-            }
-            $actions['moveleft'] = new action_menu_link_secondary(
-                new moodle_url($baseurl, array('id' => $question->id, 'indent' => '-1')),
-                new pix_icon($leftarrow, $str->moveleft, 'moodle', array('class' => 'iconsmall', 'title' => '')),
-                $str->moveleft,
-                array('class' => 'editing_moveleft ' . $enabledclass, 'data-action' => 'moveleft', 'data-keepopen' => true)
-            );
-
-        }
-
         // Delete.
         if ($hasmanagequiz) {
             $actions['delete'] = new action_menu_link_secondary(
-                new moodle_url($baseurl, array('delete' => $question->id)),
+                new moodle_url($pageurl, array('remove' => $question->slot)),
                 new pix_icon('t/delete', $str->delete, 'moodle', array('class' => 'iconsmall', 'title' => '')),
                 $str->delete,
                 array('class' => 'editing_delete', 'data-action' => 'delete')
