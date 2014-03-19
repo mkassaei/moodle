@@ -75,7 +75,8 @@ class structure {
     }
 
     /**
-     * @return stdClass[] the slots in this quiz.
+     * Get a slot by it's id. Throws an exception if it is missing.
+     * @return stdClass the requested slot.
      */
     public function get_slot_by_id($slotid) {
         if (!array_key_exists($slotid, $this->slots)) {

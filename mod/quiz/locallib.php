@@ -1843,3 +1843,43 @@ class qubaids_for_quiz extends qubaid_join {
         parent::__construct('{quiz_attempts} quiza', 'quiza.uniqueid', $where, $params);
     }
 }
+
+/**
+ * Creates a textual representation of a question for display.
+ *
+ * @param object $question A question object from the database questions table
+ * @param bool $showicon If true, show the question's icon with the question. False by default.
+ * @param bool $showquestiontext If true (default), show question text after question name.
+ *       If false, show only question name.
+ * @param bool $return If true (default), return the output. If false, print it.
+ */
+function quiz_question_tostring($question, $showicon = false,
+        $showquestiontext = true, $return = true) {
+    global $COURSE;
+    $result = '';
+    $result .= '<span class="questionname">';
+    if ($showicon) {
+        $result .= print_question_icon($question, true);
+        echo ' ';
+    }
+    $result .= shorten_text(format_string($question->name), 200) . '</span>';
+    if ($showquestiontext) {
+        $questiontext = question_utils::to_plain_text($question->questiontext,
+                $question->questiontextformat, array('noclean' => true, 'para' => false));
+        $questiontext = shorten_text($questiontext, 200);
+        $result .= '<span class="questiontext">';
+        if (!empty($questiontext)) {
+            $result .= s($questiontext);
+        } else {
+            $result .= '<span class="error">';
+            $result .= get_string('questiontextisempty', 'quiz');
+            $result .= '</span>';
+        }
+        $result .= '</span>';
+    }
+    if ($return) {
+        return $result;
+    } else {
+        echo $result;
+    }
+}

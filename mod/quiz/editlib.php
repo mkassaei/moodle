@@ -32,8 +32,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
-define('NUM_QS_TO_SHOW_IN_RANDOM', 3);
-
 /**
  * Verify that the question exists, and the user has permission to use it.
  * Does not return. Throws an exception if the question cannot be used.
@@ -62,23 +60,6 @@ function quiz_has_question_use($quiz, $slot) {
         return false;
     }
     return question_has_capability_on($question, 'use');
-}
-
-/**
- * Remove an empty page from the quiz layout. If that is not possible, do nothing.
- * @param object $quiz the quiz settings.
- * @param int $pagenumber the page number to delete.
- */
-function quiz_delete_empty_page($quiz, $pagenumber) {
-    global $DB;
-
-    if ($DB->record_exists('quiz_slots', array('quizid' => $quiz->id, 'page' => $pagenumber))) {
-        // This was not an empty page.
-        return;
-    }
-
-    $DB->execute('UPDATE {quiz_slots} SET page = page - 1 WHERE quizid = ? AND page > ?',
-            array($quiz->id, $pagenumber));
 }
 
 /**
@@ -217,58 +198,6 @@ function quiz_add_random_questions($quiz, $addonpage, $categoryid, $number,
             print_error('cannotinsertrandomquestion', 'quiz');
         }
         quiz_add_quiz_question($question->id, $quiz, $addonpage);
-    }
-}
-
-/**
- * Add a page break after a particular slot.
- * @param object $quiz the quiz settings.
- * @param int $slot the slot to add the page break after.
- */
-function quiz_add_page_break_after_slot($quiz, $slot) {
-    global $DB;
-
-    $DB->execute('UPDATE {quiz_slots} SET page = page + 1 WHERE quizid = ? AND slot > ?',
-            array($quiz->id, $slot));
-}
-
-/**
- * Creates a textual representation of a question for display.
- *
- * @param object $question A question object from the database questions table
- * @param bool $showicon If true, show the question's icon with the question. False by default.
- * @param bool $showquestiontext If true (default), show question text after question name.
- *       If false, show only question name.
- * @param bool $return If true (default), return the output. If false, print it.
- */
-function quiz_question_tostring($question, $showicon = false,
-        $showquestiontext = true, $return = true) {
-    global $COURSE;
-    $result = '';
-    $result .= '<span class="questionname">';
-    if ($showicon) {
-        $result .= print_question_icon($question, true);
-        echo ' ';
-    }
-    $result .= shorten_text(format_string($question->name), 200) . '</span>';
-    if ($showquestiontext) {
-        $questiontext = question_utils::to_plain_text($question->questiontext,
-                $question->questiontextformat, array('noclean' => true, 'para' => false));
-        $questiontext = shorten_text($questiontext, 200);
-        $result .= '<span class="questiontext">';
-        if (!empty($questiontext)) {
-            $result .= s($questiontext);
-        } else {
-            $result .= '<span class="error">';
-            $result .= get_string('questiontextisempty', 'quiz');
-            $result .= '</span>';
-        }
-        $result .= '</span>';
-    }
-    if ($return) {
-        return $result;
-    } else {
-        echo $result;
     }
 }
 
@@ -605,9 +534,6 @@ function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledm
             'edittitleinstructions',
             'show',
             'hide',
-            'groupsnone',
-            'groupsvisible',
-            'groupsseparate',
             'clicktochangeinbrackets',
             'markthistopic',
             'markedthistopic',
@@ -618,22 +544,10 @@ function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledm
             'emptydragdropregion'
         ), 'moodle');
 
-    // Include format-specific strings
-//     if ($course->id != $SITE->id) {
-//         $PAGE->requires->strings_for_js(array(
-//                 'showfromothers',
-//                 'hidefromothers',
-//             ), 'format_' . $course->format);
-//     }
-
     // For confirming resource deletion we need the name of the module in question
     foreach ($usedqtypes as $module => $modname) {
         $PAGE->requires->string_for_js('pluginname', 'qtype_'.$module);
     }
-
-    // Load drag and drop upload AJAX.
-//     require_once($CFG->dirroot.'/course/dnduploadlib.php');
-//     dndupload_add_to_course($course, $enabledmodules);
 
     return true;
 }
