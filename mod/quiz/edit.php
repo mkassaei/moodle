@@ -163,17 +163,6 @@ $afteractionurl = new moodle_url($thispageurl);
 if ($scrollpos) {
     $afteractionurl->param('scrollpos', $scrollpos);
 }
-if (($up = optional_param('up', false, PARAM_INT)) && confirm_sesskey()) {
-    quiz_move_question_up($quiz, $up);
-    quiz_delete_previews($quiz);
-    redirect($afteractionurl);
-}
-
-if (($down = optional_param('down', false, PARAM_INT)) && confirm_sesskey()) {
-    quiz_move_question_down($quiz, $down);
-    quiz_delete_previews($quiz);
-    redirect($afteractionurl);
-}
 
 if (optional_param('repaginate', false, PARAM_BOOL) && confirm_sesskey()) {
     // Re-paginate the quiz.
@@ -235,29 +224,6 @@ $addpage = optional_param('addpage', false, PARAM_INT);
 if ($addpage !== false && confirm_sesskey()) {
     quiz_add_page_break_after_slot($quiz, $addpage);
     quiz_delete_previews($quiz);
-    redirect($afteractionurl);
-}
-
-$deleteemptypage = optional_param('deleteemptypage', false, PARAM_INT);
-if (($deleteemptypage !== false) && confirm_sesskey()) {
-    quiz_delete_empty_page($quiz, $deleteemptypage);
-    quiz_delete_previews($quiz);
-    redirect($afteractionurl);
-}
-
-$remove = optional_param('remove', false, PARAM_INT);
-if ($remove && confirm_sesskey() && quiz_has_question_use($quiz, $remove)) {
-    // Remove a question from the quiz.
-    // We require the user to have the 'use' capability on the question,
-    // so that then can add it back if they remove the wrong one by mistake,
-    // but, if the question is missing, it can always be removed.
-    quiz_remove_slot($quiz, $remove);
-    quiz_delete_previews($quiz);
-    quiz_update_sumgrades($quiz);
-//     if ($DB->record_exists('question', array('id' => $remove))) {
-//         quiz_require_question_use($remove);
-//     }
-    quiz_remove_question_from_quiz($quiz, $remove);
     redirect($afteractionurl);
 }
 

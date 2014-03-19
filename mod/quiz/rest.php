@@ -45,26 +45,17 @@ $summary    = optional_param('summary', '', PARAM_RAW);
 $sequence   = optional_param('sequence', '', PARAM_SEQUENCE);
 $visible    = optional_param('visible', 0, PARAM_INT);
 $pageaction = optional_param('action', '', PARAM_ALPHA); // Used to simulate a DELETE command.
-$maxmark      = optional_param('maxmark', '', PARAM_FLOAT);
+$maxmark    = optional_param('maxmark', '', PARAM_FLOAT);
 
 $PAGE->set_url('/mod/quiz/rest.php',
         array('courseid' => $courseid, 'quizid' => $quizid, 'class' => $class));
 
-// NOTE: when making any changes here please make sure it is using the same access control as mod/quiz/edit.php !!
-
-$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-$quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
-
-// Check user is logged in and set contexts if we are dealing with resource.
-if (in_array($class, array('resource'))) {
-    $cm = get_coursemodule_from_instance('quiz', $quiz->id, $course->id);
-    require_login($course, false, $cm);
-    $modcontext = context_module::instance($cm->id);
-} else {
-    require_login($course);
-}
-$coursecontext = context_course::instance($course->id);
 require_sesskey();
+$quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
+$cm = get_coursemodule_from_instance('quiz', $quiz->id, $quiz->course);
+require_login($course, false, $cm);
+$structure = \mod_quiz\structure::create_for($quiz);
+$modcontext = context_module::instance($cm->id);
 
 echo $OUTPUT->header(); // Send headers.
 
@@ -86,36 +77,31 @@ switch($requestmethod) {
 
             case 'resource':
                 switch ($field) {
+
                     case 'move':
-                        require_capability('mod/quiz:manage', $PAGE->cm->context);
-                        if (!$slot = $DB->get_record('quiz_slots', array('quizid'=>$quiz->id, 'id'=>$id))) {
-                            throw new moodle_exception('AJAX commands.php: Bad slot ID '.$id);
-                        }
-                        \mod_quiz\structure::create_for($quiz)->move_slot(
-                                $quiz, $id, $beforeid);
-                        $isvisible = true;
-
-                        // Just something to tell the browser everything is ok.
-                        echo json_encode(array('visible' => (bool) $isvisible));
+                        require_capability('mod/quiz:manage', $modcontext);
+                        $structure->move_slot($quiz, $id, $beforeid);
+                        quiz_delete_previews($quiz);
+                        echo json_encode(array('visible' => true));
                         break;
+
                     case 'getmaxmark':
-                        require_capability('mod/quiz:manage', $PAGE->cm->context);
+                        require_capability('mod/quiz:manage', $modcontext);
                         $slot = $DB->get_record('quiz_slots', array('id' => $id), '*', MUST_EXIST);
-
-                        // Don't pass edit strings through multilang filters - we need the entire string.
-                        echo json_encode(array('instancemaxmark' => (0+$slot->maxmark)));
+                        echo json_encode(array('instancemaxmark' => 0 + $slot->maxmark));
                         break;
+
                     case 'updatemaxmark':
-                        require_capability('mod/quiz:manage', $PAGE->cm->context);
-                        $slot = $DB->get_record('quiz_slots', array('id' => $id), '*', MUST_EXIST);
-
-                        // Escape strings as they would be by mform.
-                        $slot->maxmark = clean_param($maxmark, PARAM_FLOAT);
-
-//                         if (!empty($slot->maxmark)) {
-                            $DB->update_record('quiz_slots', $slot);
-//                         }
-
+                        require_capability('mod/quiz:manage', $modcontext);
+                        $slot = $structure->get_slot_by_id($id);
+                        if ($structure->update_slot_maxmark($slot, $maxmark)) {
+                            // Grade has really changed.
+                            quiz_delete_previews($quiz);
+                            quiz_update_sumgrades($quiz);
+                            quiz_update_all_attempt_sumgrades($quiz);
+                            quiz_update_all_final_grades($quiz);
+                            quiz_update_grades($quiz, 0, true);
+                        }
                         echo json_encode(array('instancemaxmark' => $slot->maxmark));
                         break;
                 }
@@ -129,11 +115,13 @@ switch($requestmethod) {
     case 'DELETE':
         switch ($class) {
             case 'resource':
-                require_capability('mod/quiz:manage', $PAGE->cm->context);
+                require_capability('mod/quiz:manage', $modcontext);
                 if (!$slot = $DB->get_record('quiz_slots', array('quizid'=>$quiz->id, 'id'=>$id))) {
                     throw new moodle_exception('AJAX commands.php: Bad slot ID '.$id);
                 }
-                \mod_quiz\structure::create_for($quiz)->remove_slot($quiz, $slot->slot);
+                $structure->remove_slot($quiz, $slot->slot);
+                quiz_delete_previews($quiz);
+                quiz_update_sumgrades($quiz);
                 break;
         }
         break;
