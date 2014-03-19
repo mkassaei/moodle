@@ -339,7 +339,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
             });
             del.dd.plug(Y.Plugin.DDWinScroll);
 
-            M.mod_quiz.quizebase.register_module(this);
+            M.mod_quiz.quizbase.register_module(this);
             M.mod_quiz.dragres = this;
         }
     },
