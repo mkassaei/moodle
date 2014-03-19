@@ -211,35 +211,6 @@ if ((optional_param('addrandom', false, PARAM_BOOL)) && confirm_sesskey()) {
     redirect($afteractionurl);
 }
 
-if (optional_param('addnewpagesafterselected', null, PARAM_CLEAN) &&
-        !empty($selectedslots) && confirm_sesskey()) {
-    foreach ($selectedslots as $slot) {
-        quiz_add_page_break_after_slot($quiz, $slot);
-    }
-    quiz_delete_previews($quiz);
-    redirect($afteractionurl);
-}
-
-$addpage = optional_param('addpage', false, PARAM_INT);
-if ($addpage !== false && confirm_sesskey()) {
-    quiz_add_page_break_after_slot($quiz, $addpage);
-    quiz_delete_previews($quiz);
-    redirect($afteractionurl);
-}
-
-if (optional_param('quizdeleteselected', false, PARAM_BOOL) &&
-        !empty($selectedslots) && confirm_sesskey()) {
-    // Work backwards, since removing a question renumbers following slots.
-    foreach (array_reverse($selectedslots) as $slot) {
-        if (quiz_has_question_use($quiz, $slot)) {
-            quiz_remove_slot($quiz, $slot);
-        }
-    }
-    quiz_delete_previews($quiz);
-    quiz_update_sumgrades($quiz);
-    redirect($afteractionurl);
-}
-
 if (optional_param('savechanges', false, PARAM_BOOL) && confirm_sesskey()) {
     $deletepreviews = false;
     $recomputesummarks = false;
