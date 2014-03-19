@@ -51,7 +51,7 @@ class structure {
 
     /**
      * Create an instance of this class representing an empty quiz.
-     * @return \mod_quiz\structure
+     * @return structure
      */
     public static function create() {
         return new self();
@@ -59,7 +59,7 @@ class structure {
 
     /**
      * Create an instance of this class representing the structure of a given quiz.
-     * @return \mod_quiz\structure
+     * @return structure
      */
     public static function create_for($quiz) {
         $structure = self::create();
@@ -72,6 +72,16 @@ class structure {
      */
     public function get_quiz_slots() {
         return $this->slots;
+    }
+
+    /**
+     * @return stdClass[] the slots in this quiz.
+     */
+    public function get_slot_by_id($slotid) {
+        if (!array_key_exists($slotid, $this->slots)) {
+            throw new dml_missing_record_exception('quiz_slots');
+        }
+        return $this->slots[$slotid];
     }
 
     /**
@@ -167,6 +177,9 @@ class structure {
 
         $movingslot = $this->slots[$id];
         $targetslot = $this->slots[$idbefore];
+        if (empty($movingslot) || empty($targetslot)) {
+            throw new moodle_exception('Bad slot ID ' . $id . ' or ' . $idbefore);
+        }
 
         $slotreorder = array($movingslot->slot => $targetslot->slot);
         if ($movingslot->slot < $targetslot->slot) {
@@ -211,5 +224,31 @@ class structure {
                     array('quizid' => $quiz->id, 'slot' => $i));
         }
         $trans->allow_commit();
+    }
+
+    /**
+     * Change the max mark for a slot.
+     *
+     * Saves changes to the question grades in the quiz_slots table and any
+     * corresponding question_attempts.
+     * It does not update 'sumgrades' in the quiz table.
+     *
+     * @param stdClass $slot    row from the quiz_slots table.
+     * @param float    $maxmark the new maxmark.
+     * @return bool true if the new grade is different from the old one.
+     */
+    function update_slot_maxmark($slot, $maxmark) {
+        global $DB;
+
+        if (abs($maxmark - $slot->maxmark) < 1e-7) {
+            // Grade has not changed. Nothing to do.
+            return false;
+        }
+
+        $slot->maxmark = $maxmark;
+        $DB->update_record('quiz_slots', $slot);
+        question_engine::set_max_mark_in_attempts(new qubaids_for_quiz($slot->quizid),
+                $slot->slot, $maxmark);
+        return true;
     }
 }
