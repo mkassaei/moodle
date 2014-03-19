@@ -286,10 +286,10 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         echo $this->heading(get_string('editingquizx', 'quiz', format_string($quiz->name)), 2);
         echo $this->help_icon('editingquiz', 'quiz', get_string('basicideasofquiz', 'quiz'));
         // Show status bar.
-        quiz_print_status_bar($quiz);
+        echo $this->status_bar($quiz);
 
         $tabindex = 0;
-        quiz_print_grading_form($quiz, $this->page->url, $tabindex);
+        echo $this->maximum_grade_input($quiz, $this->page->url);
 
         $notifystrings = array();
         if (quiz_has_attempts($quiz->id)) {
@@ -382,6 +382,93 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
             echo $this->end_section_list();
 
+    }
+
+    /**
+     * Render the status bar.
+     *
+     * @param object $quiz The quiz object of the quiz in question
+     */
+    public function status_bar($quiz) {
+        global $DB;
+
+        $bits = array();
+
+        $bits[] = html_writer::tag('span',
+                get_string('totalmarksx', 'quiz', quiz_format_grade($quiz, $quiz->sumgrades)),
+                array('class' => 'totalpoints'));
+
+        $bits[] = html_writer::tag('span',
+                get_string('numquestionsx', 'quiz', $DB->count_records('quiz_slots', array('quizid' => $quiz->id))),
+                array('class' => 'numberofquestions'));
+
+        $timenow = time();
+
+        // Exact open and close dates for the tool-tip.
+        $dates = array();
+        if ($quiz->timeopen > 0) {
+            if ($timenow > $quiz->timeopen) {
+                $dates[] = get_string('quizopenedon', 'quiz', userdate($quiz->timeopen));
+            } else {
+                $dates[] = get_string('quizwillopen', 'quiz', userdate($quiz->timeopen));
+            }
+        }
+        if ($quiz->timeclose > 0) {
+            if ($timenow > $quiz->timeclose) {
+                $dates[] = get_string('quizclosed', 'quiz', userdate($quiz->timeclose));
+            } else {
+                $dates[] = get_string('quizcloseson', 'quiz', userdate($quiz->timeclose));
+            }
+        }
+        if (empty($dates)) {
+            $dates[] = get_string('alwaysavailable', 'quiz');
+        }
+        $tooltip = implode(', ', $dates);
+
+        // Brief summary on the page.
+        if ($timenow < $quiz->timeopen) {
+            $currentstatus = get_string('quizisclosedwillopen', 'quiz',
+                    userdate($quiz->timeopen, get_string('strftimedatetimeshort', 'langconfig')));
+        } else if ($quiz->timeclose && $timenow <= $quiz->timeclose) {
+            $currentstatus = get_string('quizisopenwillclose', 'quiz',
+                    userdate($quiz->timeclose, get_string('strftimedatetimeshort', 'langconfig')));
+        } else if ($quiz->timeclose && $timenow > $quiz->timeclose) {
+            $currentstatus = get_string('quizisclosed', 'quiz');
+        } else {
+            $currentstatus = get_string('quizisopen', 'quiz');
+        }
+
+        $bits[] = html_writer::tag('span', $currentstatus,
+                array('class' => 'quizopeningstatus', 'title' => implode(', ', $dates)));
+
+        return html_writer::tag('div', implode(' | ', $bits), array('class' => 'statusbar'));
+    }
+
+    /**
+     * Render the form for setting a quiz' overall grade
+     *
+     * @param object $quiz The quiz object of the quiz in question
+     * @param object $pageurl The url of the current page with the parameters required
+     *     for links returning to the current page, as a moodle_url object
+     * @param int $tabindex The tabindex to start from for the form elements created
+     * @return int The tabindex from which the calling page can continue, that is,
+     *      the last value used +1.
+     */
+    function maximum_grade_input($quiz, $pageurl) {
+        $o = '';
+        $o .= '<form method="post" action="edit.php" class="quizsavegradesform"><div>';
+        $o .= '<fieldset class="invisiblefieldset" style="display: block;">';
+        $o .= "<input type=\"hidden\" name=\"sesskey\" value=\"" . sesskey() . "\" />";
+        $o .= html_writer::input_hidden_params($pageurl);
+        $a = '<input type="text" id="inputmaxgrade" name="maxgrade" size="' .
+                ($quiz->decimalpoints + 2) .
+                '" value="' . quiz_format_grade($quiz, $quiz->grade) . '" />';
+        $o .= '<label for="inputmaxgrade">' . get_string('maximumgradex', '', $a) . "</label>";
+        $o .= '<input type="hidden" name="savechanges" value="save" />';
+        $o .= '<input type="submit" value="' . get_string('save', 'quiz') . '" />';
+        $o .= '</fieldset>';
+        $o .= "</div></form>\n";
+        return $o;
     }
 
     /**
