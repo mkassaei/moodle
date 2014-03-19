@@ -168,7 +168,7 @@ Y.extend(DRAGSECTION, M.core.dragdrop, {
 
         // Prepare request parameters
         params.sesskey = M.cfg.sesskey;
-        params.courseId = this.get('courseid');
+        params.courseid = this.get('courseid');
         params.quizid = this.get('quizid');
         params['class'] = 'section';
         params.field = 'move';
