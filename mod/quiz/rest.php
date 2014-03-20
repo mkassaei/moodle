@@ -46,7 +46,6 @@ $sequence   = optional_param('sequence', '', PARAM_SEQUENCE);
 $visible    = optional_param('visible', 0, PARAM_INT);
 $pageaction = optional_param('action', '', PARAM_ALPHA); // Used to simulate a DELETE command.
 $maxmark    = optional_param('maxmark', '', PARAM_FLOAT);
-
 $PAGE->set_url('/mod/quiz/rest.php',
         array('courseid' => $courseid, 'quizid' => $quizid, 'class' => $class));
 
@@ -69,7 +68,7 @@ if ($pageaction == 'DELETE') {
 
 switch($requestmethod) {
     case 'POST':
-    // case 'GET': // For debugging.
+//      case 'GET': // For debugging.
 
         switch ($class) {
             case 'section':

@@ -178,8 +178,15 @@ class structure {
 
         $movingslot = $this->slots[$id];
         $targetslot = $this->slots[$idbefore];
-        if (empty($movingslot) || empty($targetslot)) {
-            throw new moodle_exception('Bad slot ID ' . $id . ' or ' . $idbefore);
+
+        if (empty($movingslot)) {
+            throw new moodle_exception('Bad slot ID ' . $id);
+        }
+
+        // empty target slot means move slot to first
+        if (empty($targetslot)) {
+            $targetid = $DB->get_field('quiz_slots', 'id', array('slot' => 1, 'quizid' => $quiz->id));
+            $targetslot = $this->slots[$targetid];
         }
 
         $slotreorder = array($movingslot->slot => $targetslot->slot);
