@@ -544,6 +544,10 @@ function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledm
             'emptydragdropregion'
         ), 'moodle');
 
+    $PAGE->requires->strings_for_js(array(
+            'confirmremovequestion',
+        ), 'quiz');
+
     // For confirming resource deletion we need the name of the module in question
     foreach ($usedqtypes as $module => $modname) {
         $PAGE->requires->string_for_js('pluginname', 'qtype_'.$module);
