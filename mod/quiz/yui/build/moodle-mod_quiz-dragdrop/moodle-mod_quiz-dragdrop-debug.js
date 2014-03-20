@@ -429,14 +429,14 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
         // Prepare request parameters
         params.sesskey = M.cfg.sesskey;
         params.courseid = this.get('courseid');
-        params.quizid = this.get('courseid');
+        params.quizid = this.get('quizid');
         params['class'] = 'resource';
         params.field = 'move';
         params.id = Number(Y.Moodle.core_course.util.cm.getId(dragnode));
         params.sectionId = Y.Moodle.core_course.util.section.getId(dropnode.ancestor(M.mod_quiz.edit.get_section_wrapper(Y), true));
 
-        if (dragnode.next('li')) {
-            params.beforeId = Number(Y.Moodle.core_course.util.cm.getId(dragnode.next('li')));
+        if (dragnode.previous('li')) {
+            params.beforeId = Number(Y.Moodle.core_course.util.cm.getId(dragnode.previous('li')));
         }
 
 //        if (dragnode.next()) {
@@ -457,7 +457,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
                 success: function(tid, response) {
                     var responsetext = Y.JSON.parse(response.responseText);
                     var params = {element: dragnode, visible: responsetext.visible};
-                    M.course.coursebase.invoke_function('set_visibility_resource_ui', params);
+                    M.mod_quiz.quizbase.invoke_function('set_visibility_resource_ui', params);
                     this.unlock_drag_handle(drag, CSS.EDITINGMOVE);
                     window.setTimeout(function() {
                         spinner.hide();
