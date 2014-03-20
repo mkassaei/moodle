@@ -489,10 +489,12 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $slotnumber = $this->get_question_info($structure, $question->id, 'slot');
         $pagenumber = $this->get_question_info($structure, $question->id, 'page');
         $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
+
         $pagenumberclass = ''; // TODO MDL-43089 to add appropriate class name here
+        $dragdropclass = 'page activity quiz modtype_quiz  yui3-dd-drop';
         $prevpage = $this->get_previous_page($structure, $slotnumber -1);
         if ($prevpage != $pagenumber) {
-            $output .= html_writer::tag('div', $page,  array('class' => $pagenumberclass));
+            $output .= html_writer::tag('li', $page,  array('class' => $pagenumberclass . ' ' . $dragdropclass, 'id' => 'page-' . $pagenumber));
         }
 
         if ($questiontypehtml = $this->quiz_section_question($quiz, $structure, $course, $completioninfo, $question, $sectionreturn, $pageurl)) {
