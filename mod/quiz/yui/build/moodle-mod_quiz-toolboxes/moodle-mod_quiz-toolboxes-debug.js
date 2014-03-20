@@ -470,15 +470,9 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         var element   = activity,
             // Create confirm string (different if element has or does not have name)
             confirmstring = '',
-            plugindata = {
-                type: M.util.get_string('pluginname', element.getAttribute('class').match(/modtype_([^\s]*)/)[1])
-            };
-        if (Y.Moodle.core_course.util.cm.getName(element) !== null) {
-            plugindata.name = Y.Moodle.core_course.util.cm.getName(element);
-            confirmstring = M.util.get_string('deletechecktypename', 'moodle', plugindata);
-        } else {
-            confirmstring = M.util.get_string('deletechecktype', 'moodle', plugindata);
-        }
+            qtypename = M.util.get_string('pluginname',
+                        'qtype_' + element.getAttribute('class').match(/qtype_([^\s]*)/)[1]);
+        confirmstring = M.util.get_string('confirmremovequestion', 'quiz', qtypename);
 
         // Create the confirmation dialogue.
         var confirm = new M.core.confirm({

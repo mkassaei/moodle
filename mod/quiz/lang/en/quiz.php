@@ -183,6 +183,7 @@ $string['configtimelimit'] = 'Default time limit for quizzes in minutes. 0 mean 
 $string['configtimelimitsec'] = 'Default time limit for quizzes in seconds. 0 mean no time limit.';
 $string['configurerandomquestion'] = 'Configure question';
 $string['confirmclose'] = 'Once you submit, you will no longer be able to change your answers for this attempt.';
+$string['confirmremovequestion'] = 'Are you sure you want to remove this {$a} question?';
 $string['confirmserverdelete'] = 'Are you sure you want to remove the server <b>{$a}</b> from the list?';
 $string['confirmstartattemptlimit'] = 'Number of attempts allowed:  {$a}. You are about to start a new attempt.  Do you wish to proceed?';
 $string['confirmstartattempttimelimit'] = 'This quiz has a time limit and is limited to {$a} attempt(s). You are about to start a new attempt.  Do you wish to proceed?';
