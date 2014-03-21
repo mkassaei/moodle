@@ -16,16 +16,21 @@ Feature: Edit quiz page
       | teacher1 | C1     | editingteacher |
     When I log in as "teacher1"
     And I follow "Course 1"
+    # Step 1
     And I turn editing mode on
     And I add a "Quiz" to section "1" and I fill the form with:
       | Name        | Quiz for editing |
       | Description | This quiz is used to test all aspects of the edit quiz page. |
     And I follow "Quiz for editing"
+    # Step 2
     And I follow "Edit quiz"
 
   @javascript
   Scenario: Do lots of adding, reordering and removing questions.
+    # Step 3
     Then I should see "Editing quiz: Quiz for editing"
+    And I should see "Questions: 0"
+    # Step 4
     And I follow "add"
     And I follow "Add a question"
     And I set the field "True/False" to "1"
@@ -36,3 +41,28 @@ Feature: Edit quiz page
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz for editing"
     And I should see "Question A"
+    # Step 5
+    And I follow "add"
+    And I follow "Add a question"
+    And I set the field "True/False" to "1"
+    And I press "Next"
+    And I set the following fields to these values:
+      | Question name | Question B          |
+      | Question text | Its false again     |
+    And I press "id_submitbutton"
+    Then I should see "Editing quiz: Quiz for editing"
+    # TODO next step should verify it is on page 1.
+    And I should see "Question B"
+    # Step 6
+    And I follow "add"
+    And I follow "Add a question"
+    And I set the field "True/False" to "1"
+    And I press "Next"
+    And I set the following fields to these values:
+      | Question name | Question C          |
+      | Question text | Its false again     |
+      |               |                     |
+    And I press "id_submitbutton"
+    Then I should see "Editing quiz: Quiz for editing"
+    # TODO next step should verify it is on page 2.
+    And I should see "Question C"
