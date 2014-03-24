@@ -348,7 +348,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
         // Display the add icon menu.
         if (!$quiz->fullquestions) {
-            echo html_writer::tag('span', $this->add_menu_actions($quiz, ''));
+            echo html_writer::tag('span', $this->add_menu_actions($quiz, '', $pageurl));
         }
 
         // Now the list of sections.

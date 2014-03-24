@@ -30,8 +30,9 @@ Feature: Edit quiz page
     # Step 3
     Then I should see "Editing quiz: Quiz for editing"
     And I should see "Questions: 0"
+
     # Step 4
-    And I follow "add"
+    And I follow "Add"
     And I follow "Add a question"
     And I set the field "True/False" to "1"
     And I press "Next"
@@ -41,8 +42,15 @@ Feature: Edit quiz page
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz for editing"
     And I should see "Question A"
+
     # Step 5
-    And I follow "add"
+    # Step 6
+    And I set the max mark for question "Question A" to "2.5"
+    And I should see "2.5"
+    And I should see "Total of marks: 2.50"
+
+    # Step 7
+    And I follow "Add"
     And I follow "Add a question"
     And I set the field "True/False" to "1"
     And I press "Next"
@@ -53,8 +61,8 @@ Feature: Edit quiz page
     Then I should see "Editing quiz: Quiz for editing"
     # TODO next step should verify it is on page 1.
     And I should see "Question B"
-    # Step 6
-    And I follow "add"
+    # Step 8
+    And I follow "Add"
     And I follow "Add a question"
     And I set the field "True/False" to "1"
     And I press "Next"
