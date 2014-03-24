@@ -256,7 +256,7 @@ class structure {
         $trans = $DB->start_delegated_transaction();
         $slot->maxmark = $maxmark;
         $DB->update_record('quiz_slots', $slot);
-        \question_engine::set_max_mark_in_attempts(new qubaids_for_quiz($slot->quizid),
+        \question_engine::set_max_mark_in_attempts(new \qubaids_for_quiz($slot->quizid),
                 $slot->slot, $maxmark);
         $trans->allow_commit();
 
