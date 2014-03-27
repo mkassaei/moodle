@@ -1227,6 +1227,29 @@ function quiz_question_preview_button($quiz, $question, $label = false) {
 }
 
 /**
+ * @param object $quiz the quiz settings
+ * @param object $question the question
+ * @return the HTML for a delete icon and link.
+ */
+function quiz_question_delete_button($quiz, $question) {
+    global $OUTPUT, $PAGE;
+
+    if (!$hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context)) {
+        return '';
+    }
+
+    $url = new moodle_url($PAGE->url, array('sesskey' => sesskey(), 'remove' => $question->slot));
+
+    $strdelete = get_string('delete');
+
+    // Build the icon.
+    $image = $OUTPUT->pix_icon('t/delete', $strdelete);
+
+    return $OUTPUT->action_link($url, $image, null, array('title' => $strdelete,
+                'class' => 'cm-edit-action editing_delete', 'data-action' => 'delete'));
+}
+
+/**
  * @param object $attempt the attempt.
  * @param object $context the quiz context.
  * @return int whether flags should be shown/editable to the current user for this attempt.
