@@ -694,10 +694,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @return the HTML for a marked out of question grade field.
      */
     public function marked_out_of_field($quiz, $question) {
-        $output = '';
-        $maxmark = html_writer::span(0 + $question->maxmark, 'instancemaxmark');
-        $output .= html_writer::span($maxmark);
-        return $output;
+        return html_writer::span(0 + $question->maxmark, 'instancemaxmark');
     }
 
     /**
