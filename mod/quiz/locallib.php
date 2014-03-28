@@ -1223,7 +1223,7 @@ function quiz_question_preview_button($quiz, $question, $label = false) {
     $action = new popup_action('click', $url, 'questionpreview',
             question_preview_popup_params());
 
-    return $OUTPUT->action_link($url, $image, $action, array('title' => $strpreviewquestion, 'class' => 'preview edit_icon'));
+    return $OUTPUT->action_link($url, $image, $action, array('title' => $strpreviewquestion, 'class' => 'preview'));
 }
 
 /**
@@ -1246,7 +1246,7 @@ function quiz_question_delete_button($quiz, $question) {
     $image = $OUTPUT->pix_icon('t/delete', $strdelete);
 
     return $OUTPUT->action_link($url, $image, null, array('title' => $strdelete,
-                'class' => 'cm-edit-action editing_delete edit_icon', 'data-action' => 'delete'));
+                'class' => 'cm-edit-action editing_delete', 'data-action' => 'delete'));
 }
 
 /**
