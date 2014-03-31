@@ -443,7 +443,7 @@ if ($quiz->shufflequestions) {
     $repaginatingdisabled = false;
 }
 $repaginateparams = array(array('courseid' => $course->id, 'quizid' => $quiz->id));
-$PAGE->requires->yui_module('moodle-mod_quiz-repaginate', 'moodle-core-notification-dialogue', $repaginateparams);
+// $PAGE->requires->yui_module('moodle-mod_quiz-repaginate', 'moodle-core-notification-dialogue', $repaginateparams);
 
 echo '<div class="repaginatecommand"><button id="repaginatecommand" ' .
         $repaginatingdisabledhtml.'>'.
