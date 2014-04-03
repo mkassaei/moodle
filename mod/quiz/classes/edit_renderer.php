@@ -488,18 +488,33 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $slotid = $this->get_question_info($structure, $question->id, 'slotid');
         $slotnumber = $this->get_question_info($structure, $question->id, 'slot');
         $pagenumber = $this->get_question_info($structure, $question->id, 'page');
-        $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
 
         $pagenumberclass = ''; // TODO MDL-43089 to add appropriate class name here
         $dragdropclass = 'page activity quiz modtype_quiz  yui3-dd-drop';
         $prevpage = $this->get_previous_page($structure, $slotnumber -1);
+
+        $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
+
+        $editinfo = null;
         if ($prevpage != $pagenumber) {
-            $output .= html_writer::tag('li', $page,  array('class' => $pagenumberclass . ' ' . $dragdropclass, 'id' => 'page-' . $pagenumber));
+            $url =  new moodle_url('repaginate.php', array('cmid' =>$quiz->cmid, 'quizid' => $quiz->id, 'slot' => $slotnumber, 'repag' => 1));
+            $editinfo = ($slotnumber > 1) ? $page . html_writer::link($url, ' join') : $page;
+            $output .= html_writer::tag('li', $editinfo,  array('class' => $pagenumberclass . ' ' . $dragdropclass, 'id' => 'page-' . $pagenumber));
+        } else {
+            $url =  new moodle_url('repaginate.php', array('cmid' =>$quiz->cmid, 'quizid' => $quiz->id, 'slot' => $slotnumber, 'repag' => 2));
+            $editinfo = ($slotnumber > 1) ? html_writer::link($url, ' separate') : null;
+            $output .= html_writer::tag('li', $editinfo,  array('class' => $pagenumberclass . ' ' . $dragdropclass, 'id' => 'page-' . $pagenumber));
         }
 
         if ($questiontypehtml = $this->quiz_section_question($quiz, $structure, $course, $completioninfo, $question, $sectionreturn, $pageurl)) {
             $questionclasses = 'activity ' . $question->qtype . 'qtype_' . $question->qtype;
             $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses, 'id' => 'module-' . $slotid));
+        }
+        // TODO: remove this temp for my presentation
+        if ($slotnumber == 3) {
+            $url =  new moodle_url('repaginate.php', array('cmid' =>$quiz->cmid, 'quizid' => $quiz->id, 'slot' => $slotnumber, 'repag' => 2));
+            $output .= html_writer::link($url, 'dep', array('class' => 'dependency-yes'));
+            //$output .= html_writer::tag('li', $editinfo,  array('class' => $pagenumberclass . ' ' . $dragdropclass, 'id' => 'page-' . $pagenumber));
         }
         return $output;
     }

@@ -445,10 +445,10 @@ if ($quiz->shufflequestions) {
 $repaginateparams = array(array('courseid' => $course->id, 'quizid' => $quiz->id));
 // $PAGE->requires->yui_module('moodle-mod_quiz-repaginate', 'moodle-core-notification-dialogue', $repaginateparams);
 
-echo '<div class="repaginatecommand"><button id="repaginatecommand" ' .
-        $repaginatingdisabledhtml.'>'.
-        get_string('repaginatecommand', 'quiz').'...</button>';
-echo '</div>';
+// echo '<div class="repaginatecommand"><button id="repaginatecommand" ' .
+//         $repaginatingdisabledhtml.'>'.
+//         get_string('repaginatecommand', 'quiz').'...</button>';
+// echo '</div>';
 
 if ($USER->editing && !$repaginatingdisabledhtml) {
 

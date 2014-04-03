@@ -1326,7 +1326,7 @@ bank window's title is prominent enough*/
 #page-mod-quiz-edit .add-menu {
     float: left;
     text-align: right;
-    max-height: 7px;
+    max-height: 17px;
 }
 #page-mod-quiz-edit .add-menu-left {
     position:relative;
