@@ -510,12 +510,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             $questionclasses = 'activity ' . $question->qtype . 'qtype_' . $question->qtype;
             $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses, 'id' => 'module-' . $slotid));
         }
-        // TODO: remove this temp for my presentation
-        if ($slotnumber == 3) {
-            $url =  new moodle_url('repaginate.php', array('cmid' =>$quiz->cmid, 'quizid' => $quiz->id, 'slot' => $slotnumber, 'repag' => 2));
-            $output .= html_writer::link($url, 'dep', array('class' => 'dependency-yes'));
-            //$output .= html_writer::tag('li', $editinfo,  array('class' => $pagenumberclass . ' ' . $dragdropclass, 'id' => 'page-' . $pagenumber));
-        }
         return $output;
     }
 

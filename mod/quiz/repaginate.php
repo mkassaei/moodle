@@ -31,13 +31,12 @@ $quizid = required_param('quizid', PARAM_INT);
 $slotnumber = required_param('slot', PARAM_INT);
 $repagtype = required_param('repag', PARAM_INT);
 $quizslots = $DB->get_records('quiz_slots', array('quizid' => $quizid), 'slot');
-// print_object($quizslots);
-// print_object($slotnumber);
-// print_object($repagtype);
-// exit;
-if ($repagtype == 1) {
-    new quiz_repaginate($quizslots, $slotnumber, 'join');
-} else if ($repagtype == 2) {
-    new quiz_repaginate($quizslots, $slotnumber, 'separate');
+
+$repage = new quiz_repaginate();
+$newslot = $repage->repaginate_next_slot($quizid, $slotnumber -1, $slotnumber, $repagtype);
+
+if ($newslot) {
+	$repage->update_this_slot($newslot);
+	$repage->repaginate_the_rest($quizslots, $slotnumber, $repagtype);
 }
 redirect(new moodle_url('edit.php', array('cmid' => $cmid)));
