@@ -348,7 +348,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
         // Display the add icon menu.
         if (!$quiz->fullquestions) {
-            echo html_writer::tag('span', $this->add_menu_actions($quiz, '', $pageurl));
+            echo html_writer::tag('span', $this->add_menu_actions($quiz, '', $pageurl), array('class' => 'add-menu-outer'));
         }
 
         // Now the list of sections.
@@ -484,25 +484,33 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @return String
      */
     public function quiz_section_question_list_item($quiz, $structure, $course, &$completioninfo, $question, $sectionreturn, $pageurl) {
-        $output = '';
+        global $OUTPUT;
+    	$output = '';
         $slotid = $this->get_question_info($structure, $question->id, 'slotid');
         $slotnumber = $this->get_question_info($structure, $question->id, 'slot');
         $pagenumber = $this->get_question_info($structure, $question->id, 'page');
 
-        $pagenumberclass = ''; // TODO MDL-43089 to add appropriate class name here
+        $pagenumberclass = 'pagenumber'; // TODO MDL-43089 to add appropriate class name here
         $dragdropclass = 'page activity quiz modtype_quiz  yui3-dd-drop';
         $prevpage = $this->get_previous_page($structure, $slotnumber -1);
 
         $page = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
 
         $editinfo = null;
+        // TODO: Create two icons or use link and unlink icon from TinyMCE to replcae show and hide
         if ($prevpage != $pagenumber) {
+            // Add the add-menu at the page level.
+            $addmenu = html_writer::tag('span', $this->add_menu_actions($quiz, $question, $pageurl), array('class' => 'add-menu-outer'));
+
             $url =  new moodle_url('repaginate.php', array('cmid' =>$quiz->cmid, 'quizid' => $quiz->id, 'slot' => $slotnumber, 'repag' => 1));
-            $editinfo = ($slotnumber > 1) ? $page . html_writer::link($url, ' join') : $page;
+            $editinfo = ($slotnumber > 1) ? $page . ' ' . html_writer::link($url, $OUTPUT->pix_icon('t/show', get_string('show'))) : $page;
+
             $output .= html_writer::tag('li', $editinfo,  array('class' => $pagenumberclass . ' ' . $dragdropclass, 'id' => 'page-' . $pagenumber));
+            $output .= $addmenu;
         } else {
+        	$pagenumberclass = 'nopagenumber';
             $url =  new moodle_url('repaginate.php', array('cmid' =>$quiz->cmid, 'quizid' => $quiz->id, 'slot' => $slotnumber, 'repag' => 2));
-            $editinfo = ($slotnumber > 1) ? html_writer::link($url, ' separate') : null;
+            $editinfo = ($slotnumber > 1) ? html_writer::link($url, $OUTPUT->pix_icon('t/hide', get_string('hide'))) : null;
             $output .= html_writer::tag('li', $editinfo,  array('class' => $pagenumberclass . ' ' . $dragdropclass, 'id' => 'page-' . $pagenumber));
         }
 
@@ -800,11 +808,11 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         }
 
         $questionicons = '';
-        if ($this->page->user_is_editing()) {
-            $questionicons .= ' '. $this->add_menu_actions($quiz, $question, $pageurl);
+//         if ($this->page->user_is_editing()) {
+//             $questionicons .= ' '. $this->add_menu_actions($quiz, $question, $pageurl);
 
-            $output .= html_writer::span($questionicons, 'actions');
-        }
+//             $output .= html_writer::span($questionicons, 'actions');
+//         }
 
         $output .= html_writer::end_tag('div'); // $indentclasses
 

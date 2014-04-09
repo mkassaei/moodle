@@ -1323,10 +1323,16 @@ bank window's title is prominent enough*/
 
 .path-mod-quiz li.activity > div {position:relative;}
 
+#page-mod-quiz-edit .add-menu-outer {
+    diaplay: inline;
+    text-align: right;
+    --margin-bottom: -1.5em;'
+    margin-left: 55em;'
+}
 #page-mod-quiz-edit .add-menu {
     float: left;
     text-align: right;
-    max-height: 17px;
+    max-height: 20px;
 }
 #page-mod-quiz-edit .add-menu-left {
     position:relative;
@@ -1346,6 +1352,17 @@ bank window's title is prominent enough*/
     margin-left: 0.5em;
     margin-right: 0.5em;
     padding: 2px 5px 2px 5px;
+}
+#page-mod-quiz-edit .pagenumber{
+    text-align: left;
+    margin-left: -4em;
+    margin-bottom: -1.5em;
+}
+#page-mod-quiz-edit .nopagenumber{
+    text-align: left;
+    margin-left: -2em;
+    margin-top: -0.7em;
+    margin-bottom: -0.7em;
 }
 
 /** Edit Quiz **/
