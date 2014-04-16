@@ -201,7 +201,7 @@ function quiz_add_random_questions($quiz, $addonpage, $categoryid, $number,
     }
 }
 
-
+/**
  * A column type for the add this question to the quiz.
  *
  * @copyright  2009 Tim Hunt
