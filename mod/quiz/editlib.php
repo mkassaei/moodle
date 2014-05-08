@@ -303,8 +303,7 @@ class quiz_question_bank_view extends question_bank_view {
     }
 
     protected function wanted_columns() {
-        return array('addtoquizaction', 'checkbox', 'qtype', 'questionnametext',
-                'editaction', 'copyaction', 'previewaction');
+        return array('addtoquizaction', 'checkbox', 'qtype', 'questionnametext', 'previewaction');
     }
 
     /**
