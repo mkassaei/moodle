@@ -1971,9 +1971,9 @@ function create_new_question_button($categoryid, $params, $caption, $tooltip = '
     echo $OUTPUT->single_button($url, $caption, 'get', array('disabled'=>$disabled, 'title'=>$tooltip));
 
     if (!$choiceformprinted) {
-        echo '<div id="qtypechoicecontainer">';
+        //echo '<div id="qtypechoicecontainer">';
         print_choose_qtype_to_add_form(array());
-        echo "</div>\n";
+        //echo "</div>\n";
         $choiceformprinted = true;
     }
 }

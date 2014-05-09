@@ -177,6 +177,7 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
     }
 });
 
+
 M.mod_quiz.init_section_toolbox = function(config) {
     return new SECTIONTOOLBOX(config);
 };

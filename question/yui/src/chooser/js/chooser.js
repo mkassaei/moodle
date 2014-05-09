@@ -49,4 +49,5 @@ Y.extend(Chooser, M.core.chooserdialogue, {
 M.question = M.question || {};
 M.question.init_chooser = function(config) {
     return new Chooser(config);
+    
 };

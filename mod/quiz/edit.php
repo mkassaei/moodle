@@ -139,6 +139,10 @@ if (!$course) {
 $questionbank = new quiz_question_bank_view($contexts, $thispageurl, $course, $cm, $quiz);
 $questionbank->set_quiz_has_attempts($quizhasattempts);
 
+$category = $defaultcategoryobj;
+$canadd =true;
+//$questionbank->create_new_question_form($category, $canadd);
+
 // You need mod/quiz:manage in addition to question capabilities to access this page.
 require_capability('mod/quiz:manage', $contexts->lowest());
 

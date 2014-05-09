@@ -306,6 +306,9 @@ class quiz_question_bank_view extends question_bank_view {
         return array('addtoquizaction', 'checkbox', 'qtype', 'questionnametext', 'previewaction');
     }
 
+    public function create_new_question_form($category, $canadd) {
+        parent::create_new_question_form($category, $canadd);
+    }
     /**
      * Specify the column heading
      *
@@ -505,6 +508,10 @@ function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledm
             ))
     );
 
+    // Add the chooser.
+    $PAGE->requires->yui_module('moodle-mod_quiz-questionchooser', 'M.mod_quiz.init_questionchooser');
+
+
     // Include course dragdrop.
     if ($course->id != $SITE->id) {
         $PAGE->requires->yui_module('moodle-mod_quiz-dragdrop', 'M.mod_quiz.init_section_dragdrop',
@@ -551,6 +558,7 @@ function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledm
     foreach ($usedqtypes as $module => $modname) {
         $PAGE->requires->string_for_js('pluginname', 'qtype_'.$module);
     }
+
 
     return true;
 }
