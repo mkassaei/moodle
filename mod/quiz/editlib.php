@@ -524,6 +524,15 @@ function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledm
             )), null, true);
     }
 
+    // include list
+    $PAGE->requires->yui_module('moodle-mod_quiz-list', 'M.mod_quiz.init_list',
+            array(array(
+                'courseid' => $course->id,
+                'quizid' => $quiz->id,
+                'ajaxurl' => $config->resourceurl,
+                'config' => $config,
+            )), null, true);
+
     // Require various strings for the command toolbox.
     $PAGE->requires->strings_for_js(array(
             'moveleft',

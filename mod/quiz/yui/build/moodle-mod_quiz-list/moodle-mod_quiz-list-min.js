@@ -1,0 +1,1 @@
+YUI.add("moodle-mod_quiz-list",function(e,t){e.namespace("Moodle.mod_quiz.list"),M.mod_quiz=M.mod_quiz||{},M.mod_quiz.init_list=function(e){console.log("M.mod_quiz.init_list: initialised")}},"@VERSION@",{requires:["node"]});

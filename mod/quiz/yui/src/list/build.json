@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_quiz-list",
+    "builds": {
+        "moodle-mod_quiz-list": {
+            "jsfiles": [
+                "list.js"
+            ]
+        }
+    }
+}
