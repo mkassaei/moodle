@@ -207,6 +207,7 @@ Y.extend(TOOLBOX, Y.Base, {
         }
     }
 }
+
 );
 /**
  * Resource and activity toolbox class.

@@ -1,0 +1,1 @@
+YUI.add("moodle-mod_quiz-questionchooser",function(e,t){e.namespace("Moodle.mod_quiz.questionchooser"),M.mod_quiz=M.mod_quiz||{},M.mod_quiz.init_questionchooser=function(e){console.log("M.mod_quiz.init_questionchooser: initialised")}},"@VERSION@",{requires:["node"]});
