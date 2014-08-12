@@ -83,20 +83,26 @@ class structure {
      * Get a slot by it's id. Throws an exception if it is missing.
      * @return stdClass the requested slot.
      */
-    public function get_slot_by_id($slotid) {
-        if (!array_key_exists($slotid, $this->slots)) {
+    public function get_slot_by_id($slotid, $slots = array()) {
+        if(!count($slots)){
+            $slots = $this->slots;
+        }
+        if (!array_key_exists($slotid, $slots)) {
             throw new \coding_exception('The \'slotid\' could not be found.');
         }
-        return $this->slots[$slotid];
+        return $slots[$slotid];
     }
 
     /**
      * Get a slot by it's slot number. Throws an exception if it is missing.
      * @return stdClass the requested slot.
      */
-    public function get_slot_by_slot_number($slotnumber) {
+    public function get_slot_by_slot_number($slotnumber, $slots = array()) {
         $slotnumber = strval($slotnumber);
-        foreach ($this->slots as $slot) {
+        if(!count($slots)){
+            $slots = $this->slots;
+        }
+        foreach ($slots as $slot) {
             if ($slot->slot !== $slotnumber) {
                 continue;
             }
@@ -104,15 +110,15 @@ class structure {
             return $slot;
         }
 
-        throw new \coding_exception('The \'slotnumber\' could not be found.');
+        return null;
     }
 
     /**
      * Get a slotid by it's slot number. Throws an exception if it is missing.
      * @return stdClass the requested slot.
      */
-    public function get_slot_id_by_slot_number($slotnumber) {
-        $slot = $this->get_slot_by_slot_number($slotnumber);
+    public function get_slot_id_by_slot_number($slotnumber, $slots = array()) {
+        $slot = $this->get_slot_by_slot_number($slotnumber, $slots);
         if(!$slot){
             return null;
         }
@@ -293,7 +299,7 @@ class structure {
          * Refresh page numbering.
          */
 
-        $slots = $this->refresh_page_numbers($quiz);
+        $slots = $this->refresh_page_numbers_and_update_db($quiz);
 
         $trans->allow_commit();
 
@@ -302,16 +308,42 @@ class structure {
     }
 
     /**
+     * Refresh slot numbering of quiz slots
+     * Required after deleting slots.
+     * @param object $quiz the quiz object.
+     */
+    public function refresh_slot_numbers($quiz, $slots=array()) {
+        $slottoslotids = $this->create_slot_to_slotids($slots);
+        $slotnumber = 1;
+        foreach ($slottoslotids as $slottoslotid) {
+            $slots[$slottoslotid]->slot = $slotnumber;
+            $slotnumber++;
+        }
+
+        return $slots;
+    }
+    /**
      * Refresh page numbering of quiz slots
      * @param object $quiz the quiz object.
      */
-    public function refresh_page_numbers($quiz) {
+    public function refresh_page_numbers($quiz, $slots=array()) {
         global $DB;
         // Get slots ordered by page then slot.
-        $slots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id), 'slot, page');
+        if (!count($slots)) {
+            $slots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id), 'slot, page');
+        }
 
         // Loop slots. Start Page number at 1 and increment as required.
         $pagenumbers = array('new' => 0, 'old' => 0);
+
+        /*
+         * slots are only changed (moved/removed) one at a a time. So largest slot number possible
+         * is slot array length +1.
+         *
+         * Iterate through slots by slot number. Updating page accordingly. Existing code should work
+         * on page numbers;
+         *
+         */
         foreach ($slots as $slot) {
             if ($slot->page !== $pagenumbers['old']) {
                 $pagenumbers['old'] = $slot->page;
@@ -323,6 +355,13 @@ class structure {
             }
             $slot->page = $pagenumbers['new'];
         }
+
+        return $slots;
+    }
+
+    public function refresh_page_numbers_and_update_db($quiz) {
+        global $DB;
+        $slots = $this->refresh_page_numbers($quiz);
 
         // Record new page order.
         foreach ($slots as $slot) {
@@ -359,6 +398,8 @@ class structure {
             // This function automatically checks if the question is in use, and won't delete if it is.
             question_delete_question($slot->questionid);
         }
+
+        $this->refresh_page_numbers_and_update_db($quiz);
 
         $trans->allow_commit();
     }

@@ -173,6 +173,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             if (M.core.actionmenu && M.core.actionmenu.instance) {
                 M.core.actionmenu.instance.hideMenu();
             }
+            window.location.reload(true);
 
         }, this);
 
