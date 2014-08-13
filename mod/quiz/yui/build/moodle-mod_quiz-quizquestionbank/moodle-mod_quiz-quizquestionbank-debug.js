@@ -65,6 +65,8 @@ Y.extend(POPUP, Y.Base, {
         this.dialogue.hide();
 
         this.loadingDiv = this.dialogue.bodyNode.getHTML();
+
+        Y.later(100, this, function() {this.load_content(window.location.search);});
     },
 
     initializer : function() {
@@ -79,13 +81,14 @@ Y.extend(POPUP, Y.Base, {
     display_dialog : function (e, page) {
         e.preventDefault();
         this.dialogue.show();
-        this.load_content(window.location.search);
     },
 
     load_content : function(queryString) {
         Y.log('Starting load.');
         this.dialogue.bodyNode.setHTML(this.loadingDiv);
-        Y.later(100, this.dialogue.centerDialogue);
+        if (this.dialogue.visible) {
+            Y.later(0, this.dialogue, this.dialogue.centerDialogue);
+        }
 
         window.history.replaceState(null, '', M.cfg.wwwroot + '/mod/quiz/edit.php' + queryString);
 
@@ -113,9 +116,12 @@ Y.extend(POPUP, Y.Base, {
         Y.log('Load completed.');
 
         this.dialogue.bodyNode.setHTML(result.contents);
-        Y.later(100, this.dialogue.centerDialogue);
         Y.use('moodle-question-chooser', function() {M.question.init_chooser({courseid: 2});}); // TODO hard-coded id.
         this.dialogue.bodyNode.one('form').delegate('change', this.options_changed, '.searchoptions', this);
+
+        if (this.dialogue.visible) {
+            Y.later(0, this.dialogue, this.dialogue.centerDialogue);
+        }
     },
 
     load_failed: function() {
@@ -140,4 +146,4 @@ M.mod_quiz.quizquestionbank.init = function() {
 };
 
 
-}, '@VERSION@', {"requires": ["base", "event", "node", "io", "io-form"]});
+}, '@VERSION@', {"requires": ["base", "event", "node", "io", "io-form", "yui-later"]});

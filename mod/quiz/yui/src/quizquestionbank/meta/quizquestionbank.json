@@ -5,7 +5,8 @@
             "event",
             "node",
             "io",
-            "io-form"
+            "io-form",
+            "yui-later"
         ]
     }
 }
