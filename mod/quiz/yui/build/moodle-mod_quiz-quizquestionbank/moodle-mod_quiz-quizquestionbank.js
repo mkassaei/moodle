@@ -86,6 +86,8 @@ Y.extend(POPUP, Y.Base, {
         this.dialogue.bodyNode.setHTML(this.loadingDiv);
         Y.later(100, this.dialogue.centerDialogue);
 
+        window.history.replaceState(null, '', M.cfg.wwwroot + '/mod/quiz/edit.php' + queryString);
+
         Y.io(M.cfg.wwwroot + '/mod/quiz/questionbank.ajax.php' + queryString, {
             method: 'GET',
             on: {
