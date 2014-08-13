@@ -106,7 +106,8 @@ Y.extend(POPUP, Y.Base, {
         this.dialogue.bodyNode.setHTML(result.contents);
         this.dialogue.centerDialogue();
         this.dialogue.bodyNode.delegate('click', this.link_clicked, 'a[href]', this);
-        Y.use('moodle-question-chooser', function() {M.question.init_chooser({courseid: 2})}); // TODO hard-coded id.
+        Y.use('moodle-question-chooser', function() {M.question.init_chooser({courseid: 2});}); // TODO hard-coded id.
+        this.dialogue.bodyNode.one('form').delegate('change', this.options_changed, '.searchoptions', this);
     },
 
     load_failed: function() {
@@ -116,8 +117,12 @@ Y.extend(POPUP, Y.Base, {
     link_clicked: function(e) {
         e.preventDefault();
         this.load_content(e.currentTarget.get('search'));
-    }
+    },
 
+    options_changed: function(e) {
+        e.preventDefault();
+        this.load_content('?' + Y.IO.stringify(e.currentTarget.get('form')));
+    }
 });
 
 M.mod_quiz = M.mod_quiz || {};
