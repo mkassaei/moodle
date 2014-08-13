@@ -33,7 +33,7 @@ var CSS = {
 
 var PARAMS = {
     PAGE: 'addonpage',
-    HEADER: 'header',
+    HEADER: 'header'
 };
 
 var POPUP = function() {
@@ -42,61 +42,50 @@ var POPUP = function() {
 
 Y.extend(POPUP, Y.Base, {
     qbank: Y.one(CSS.QBANK),
-    qbankform: Y.one(CSS.QBANKFORM),
-    qbanklink: Y.all(CSS.QBANKLINK),
-    popup: null,
+    dialogue: null,
 
-    dialogue: function(header, body, hideshow) {
+    create_dialogue: function() {
         // Create a dialogue on the page and hide it.
         config = {
-            headerContent : header,
-            bodyContent : body,
+            headerContent : this.qbank._node.getAttribute(PARAMS.HEADER),
+            bodyContent : Y.one(CSS.QBANKFORM),
             draggable : true,
             modal : true,
             zIndex : 1000,
             context: [CSS.QBANK, 'tr', 'br', ['beforeShow']],
-            centered: false,
+            centered: true,
             width: null,
             visible: false,
             postmethod: 'form',
             footerContent: null,
             extraClasses: ['mod_quiz_qbank_dialogue']
         };
-        this.popup = { dialog: null };
-        this.popup.dialog = new M.core.dialogue(config);
-        if (hideshow === 'hide') {
-            this.popup.dialog.hide();
-        } else {
-            this.popup.dialog.show();
-        }
+        this.dialogue = new M.core.dialogue(config);
+        this.dialogue.hide();
     },
 
     initializer : function() {
-        var header = this.qbank._node.getAttribute(PARAMS.HEADER);
-        var body = this.qbankform;
+        this.create_dialogue();
 
-        this.dialogue(header, body, 'hide');
-
-        this.qbanklink.each(function(node) {
-            var page = node.getAttribute(PARAMS.PAGE);
-            header = node.getAttribute(PARAMS.HEADER);
-            node.on('click', this.display_dialog, this, header, page, body);
+        Y.all(CSS.QBANKLINK).each(function(node) {
+            var page = node.getData(PARAMS.PAGE);
+            node.on('click', this.display_dialog, this, page);
         }, this);
     },
 
-    display_dialog : function (e, header, page, body) {
+    display_dialog : function (e, page) {
         e.preventDefault();
-        this.dialogue(header, body, 'show');
-        this.load_content();
+        this.dialogue.show();
+        this.load_content(window.location.search);
     },
 
-    load_content : function() {
+    load_content : function(queryString) {
 
-        Y.io('https://tjh238.vledev2.open.ac.uk/moodle_head/mod/quiz/questionbank.ajax.php?cmid=3', {
-            method:  'GET',
-            on:      {
+        Y.io(M.cfg.wwwroot + '/mod/quiz/questionbank.ajax.php' + queryString, {
+            method: 'GET',
+            on: {
                 success: this.load_done,
-                failure: this.save_failed
+                failure: this.load_failed
             },
             context: this
         });
@@ -113,12 +102,19 @@ Y.extend(POPUP, Y.Base, {
         }
 
 
-        this.popup.dialog.bodyNode.setHTML(result.contents);
-        this.popup.dialog.centerDialogue();
+        this.dialogue.bodyNode.setHTML(result.contents);
+        this.dialogue.centerDialogue();
+        this.dialogue.bodyNode.delegate('click', this.link_clicked, 'a[href]', this);
     },
 
     load_failed: function() {
+    },
+
+    link_clicked: function(e) {
+        e.preventDefault();
+        this.load_content(e.currentTarget.get('search'));
     }
+
 });
 
 M.mod_quiz = M.mod_quiz || {};

@@ -1049,7 +1049,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         );
 
         // Call question bank.
-        $returnurl = new moodle_url($pageurl, array('addonpage' => $page));
+        $returnurl = new moodle_url($pageurl, array('data-addonpage' => $page));
         $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid, 'qbanktool' => 1, 'appendqnumstring' => 'questionbank');
         $icon = new pix_icon('t/add', $str->questionbank, 'moodle', array('class' => 'iconsmall', 'title' => ''));
         $attributes = array('class' => 'cm-edit-action questionbank', 'data-action' => 'questionbank');
