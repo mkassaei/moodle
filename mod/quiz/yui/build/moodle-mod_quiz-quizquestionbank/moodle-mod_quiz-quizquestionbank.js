@@ -52,7 +52,6 @@ Y.extend(POPUP, Y.Base, {
             bodyContent : Y.one(CSS.QBANKLOADING),
             draggable : true,
             modal : true,
-            zIndex : 1000,
             context: [CSS.QBANK, 'tr', 'br', ['beforeShow']],
             centered: true,
             width: null,
@@ -85,6 +84,7 @@ Y.extend(POPUP, Y.Base, {
 
     load_content : function(queryString) {
         this.dialogue.bodyNode.setHTML(this.loadingDiv);
+        Y.later(100, this.dialogue.centerDialogue);
 
         Y.io(M.cfg.wwwroot + '/mod/quiz/questionbank.ajax.php' + queryString, {
             method: 'GET',
@@ -108,7 +108,7 @@ Y.extend(POPUP, Y.Base, {
 
 
         this.dialogue.bodyNode.setHTML(result.contents);
-        this.dialogue.centerDialogue();
+        Y.later(100, this.dialogue.centerDialogue);
         Y.use('moodle-question-chooser', function() {M.question.init_chooser({courseid: 2});}); // TODO hard-coded id.
         this.dialogue.bodyNode.one('form').delegate('change', this.options_changed, '.searchoptions', this);
     },

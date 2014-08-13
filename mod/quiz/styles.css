@@ -1144,21 +1144,6 @@ bank window's title is prominent enough*/
     padding-top: 1em;
 }
 
-.ie6#page-mod-quiz-edit div.question div.content .questiontext,
-.ie6#page-mod-quiz-edit #categoryquestions .questionname {
-    /*ie6 shows this as an arrow if this is not specified*/cursor: pointer;
-}
-.ie6#page-mod-quiz-edit div.question div.content .questionname,
-.ie6#page-mod-quiz-edit #categoryquestions .questiontext {
-    /*ie6 shows this as an arrow if this is not specified*/cursor: pointer;
-}
-.ie6#page-mod-quiz-edit .reorder .questioncontentcontainer .randomquestioncategory label {
-    width: 35%;
-}
-.ie6#page-mod-quiz-edit .editq div.question div.content .randomquestioncategory a {
-    width: 40%;
-}
-
 #page-mod-quiz-edit #categoryquestions .questiontext {
     font-weight: bold;
 }
@@ -1181,20 +1166,11 @@ bank window's title is prominent enough*/
 #page-mod-quiz-edit .questioncontentcontainer div.randomquestionqlist .totalquestionsinrandomqcategory {
     color: #000;
 }
-#page-mod-quiz-edit .categoryinfo {
-    background-color: #eee;
-    border-bottom: 1px solid #bbb;
-}
+
 #page-mod-quiz-edit .questionsortoptions {
     background-color: #ddd;
 }
 
-#page-mod-quiz-edit div.questionbank {
-    background-color: #e6e6ff;
-}
-#page-mod-quiz-edit div.questionbank form .invisiblefieldset {
-    clear: both;
-}
 #page-mod-quiz-edit div.questionbank .categorysortopotionscontainer {
     padding-top: 0.5em;
     margin-top: 0.3em;
@@ -1213,32 +1189,6 @@ bank window's title is prominent enough*/
     width: 50%;
 }
 
-.ie6#page-mod-quiz-edit div.question div.content .questiontext,
-.ie6#page-mod-quiz-edit #categoryquestions .questionname {
-    /*ie6 shows this as an arrow if this is not specified*/cursor: pointer;
-}
-.ie6#page-mod-quiz-edit div.question div.content .questionname,
-.ie6#page-mod-quiz-edit #categoryquestions .questiontext {
-    /*ie6 shows this as an arrow if this is not specified*/cursor: pointer;
-}
-.ie6.path-mod-quiz div.tabtree a span img.iconsmall {
-    margin: 0;
-    vertical-align: baseline;
-    position: relative;
-    top: 1px;
-}
-.ie6#page-mod-quiz-edit div.question div.content .questiontext {
-    width: 50%;
-}
-.ie6#page-mod-quiz-edit div.question div.content .questionname {
-    width: 20%;
-}
-.ie6#page-mod-quiz-edit .editq div.question div.content .randomquestioncategory a {
-    width: 40%;
-}
-.ie6#page-mod-quiz-edit .reorder .questioncontentcontainer .randomquestioncategory label {
-    width: 35%;
-}
 .qnum label {
     padding-right: 0.25em;
 }
@@ -1369,10 +1319,6 @@ bank window's title is prominent enough*/
     margin-left: -2em;
     margin-top: -0.7em;
     margin-bottom: -0.7em;
-}
-
-#page-mod-quiz-edit .questionbankformforpopup {
-    padding-left: 2em;
 }
 
 #page-mod-quiz-edit .randomquestionformforpopup {
