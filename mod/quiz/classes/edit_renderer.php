@@ -388,8 +388,10 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
         // Call random question form.
         if (!quiz_has_attempts($quiz->id)) {
+            echo '<div class="mod_quiz_edit_forms">';
             echo $this->get_questionbank_loading();
             echo $this->get_randomquestion_form($pageurl, $contexts, $pagevars, $cm);
+            echo '</div>';
         }
     }
 

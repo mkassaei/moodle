@@ -242,7 +242,9 @@ body.jsenabled .questionflagcheckbox {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-
+#page-mod-quiz-edit .mod_quiz_edit_forms {
+    display: none;
+}
 #page-mod-quiz-edit div.question div.content .questionname,
 #categoryquestions .questionname {
     white-space: nowrap;
