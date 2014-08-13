@@ -43,6 +43,7 @@ var POPUP = function() {
 Y.extend(POPUP, Y.Base, {
     loadingDiv: '',
     dialogue: null,
+    addonpage: 0,
 
     create_dialogue: function() {
         // Create a dialogue on the page and hide it.
@@ -75,6 +76,7 @@ Y.extend(POPUP, Y.Base, {
     display_dialogue : function (e) {
         e.preventDefault();
         this.dialogue.set('headerContent', e.currentTarget.getData(PARAMS.HEADER));
+        this.addonpage = e.currentTarget.getData(PARAMS.PAGE);
         this.dialogue.show();
     },
 
@@ -125,7 +127,8 @@ Y.extend(POPUP, Y.Base, {
 
     link_clicked: function(e) {
         if (e.currentTarget.ancestor(CSS.ADDTOQUIZCONTAINER)) {
-            // These links need to work like normal.
+            // These links need to work like normal, after we modify the URL.
+            e.currentTarget.set('href', e.currentTarget.get('href') + '&addonpage=' + this.addonpage);
             return;
         }
         e.preventDefault();
