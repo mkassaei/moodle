@@ -28,7 +28,8 @@ YUI.add('moodle-mod_quiz-quizquestionbank', function (Y, NAME) {
 var CSS = {
         QBANKLOADING: 'div.questionbankloading',
         QBANKLINK: 'a.questionbank',
-        QBANK: '.questionbank'
+        QBANK: '.questionbank',
+        ADDTOQUIZCONTAINER: 'td.addtoquizaction'
 };
 
 var PARAMS = {
@@ -129,6 +130,10 @@ Y.extend(POPUP, Y.Base, {
     },
 
     link_clicked: function(e) {
+        if (e.currentTarget.ancestor(CSS.ADDTOQUIZCONTAINER)) {
+            // These links need to work like normal.
+            return;
+        }
         e.preventDefault();
         this.load_content(e.currentTarget.get('search'));
     },
