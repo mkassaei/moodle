@@ -27,8 +27,7 @@ YUI.add('moodle-mod_quiz-quizquestionbank', function (Y, NAME) {
 
 var CSS = {
         QBANKLOADING: 'div.questionbankloading',
-        QBANKLINK: 'a.questionbank',
-        QBANK: '.questionbank',
+        ADDQUESTIONLINKS: 'ul.menu a.questionbank',
         ADDTOQUIZCONTAINER: 'td.addtoquizaction'
 };
 
@@ -42,18 +41,16 @@ var POPUP = function() {
 };
 
 Y.extend(POPUP, Y.Base, {
-    qbank: Y.one(CSS.QBANK),
     loadingDiv: '',
     dialogue: null,
 
     create_dialogue: function() {
         // Create a dialogue on the page and hide it.
         config = {
-            headerContent : this.qbank._node.getAttribute(PARAMS.HEADER),
+            headerContent : '',
             bodyContent : Y.one(CSS.QBANKLOADING),
             draggable : true,
             modal : true,
-            context: [CSS.QBANK, 'tr', 'br', ['beforeShow']],
             centered: true,
             width: null,
             visible: false,
@@ -72,15 +69,12 @@ Y.extend(POPUP, Y.Base, {
 
     initializer : function() {
         this.create_dialogue();
-
-        Y.all(CSS.QBANKLINK).each(function(node) {
-            var page = node.getData(PARAMS.PAGE);
-            node.on('click', this.display_dialog, this, page);
-        }, this);
+        Y.one('body').delegate('click', this.display_dialogue, CSS.ADDQUESTIONLINKS, this);
     },
 
-    display_dialog : function (e, page) {
+    display_dialogue : function (e) {
         e.preventDefault();
+        this.dialogue.set('headerContent', e.currentTarget.getData(PARAMS.HEADER));
         this.dialogue.show();
     },
 

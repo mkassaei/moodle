@@ -400,6 +400,79 @@ class quiz_question_bank_view extends core_question\bank\view {
     }
 
     /**
+     * Display the controls at the bottom of the list of questions.
+     * @param int      $totalnumber Total number of questions that might be shown (if it was not for paging).
+     * @param bool     $recurse     Whether to include subcategories.
+     * @param stdClass $category    The question_category row from the database.
+     * @param context  $catcontext  The context of the category being displayed.
+     * @param array    $addcontexts contexts where the user is allowed to add new questions.
+     */
+    protected function display_bottom_controls($totalnumber, $recurse, $category, \context $catcontext, array $addcontexts) {
+        global $OUTPUT;
+        $totalnumber = $this->get_question_count();
+
+        $cmoptions = new \stdClass();
+        $cmoptions->hasattempts = !empty($this->quizhasattempts);
+
+        $caneditall = has_capability('moodle/question:editall', $catcontext);
+        $canuseall = has_capability('moodle/question:useall', $catcontext);
+        $canmoveall = has_capability('moodle/question:moveall', $catcontext);
+
+        echo '<div class="modulespecificbuttonscontainer">';
+        if ($canuseall) {
+            // Add selected questions to the quiz.
+            $params = array(
+                    'type' => 'submit',
+                    'name' => 'add',
+                    'value' => get_string('addselectedquestionstoquiz', 'quiz'),
+            );
+            if ($cmoptions->hasattempts) {
+                $params['disabled'] = 'disabled';
+            }
+            echo html_writer::empty_tag('input', $params);
+
+            // Add multiple random questions.
+            $out = '';
+            if ($cmoptions->hasattempts) {
+                $disabled = ' disabled="disabled"';
+            } else {
+                $disabled = '';
+            }
+            $randomusablequestions =
+                    question_bank::get_qtype('random')->get_available_questions_from_category(
+                            $category->id, $recurse);
+            $maxrand = count($randomusablequestions);
+            $randomcount = array();
+            if ($maxrand > 0) {
+                for ($i = 1; $i <= min(10, $maxrand); $i++) {
+                    $randomcount[$i] = $i;
+                }
+                for ($i = 20; $i <= min(100, $maxrand); $i += 10) {
+                    $randomcount[$i] = $i;
+                }
+            } else {
+                $randomcount[0] = 0;
+                $disabled = ' disabled="disabled"';
+            }
+
+            $out = '<strong><label for="menurandomcount">'.get_string('addrandomfromcategory', 'quiz').
+            '</label></strong><br />';
+            $attributes = array();
+            $attributes['disabled'] = $disabled ? 'disabled' : null;
+            $select = html_writer::select($randomcount, 'randomcount', '1', null, $attributes);
+            $out .= get_string('addrandom', 'quiz', $select);
+            $out .= '<input type="hidden" name="recurse" value="'.$recurse.'" />';
+            $out .= '<input type="hidden" name="categoryid" value="' . $category->id . '" />';
+            $out .= ' <input type="submit" name="addrandom" value="'.
+                    get_string('addtoquiz', 'quiz').'"' . $disabled . ' />';
+            $out .= $OUTPUT->help_icon('addarandomquestion', 'quiz');
+            echo $out;
+
+        }
+        echo "</div>\n";
+    }
+
+    /**
      * prints a form to choose categories
      * @param string $categoryandcontext 'categoryID,contextID'.
      * @deprecated since Moodle 2.6 MDL-40313.

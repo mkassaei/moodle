@@ -1047,24 +1047,20 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         );
 
         // Call question bank.
-        $returnurl = new moodle_url($pageurl, array('data-addonpage' => $page));
-        $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid, 'qbanktool' => 1, 'appendqnumstring' => 'questionbank');
         $icon = new pix_icon('t/add', $str->questionbank, 'moodle', array('class' => 'iconsmall', 'title' => ''));
-        $attributes = array('class' => 'cm-edit-action questionbank', 'data-action' => 'questionbank');
-        $header = html_writer::tag('div', get_string('questionbank', 'question') . ' (Page ' . $page . ')', array('class' => 'hd'));
-        $attributes = array_merge(array('header' => $header, 'addonpage' => $page), $attributes);
-        $actions['questionbank'] = new action_menu_link_secondary($returnurl, $icon, $str->questionbank, $attributes);
+        $title = get_string('addquestionfrombanktopage', 'quiz', $page);
+        $attributes = array('class' => 'cm-edit-action questionbank',
+                'data-header' => $title, 'data-action' => 'questionbank', 'data-addonpage' => $page);
+        $actions['questionbank'] = new action_menu_link_secondary($pageurl, $icon, $str->questionbank, $attributes);
 
         // Add a random question.
-        $returnurl = new moodle_url('/mod/quiz/edit.php', array('cmid' => $quiz->cmid, 'addonpage' => $page));
+        $returnurl = new moodle_url('/mod/quiz/edit.php', array('cmid' => $quiz->cmid, 'data-addonpage' => $page));
         $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid, 'appendqnumstring' => 'addarandomquestion');
         $url = new moodle_url('/mod/quiz/addrandom.php', $params);
         $icon = new pix_icon('t/add', $str->addarandomquestion, 'moodle', array('class' => 'iconsmall', 'title' => ''));
-        // $page = $question ? $question->page : 0;
         $attributes = array('class' => 'cm-edit-action addarandomquestion', 'data-action' => 'addarandomquestion');
-        $header = $header = html_writer::tag('div', get_string('addrandomquestiontoquiz', 'quiz', $quiz->name) . ' (Page ' . $page . ')',
-                    array('class' => 'hd'));
-        $attributes = array_merge(array('header' => $header, 'addonpage' => $page), $attributes);
+        $title = get_string('addrandomquestiontopage', 'quiz', $page);
+        $attributes = array_merge(array('data-header' => $title, 'data-addonpage' => $page), $attributes);
         $actions['addarandomquestion'] = new action_menu_link_secondary($url, $icon, $str->addarandomquestion, $attributes);
 
 //         // Add a random selected question.

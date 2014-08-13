@@ -666,20 +666,13 @@ class view {
 
         $category = $this->get_current_category($categoryandcontext);
 
-        $cmoptions = new \stdClass();
-        $cmoptions->hasattempts = !empty($this->quizhasattempts);
-
         $strselectall = get_string('selectall');
         $strselectnone = get_string('deselectall');
-        $strdelete = get_string('delete');
 
         list($categoryid, $contextid) = explode(',', $categoryandcontext);
         $catcontext = \context::instance_by_id($contextid);
 
         $canadd = has_capability('moodle/question:add', $catcontext);
-        $caneditall = has_capability('moodle/question:editall', $catcontext);
-        $canuseall = has_capability('moodle/question:useall', $catcontext);
-        $canmoveall = has_capability('moodle/question:moveall', $catcontext);
 
         $this->create_new_question_form($category, $canadd);
 
@@ -728,32 +721,7 @@ class view {
         }
         echo '</div>';
 
-        echo '<div class="modulespecificbuttonscontainer">';
-        if ($caneditall || $canmoveall || $canuseall) {
-            echo '<strong>&nbsp;'.get_string('withselected', 'question').':</strong><br />';
-
-            if (function_exists('module_specific_buttons')) {
-                echo module_specific_buttons($this->cm->id, $cmoptions);
-            }
-
-            // Print delete and move selected question.
-            if ($caneditall) {
-                echo '<input type="submit" name="deleteselected" value="' . $strdelete . "\" />\n";
-            }
-
-            if ($canmoveall && count($addcontexts)) {
-                echo '<input type="submit" name="move" value="'.get_string('moveto', 'question')."\" />\n";
-                question_category_select_menu($addcontexts, false, 0, "{$category->id},{$category->contextid}");
-            }
-
-            if (function_exists('module_specific_controls') && $canuseall) {
-                $modulespecific = module_specific_controls($totalnumber, $recurse, $category, $this->cm->id, $cmoptions);
-                if (!empty($modulespecific)) {
-                    echo "<hr />{$modulespecific}";
-                }
-            }
-        }
-        echo "</div>\n";
+        $this->display_bottom_controls($totalnumber, $recurse, $category, $catcontext, $addcontexts);
 
         echo '</fieldset>';
         echo "</form>\n";

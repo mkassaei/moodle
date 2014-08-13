@@ -23,9 +23,9 @@
  */
 
 var CSS = {
-        RANDOMQUESTIONFORM: 'div.randomquestionformforpopup',
-        RANDOMQUESTIONLINK: 'a.addarandomquestion',
-        RANDOMQUESTION: '.addarandomquestion'
+    RANDOMQUESTIONFORM: 'div.randomquestionformforpopup',
+    PAGEHIDDENINPUT: 'input#rform_qpage',
+    RANDOMQUESTIONLINKS: 'ul.menu a.addarandomquestion'
 };
 
 var PARAMS = {
@@ -39,21 +39,15 @@ var POPUP = function() {
 };
 
 Y.extend(POPUP, Y.Base, {
-    rq: Y.one(CSS.RANDOMQUESTION),
-    rqlink: Y.all(CSS.RANDOMQUESTIONLINK),
-    page: 0,
-    header: 'header',
-    body: 'body',
 
-    dialogue: function(header, body, hideshow) {
+    dialogue: function(header) {
         // Create a dialogue on the page and hide it.
         config = {
             headerContent : header,
-            bodyContent : body,
+            bodyContent : Y.one(CSS.RANDOMQUESTIONFORM),
             draggable : true,
             modal : true,
             zIndex : 1000,
-            context: [CSS.RANDOMQUESTIONLINK, 'tr', 'br', ['beforeShow']],
             centered: false,
             width: 'auto',
             visible: false,
@@ -62,31 +56,20 @@ Y.extend(POPUP, Y.Base, {
         };
         var popup = { dialog: null };
         popup.dialog = new M.core.dialogue(config);
-        if (hideshow === 'hide') {
-            popup.dialog.hide();
-        } else {
-            popup.dialog.show();
-        }
+        popup.dialog.show();
     },
  
     initializer : function() {
-        this.dialogue(Y.one(CSS.RANDOMQUESTION)._node.getAttribute(PARAMS.HEADER), Y.one(CSS.RANDOMQUESTIONFORM), 'hide');
-        this.rqlink.each(function(node) {
-            var formid = node.getAttribute(PARAMS.PAGE);
-            node.on('click', this.display_dialog, this, formid);
-        }, this);
+        Y.one('body').delegate('click', this.display_dialogue, CSS.RANDOMQUESTIONLINKS, this);
     },
 
-    display_dialog : function (e, formid) {
+    display_dialogue : function (e) {
         e.preventDefault();
-        var rq = Y.one('li#page-' + formid + ' ' + CSS.RANDOMQUESTIONLINK);
-        this.header = rq._node.getAttribute(PARAMS.HEADER);
-        var body = Y.one(CSS.RANDOMQUESTIONFORM);
 
-        var formparampage = Y.one(CSS.RANDOMQUESTIONFORM + ' ' +  'input#rform_qpage');
-        formparampage.set('value', formid);
+        Y.one(CSS.RANDOMQUESTIONFORM + ' ' + CSS.PAGEHIDDENINPUT).set('value',
+                e.currentTarget.getData(PARAMS.PAGE));
 
-        this.dialogue(this.header, body, 'show');
+        this.dialogue(e.currentTarget.getData(PARAMS.HEADER));
     }
 });
 

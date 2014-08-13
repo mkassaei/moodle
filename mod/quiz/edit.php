@@ -46,69 +46,6 @@ require_once($CFG->dirroot . '/mod/quiz/editlib.php');
 require_once($CFG->dirroot . '/mod/quiz/addrandomform.php');
 require_once($CFG->dirroot . '/question/category_class.php');
 
-/**
- * Callback function called from question_list() function
- * (which is called from showbank())
- * Displays button in form with checkboxes for each question.
- */
-function module_specific_buttons($cmid, $cmoptions) {
-    global $OUTPUT;
-    $params = array(
-        'type' => 'submit',
-        'name' => 'add',
-        'value' => $OUTPUT->larrow() . ' ' . get_string('addtoquiz', 'quiz'),
-    );
-    if ($cmoptions->hasattempts) {
-        $params['disabled'] = 'disabled';
-    }
-    return html_writer::empty_tag('input', $params);
-}
-
-/**
- * Callback function called from question_list() function
- * (which is called from showbank())
- */
-function module_specific_controls($totalnumber, $recurse, $category, $cmid, $cmoptions) {
-    global $OUTPUT;
-    $out = '';
-    $catcontext = context::instance_by_id($category->contextid);
-    if (has_capability('moodle/question:useall', $catcontext)) {
-        if ($cmoptions->hasattempts) {
-            $disabled = ' disabled="disabled"';
-        } else {
-            $disabled = '';
-        }
-        $randomusablequestions =
-                question_bank::get_qtype('random')->get_available_questions_from_category(
-                        $category->id, $recurse);
-        $maxrand = count($randomusablequestions);
-        if ($maxrand > 0) {
-            for ($i = 1; $i <= min(10, $maxrand); $i++) {
-                $randomcount[$i] = $i;
-            }
-            for ($i = 20; $i <= min(100, $maxrand); $i += 10) {
-                $randomcount[$i] = $i;
-            }
-        } else {
-            $randomcount[0] = 0;
-            $disabled = ' disabled="disabled"';
-        }
-
-        $out = '<strong><label for="menurandomcount">'.get_string('addrandomfromcategory', 'quiz').
-                '</label></strong><br />';
-        $attributes = array();
-        $attributes['disabled'] = $disabled ? 'disabled' : null;
-        $select = html_writer::select($randomcount, 'randomcount', '1', null, $attributes);
-        $out .= get_string('addrandom', 'quiz', $select);
-        $out .= '<input type="hidden" name="recurse" value="'.$recurse.'" />';
-        $out .= '<input type="hidden" name="categoryid" value="' . $category->id . '" />';
-        $out .= ' <input type="submit" name="addrandom" value="'.
-                get_string('addtoquiz', 'quiz').'"' . $disabled . ' />';
-        $out .= $OUTPUT->help_icon('addarandomquestion', 'quiz');
-    }
-    return $out;
-}
-
 // These params are only passed from page request to request while we stay on
 // this page otherwise they would go in question_edit_setup.
 $scrollpos = optional_param('scrollpos', '', PARAM_INT);
