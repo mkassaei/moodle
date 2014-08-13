@@ -307,20 +307,20 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $options = array('cmid' => $cm->id, 'header' => $header, 'form' => $form);
         list($repaginatingdisabledhtml, $repaginatebutton) = $this->get_repaginate_button($quiz, $options);
         echo $repaginatebutton;
-        if ($USER->editing && !$repaginatingdisabledhtml) {
+        if (!$repaginatingdisabledhtml) {
             $PAGE->requires->yui_module('moodle-mod_quiz-repaginate', 'M.mod_quiz.repaginate.init');
         }
 
         // Add the form for question bank.
-         $canaddfromqbank = has_capability('moodle/question:useall', $context);;
-         $qbankoptions = array('class' => 'questionbank', 'cmid' => $cm->id);
-         if ($USER->editing && $canaddfromqbank) {
-             $PAGE->requires->yui_module('moodle-mod_quiz-quizquestionbank', 'M.mod_quiz.quizquestionbank.init', $qbankoptions);
-         }
+        $canaddfromqbank = has_capability('moodle/question:useall', $context);
+        $qbankoptions = array('class' => 'questionbank', 'cmid' => $cm->id);
+        if ($canaddfromqbank) {
+            $PAGE->requires->yui_module('moodle-mod_quiz-quizquestionbank', 'M.mod_quiz.quizquestionbank.init', $qbankoptions);
+        }
 
         // Add the form for random question.
-        $canaddrandom = has_capability('moodle/question:useall', $context);;
-        if ($USER->editing && $canaddrandom) {
+        $canaddrandom = has_capability('moodle/question:useall', $context);
+        if ($canaddrandom) {
             $PAGE->requires->yui_module('moodle-mod_quiz-randomquestion', 'M.mod_quiz.randomquestion.init');
         }
 
