@@ -388,7 +388,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
         // Call random question form.
         if (!quiz_has_attempts($quiz->id)) {
-            echo $this->get_questionbank_form($pageurl, $contexts, $pagevars, $course, $cm, $quiz);
+            echo $this->get_questionbank_loading();
             echo $this->get_randomquestion_form($pageurl, $contexts, $pagevars, $cm);
         }
     }
@@ -480,12 +480,10 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @param stdClass $quiz the quiz settings.
      * @return array with two elements. The question bank pop-up header and contents.
      */
-    public function get_questionbank_form(moodle_url $thispageurl,
-            question_edit_contexts $contexts, array $pagevars, $course, $cm, $quiz) {
-
+    public function get_questionbank_loading() {
         return html_writer::tag('div', html_writer::empty_tag('img',
                 array('alt' => 'loading', 'class' => 'loading-icon', 'src' => $this->pix_url('i/loading'))),
-                array('class' => 'questionbankformforpopup'));
+                array('class' => 'questionbankloading'));
     }
 
     /**

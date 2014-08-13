@@ -24,7 +24,7 @@
 
 
 var CSS = {
-        QBANKFORM: 'div.questionbankformforpopup',
+        QBANKLOADING: 'div.questionbankloading',
         QBANKLINK: 'a.questionbank',
         QBANK: '.questionbank'
 };
@@ -40,13 +40,14 @@ var POPUP = function() {
 
 Y.extend(POPUP, Y.Base, {
     qbank: Y.one(CSS.QBANK),
+    loadingDiv: '',
     dialogue: null,
 
     create_dialogue: function() {
         // Create a dialogue on the page and hide it.
         config = {
             headerContent : this.qbank._node.getAttribute(PARAMS.HEADER),
-            bodyContent : Y.one(CSS.QBANKFORM),
+            bodyContent : Y.one(CSS.QBANKLOADING),
             draggable : true,
             modal : true,
             zIndex : 1000,
@@ -59,7 +60,10 @@ Y.extend(POPUP, Y.Base, {
             extraClasses: ['mod_quiz_qbank_dialogue']
         };
         this.dialogue = new M.core.dialogue(config);
+        this.dialogue.bodyNode.delegate('click', this.link_clicked, 'a[href]', this);
         this.dialogue.hide();
+
+        this.loadingDiv = this.dialogue.bodyNode.getHTML();
     },
 
     initializer : function() {
@@ -79,6 +83,7 @@ Y.extend(POPUP, Y.Base, {
 
     load_content : function(queryString) {
         Y.log('Starting load.');
+        this.dialogue.bodyNode.setHTML(this.loadingDiv);
 
         Y.io(M.cfg.wwwroot + '/mod/quiz/questionbank.ajax.php' + queryString, {
             method: 'GET',
@@ -105,7 +110,6 @@ Y.extend(POPUP, Y.Base, {
 
         this.dialogue.bodyNode.setHTML(result.contents);
         this.dialogue.centerDialogue();
-        this.dialogue.bodyNode.delegate('click', this.link_clicked, 'a[href]', this);
         Y.use('moodle-question-chooser', function() {M.question.init_chooser({courseid: 2});}); // TODO hard-coded id.
         this.dialogue.bodyNode.one('form').delegate('change', this.options_changed, '.searchoptions', this);
     },
