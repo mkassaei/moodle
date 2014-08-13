@@ -105,6 +105,7 @@ Y.extend(POPUP, Y.Base, {
         this.dialogue.bodyNode.setHTML(result.contents);
         this.dialogue.centerDialogue();
         this.dialogue.bodyNode.delegate('click', this.link_clicked, 'a[href]', this);
+        Y.use('moodle-question-chooser', function() {M.question.init_chooser({courseid: 2})}); // TODO hard-coded id.
     },
 
     load_failed: function() {
