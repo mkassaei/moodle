@@ -76,7 +76,17 @@ Y.extend(POPUP, Y.Base, {
     display_dialogue : function (e) {
         e.preventDefault();
         this.dialogue.set('headerContent', e.currentTarget.getData(PARAMS.HEADER));
+
         this.addonpage = e.currentTarget.getData(PARAMS.PAGE);
+        var controlsDiv = this.dialogue.bodyNode.one('.modulespecificbuttonscontainer')
+        if (controlsDiv) {
+            var hidden = controlsDiv.one('input[name=addonpage]');
+            if (!hidden) {
+                hidden = controlsDiv.appendChild('<input type="hidden" name="addonpage">')
+            }
+            hidden.set('value', this.addonpage);
+        }
+
         this.dialogue.show();
     },
 
