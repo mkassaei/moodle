@@ -266,13 +266,13 @@ class quiz_repaginate_test extends advanced_testcase {
     }
 
     public function test_repaginate_the_rest() {
-    	$slots = $this->get_quiz_slots();
+        $slots = $this->get_quiz_slots();
         $slotfrom = 1;
         $type = mod_quiz_repaginate::LINK;
         $expected = array();
         foreach ($slots as $slot) {
             if ($slot->slot > $slotfrom) {
-                $slot->page = $slot->page -1;
+                $slot->page = $slot->page - 1;
                 $expected[$slot->id] = $slot;
             }
         }
@@ -288,15 +288,15 @@ class quiz_repaginate_test extends advanced_testcase {
             $newslots[$s->id] = $s;
         }
 
-         $type = mod_quiz_repaginate::UNLINK;
-         $expected = array();
-         foreach ($slots as $slot) {
-             if ($slot->slot > ($slotfrom - 1)) {
-                 $slot->page = $slot->page -1;
-                 $expected[$slot->id] = $slot;
-             }
-         }
-         $actual = $this->repaginate->repaginate_the_rest($newslots, $slotfrom, $type, false);
-         $this->assertEquals($expected, $actual);
+        $type = mod_quiz_repaginate::UNLINK;
+        $expected = array();
+        foreach ($slots as $slot) {
+            if ($slot->slot > ($slotfrom - 1)) {
+                $slot->page = $slot->page - 1;
+                $expected[$slot->id] = $slot;
+            }
+        }
+        $actual = $this->repaginate->repaginate_the_rest($newslots, $slotfrom, $type, false);
+        $this->assertEquals($expected, $actual);
     }
 }

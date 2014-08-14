@@ -119,7 +119,7 @@ class structure {
      */
     public function get_slot_id_by_slot_number($slotnumber, $slots = array()) {
         $slot = $this->get_slot_by_slot_number($slotnumber, $slots);
-        if(!$slot){
+        if (!$slot) {
             return null;
         }
 

@@ -230,7 +230,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                 'autocomplete' : 'off',
                 'aria-describedby' : 'id_editinstructions',
                 'maxLength' : '12',
-                'size' : parseInt(this.get('config').questiondecimalpoints, 10)+2
+                'size' : parseInt(this.get('config').questiondecimalpoints, 10) + 2
             });
 
             // Clear the existing content and put the editor in

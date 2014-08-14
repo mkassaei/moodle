@@ -58,7 +58,7 @@ Y.extend(POPUP, Y.Base, {
         popup.dialog = new M.core.dialogue(config);
         popup.dialog.show();
     },
- 
+
     initializer : function() {
         Y.one('body').delegate('click', this.display_dialogue, CSS.RANDOMQUESTIONLINKS, this);
     },

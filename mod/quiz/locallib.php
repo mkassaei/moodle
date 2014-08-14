@@ -1282,19 +1282,19 @@ function quiz_question_delete_button($quiz, $question) {
  * @param object $question the question
  * @return the HTML for a delete icon and link.
  */
-function quiz_question_page_join_button($quiz, $question, $link_page) {
+function quiz_question_page_join_button($quiz, $question, $linkpage) {
     global $OUTPUT, $PAGE;
 
     if (!$hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context)) {
         return '';
     }
 
-    $url = new moodle_url('repaginate.php', array('cmid' =>$quiz->cmid, 'quizid' => $quiz->id,
-                'slot' => $question->slot, 'repag' => $link_page, 'sesskey' => sesskey()));
+    $url = new moodle_url('repaginate.php', array('cmid' => $quiz->cmid, 'quizid' => $quiz->id,
+                'slot' => $question->slot, 'repag' => $linkpage, 'sesskey' => sesskey()));
 
-    if($link_page == 1) {
+    if ($linkpage == 1) {
         $title = get_string('linkpage', 'quiz');
-        $image = $OUTPUT->pix_icon('e/insert_page_break', $title); //remove_link
+        $image = $OUTPUT->pix_icon('e/insert_page_break', $title); // Remove_link.
         $action = 'linkpage';
     } else {
         $title = get_string('unlinkpage', 'quiz');

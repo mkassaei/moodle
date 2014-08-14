@@ -320,7 +320,6 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
             identifier: 'totopofsection',
             component: 'moodle'
         };
-        
 
         // Go through all sections
         var sectionlistselector = M.mod_quiz.edit.get_section_selector(Y);
@@ -417,7 +416,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
         // Get a reference to our drag node
         var dragnode = drag.get('node');
         var dropnode = e.drop.get('node');
-        
+
         // Add spinner if it not there
         var actionarea = dragnode.one(CSS.ACTIONAREA);
         var spinner = M.util.add_spinner(Y, actionarea);
@@ -482,10 +481,10 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
             context:this
         });
     },
-    
+
     global_drop_over: function(e) {
         //Overriding parent method so we can stop the slots being dragged before the first page node.
-        
+
         // Check that drop object belong to correct group.
         if (!e.drop || !e.drop.inGroup(this.groups)) {
             return;
@@ -494,7 +493,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
         // Get a reference to our drag and drop nodes.
         var drag = e.drag.get('node'),
             drop = e.drop.get('node');
-        
+
         // Save last drop target for the case of missed target processing.
         this.lastdroptarget = e.drop;
 
