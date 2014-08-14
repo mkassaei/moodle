@@ -84,7 +84,7 @@ class structure {
      * @return stdClass the requested slot.
      */
     public function get_slot_by_id($slotid, $slots = array()) {
-        if(!count($slots)){
+        if (!count($slots)) {
             $slots = $this->slots;
         }
         if (!array_key_exists($slotid, $slots)) {
@@ -99,7 +99,7 @@ class structure {
      */
     public function get_slot_by_slot_number($slotnumber, $slots = array()) {
         $slotnumber = strval($slotnumber);
-        if(!count($slots)){
+        if (!count($slots)) {
             $slots = $this->slots;
         }
         foreach ($slots as $slot) {
@@ -232,8 +232,7 @@ class structure {
         // Empty target slot means move slot to first.
         if (empty($idbefore)) {
             $targetslot = $this->slots[$slottoslotids[1]];
-        }
-        else {
+        } else {
             $targetslot = $this->slots[$idbefore];
         }
         $hasslotmoved = false;
@@ -285,20 +284,13 @@ class structure {
             $pagehaschanged = true;
         }
 
-
         // Slot dropped back where it came from.
-        if (!$hasslotmoved && !$pagehaschanged){
+        if (!$hasslotmoved && !$pagehaschanged) {
             $trans->allow_commit();
             return;
         }
 
-//         require_once($CFG->dirroot . '/mod/quiz/locallib.php');
-//         require_once($CFG->dirroot . '/mod/quiz/classes/repaginate.php');
-
-        /*
-         * Refresh page numbering.
-         */
-
+        // Refresh page numbering.
         $slots = $this->refresh_page_numbers_and_update_db($quiz);
 
         $trans->allow_commit();
@@ -336,14 +328,6 @@ class structure {
         // Loop slots. Start Page number at 1 and increment as required.
         $pagenumbers = array('new' => 0, 'old' => 0);
 
-        /*
-         * slots are only changed (moved/removed) one at a a time. So largest slot number possible
-         * is slot array length +1.
-         *
-         * Iterate through slots by slot number. Updating page accordingly. Existing code should work
-         * on page numbers;
-         *
-         */
         foreach ($slots as $slot) {
             if ($slot->page !== $pagenumbers['old']) {
                 $pagenumbers['old'] = $slot->page;

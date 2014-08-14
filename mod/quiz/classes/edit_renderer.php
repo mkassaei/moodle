@@ -190,10 +190,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      */
     protected function section_edit_controls($course, $section, $onsectionpage = false) {
 
-        if (!$this->page->user_is_editing()) {
-            return array();
-        }
-
         $coursecontext = context_course::instance($course->id);
 
         if ($onsectionpage) {
@@ -463,7 +459,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         }
 
         $randomform = new quiz_add_random_form(new moodle_url('/mod/quiz/addrandom.php'), $contexts);
-        $randomform-> set_data(array(
+        $randomform->set_data(array(
                 'category' => $pagevars['cat'],
                 'returnurl' => $thispageurl->out_as_local_url(true),
                 'cmid' => $cm->id
@@ -659,7 +655,8 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
             // Form fields.
             $addquestionformhtml = html_writer::tag('input', null,
-                    array('type' => 'hidden', 'name' => 'returnurl', 'value' => '/mod/quiz/edit.php?cmid='.$quiz->cmid.'&amp;addonpage=' . $pagenumber));
+                    array('type' => 'hidden', 'name' => 'returnurl',
+                            'value' => '/mod/quiz/edit.php?cmid='.$quiz->cmid.'&amp;addonpage=' . $pagenumber));
             $addquestionformhtml .= html_writer::tag('input', null,
                     array('type' => 'hidden', 'name' => 'cmid', 'value' => $quiz->cmid));
             $addquestionformhtml .= html_writer::tag('input', null,
@@ -708,12 +705,13 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @param int $sectionreturn section number to return to
      * @return void
      */
-    public function quiz_section_question_list($course, $cm, $quiz, $contexts, $pagevars, $structure, $section, $sectionreturn, $pageurl) {
+    public function quiz_section_question_list($course, $cm, $quiz, $contexts, $pagevars, $structure,
+            $section, $sectionreturn, $pageurl) {
         global $USER;
         $output = '';
 
         // Check if we are currently in the process of moving a module with JavaScript disabled.
-        $ismoving = $this->page->user_is_editing() && ismoving($course->id);
+        $ismoving = ismoving($course->id);
         if ($ismoving) {
             $movingpix = new pix_icon('movehere', get_string('movehere'), 'moodle', array('class' => 'movetarget'));
             $strmovefull = strip_tags(get_string("movefull", "", "'$USER->activitycopyname'"));
@@ -735,8 +733,8 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
                     continue;
                 }
 
-                if ($questiontypehtml = $this->quiz_section_question_list_item($course, $cm, $quiz, $contexts, $pagevars, $structure, $question,
-                        $sectionreturn, $pageurl)) {
+                if ($questiontypehtml = $this->quiz_section_question_list_item($course, $cm, $quiz, $contexts,
+                        $pagevars, $structure, $question, $sectionreturn, $pageurl)) {
                     $questionshtml[$questionnumber] = $questiontypehtml;
                 }
             }
@@ -873,7 +871,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         // or use 'i' followed by a number (when morethan one) which can be incremented.
         $slotnumber = $this->get_question_info($structure, $question->id, 'slot');
 
-        if ($this->page->user_is_editing()) {
+        if (!quiz_has_attempts($quiz->id)) {
             $output .= $this->question_move($question, $sectionreturn);
         }
 
@@ -904,9 +902,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             }
 
             $questionicons .= $this->marked_out_of_field($quiz, $question);
-            if ($this->page->user_is_editing()) {
-                $questionicons .= ' ' . $this->regrade_action($question, $sectionreturn);
-            }
+            $questionicons .= ' ' . $this->regrade_action($question, $sectionreturn);
 
             $output .= html_writer::span($questionicons, 'actions'); // Required to add js spinner icon.
 
@@ -947,7 +943,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         }
 
         // AJAX edit title.
-        if ($hasmanagequiz && course_ajax_enabled($COURSE)) {
+        if ($hasmanagequiz) {
             return html_writer::span(
                 html_writer::link(
                     new moodle_url($baseurl, array('update' => $question->id)),
@@ -1065,16 +1061,18 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $attributes = array_merge(array('data-header' => $title, 'data-addonpage' => $page), $attributes);
         $actions['addarandomquestion'] = new action_menu_link_secondary($url, $icon, $str->addarandomquestion, $attributes);
 
-//         // Add a random selected question.
-//         // TODO: We have to refine the functionality when adding random selected questions.
-//         $returnurl = new moodle_url('/mod/quiz/edit.php', array('cmid' => $quiz->cmid));
-//         $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid);
-//         $actions['addarandomselectedquestion'] = new action_menu_link_secondary(
-//             new moodle_url('/mod/quiz/addrandom.php', $params),
-//             new pix_icon('t/add', $str->addarandomselectedquestion, 'moodle', array('class' => 'iconsmall', 'title' => '')),
-//             $str->addarandomselectedquestion, array('class' => 'editing_addarandomselectedquestion',
-//                     'data-action' => 'addarandomselectedquestion')
-//         );
+        /*
+         * // Add a random selected question.
+         * // TODO: We have to refine the functionality when adding random selected questions.
+         * $returnurl = new moodle_url('/mod/quiz/edit.php', array('cmid' => $quiz->cmid));
+         * $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid);
+         * $actions['addarandomselectedquestion'] = new action_menu_link_secondary(
+         *     new moodle_url('/mod/quiz/addrandom.php', $params),
+         *     new pix_icon('t/add', $str->addarandomselectedquestion, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+         *     $str->addarandomselectedquestion, array('class' => 'editing_addarandomselectedquestion',
+         *             'data-action' => 'addarandomselectedquestion')
+         *  );
+         */
         return $actions;
     }
 

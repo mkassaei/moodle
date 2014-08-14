@@ -298,25 +298,24 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         $count = $DB->count_records('question', array('id' => $randomq->id));
         $this->assertEquals(0, $count);
 
-        /*
-         * Test a longer quiz. Are page and slot numbers updated correctly?
-         */
+        // Test a longer quiz. Are page and slot numbers updated correctly?
+
         // Append slots to the quiz.
         $testslots = $this->reset_slots($quiz, $structure);
 
-        $this->assertInstanceOf('\mod_quiz\structure', $structure);
-
         $structure->remove_slot($quiz, 7);
 
+        // Get updated slots from db.
         $this->get_saved_quiz_slots($quiz, $structure);
         $slotsremoved = $structure->get_quiz_slots();
 
         $idremove = $this->get_slot_id_by_slot_number('7', $testslots);
-        // Remove slot.
-        unset($testslots[$idremove]);
 
+        // Update test data. Remove slot and refresh slots and pages.
+        unset($testslots[$idremove]);
         $this->refresh_slots_and_pages($quiz, $structure, $testslots);
 
+        // Do the arrays of slots match?
         $this->assertEquals($testslots, $slotsremoved);
     }
 
@@ -430,7 +429,7 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         // Test: Nothing changed.
         $slottoslotids = $structure->create_slot_to_slotids($slots);
 
-        // Create test data
+        // Create test data.
         $testslottoslotids = array();
         foreach ($testslots as $slot) {
             $testslottoslotids[$slot->slot] = $slot->id;
@@ -447,7 +446,7 @@ class mod_quiz_structure_testcase extends advanced_testcase {
 
         $slottoslotids = $structure->create_slot_to_slotids($slots);
 
-        // Create test data
+        // Create test data.
         unset($testslots[$idmove]);
         $testslottoslotids = array();
         foreach ($testslots as $slot) {
@@ -458,7 +457,7 @@ class mod_quiz_structure_testcase extends advanced_testcase {
     }
 
     /*
-     *
+     * Refresh the slot and page numbers of a given array of slots.
      */
     private function refresh_slots_and_pages ($quiz, $structure, $slots) {
         $structure->refresh_slot_numbers($quiz, $slots);
