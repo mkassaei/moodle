@@ -126,13 +126,14 @@ if (($addquestion = optional_param('addquestion', 0, PARAM_INT)) && confirm_sess
 }
 
 if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
+    $addonpage = optional_param('addonpage', 0, PARAM_INT);
     // Add selected questions to the current quiz.
     $rawdata = (array) data_submitted();
     foreach ($rawdata as $key => $value) { // Parse input for question ids.
         if (preg_match('!^q([0-9]+)$!', $key, $matches)) {
             $key = $matches[1];
             quiz_require_question_use($key);
-            quiz_add_quiz_question($key, $quiz);
+            quiz_add_quiz_question($key, $quiz, $addonpage);
         }
     }
     quiz_delete_previews($quiz);
