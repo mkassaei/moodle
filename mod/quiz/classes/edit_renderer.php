@@ -247,21 +247,22 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
     public function edit_page($course, $quiz, mod_quiz\structure  $structure, $cm,
             question_edit_contexts $contexts, moodle_url $pageurl, array $pagevars) {
         global $DB, $CFG, $PAGE, $USER;
+        $output = '';
 
         $modinfo = get_fast_modinfo($course);
         $course = course_get_format($course)->get_course();
 
         $context = context_course::instance($course->id);
         // Title with completion help icon.
-        echo $this->output->heading($this->page_title(), 2, 'accesshide');
+        $output .= $this->output->heading($this->page_title(), 2, 'accesshide');
 
-        echo $this->heading(get_string('editingquizx', 'quiz', format_string($quiz->name)), 2);
-        echo $this->help_icon('editingquiz', 'quiz', get_string('basicideasofquiz', 'quiz'));
+        $output .= $this->heading(get_string('editingquizx', 'quiz', format_string($quiz->name)), 2);
+        $output .= $this->help_icon('editingquiz', 'quiz', get_string('basicideasofquiz', 'quiz'));
         // Show status bar.
-        echo $this->status_bar($quiz);
+        $output .= $this->status_bar($quiz);
 
         $tabindex = 0;
-        echo $this->maximum_grade_input($quiz, $this->page->url);
+        $output .= $this->maximum_grade_input($quiz, $this->page->url);
 
         $notifystrings = array();
         if (quiz_has_attempts($quiz->id)) {
@@ -277,7 +278,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             $notifystrings[] = get_string('shufflequestionsselected', 'quiz', $updatelink);
         }
         if (!empty($notifystrings)) {
-            echo $this->box('<p>' . implode('</p><p>', $notifystrings) . '</p>', 'statusdisplay');
+            $output .= $this->box('<p>' . implode('</p><p>', $notifystrings) . '</p>', 'statusdisplay');
         }
 
         $slots = $structure->get_quiz_slots();
@@ -302,7 +303,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $form = $this->get_repaginate_form($cm, $quiz, $pageurl);
         $options = array('cmid' => $cm->id, 'header' => $header, 'form' => $form);
         list($repaginatingdisabledhtml, $repaginatebutton) = $this->get_repaginate_button($quiz, $options);
-        echo $repaginatebutton;
+        $output .= $repaginatebutton;
         if (!$repaginatingdisabledhtml) {
             $PAGE->requires->yui_module('moodle-mod_quiz-repaginate', 'M.mod_quiz.repaginate.init');
         }
@@ -358,12 +359,12 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
         // Display the add icon menu.
         if (!$quiz->fullquestions) {
-            echo html_writer::tag('span', $this->add_menu_actions(0,
+            $output .= html_writer::tag('span', $this->add_menu_actions(0,
                     $pageurl, $contexts, $pagevars, $course, $cm, $quiz), array('class' => 'add-menu-outer'));
         }
 
         // Now the list of sections.
-        echo $this->start_section_list();
+        $output .= $this->start_section_list();
 
         $section = null;
         foreach ($sections as $section) {
@@ -373,22 +374,24 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             $section->available = 1;
             $section->indent = 1;
 
-            echo $this->section_header($section, $course, false, 0);
-            echo $this->quiz_section_question_list($course, $cm, $quiz, $contexts, $pagevars, $structure, $section, 0, $pageurl);
-            echo $this->section_footer();
+            $output .= $this->section_header($section, $course, false, 0);
+            $output .= $this->quiz_section_question_list($course, $cm, $quiz, $contexts, $pagevars, $structure, $section, 0, $pageurl);
+            $output .= $this->section_footer();
         }
 
-        echo $this->end_section_list();
+        $output .= $this->end_section_list();
 
-        echo $this->question_chooser();
+        $output .= $this->question_chooser();
 
         // Call random question form.
         if (!quiz_has_attempts($quiz->id)) {
-            echo '<div class="mod_quiz_edit_forms">';
-            echo $this->get_questionbank_loading();
-            echo $this->get_randomquestion_form($pageurl, $contexts, $pagevars, $cm);
-            echo '</div>';
+            $output .= '<div class="mod_quiz_edit_forms">';
+            $output .= $this->get_questionbank_loading();
+            $output .= $this->get_randomquestion_form($pageurl, $contexts, $pagevars, $cm);
+            $output .= '</div>';
         }
+
+        return $output;
     }
 
     /**
