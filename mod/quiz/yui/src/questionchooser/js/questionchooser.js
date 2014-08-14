@@ -1,8 +1,6 @@
-var SELECTORS = {
-    ADDNEWQUESTIONBUTTON: 'a.addquestion',
-    ADDNEWQUESTIONFORM: 'form.addnewquestion',
+var CSS = {
+    ADDNEWQUESTIONBUTTONS: 'ul.menu a.addquestion',
     CREATENEWQUESTION: 'div.createnewquestion',
-    CREATENEWQUESTIONFORM: 'div.createnewquestion form',
     CHOOSERDIALOGUE: 'div.chooserdialogue',
     CHOOSERHEADER: 'div.choosertitle'
 };
@@ -22,14 +20,13 @@ var QUESTIONCHOOSER = function() {
 
 Y.extend(QUESTIONCHOOSER, M.core.chooserdialogue, {
     initializer: function() {
-        Y.all(SELECTORS.ADDNEWQUESTIONBUTTON).each(function(node) {
-                node.on('click', this.display, this);
-        }, this);
+        Y.one('body').delegate('click', this.display_dialogue, CSS.ADDNEWQUESTIONBUTTONS, this);
     },
-    display: function(e) {
+
+    display_dialogue: function(e) {
         e.preventDefault();
-        var dialogue = Y.one(SELECTORS.CREATENEWQUESTION + ' ' + SELECTORS.CHOOSERDIALOGUE),
-            header = Y.one(SELECTORS.CREATENEWQUESTION + ' ' + SELECTORS.CHOOSERHEADER);
+        var dialogue = Y.one(CSS.CREATENEWQUESTION + ' ' + CSS.CHOOSERDIALOGUE),
+            header = Y.one(CSS.CREATENEWQUESTION + ' ' + CSS.CHOOSERHEADER);
 
         if (this.container === null) {
             // Setup the dialogue, and then prepare the chooser if it's not already been set up.
@@ -38,19 +35,31 @@ Y.extend(QUESTIONCHOOSER, M.core.chooserdialogue, {
         }
 
         // Update all of the hidden fields within the questionbank form.
-        var originForm = e.target.ancestor(Y.Moodle.mod_quiz.util.page.SELECTORS.PAGE, true).one(SELECTORS.ADDNEWQUESTIONFORM),
-            targetForm = this.container.one('form'),
-            hiddenElements = originForm.all('input[type="hidden"]');
-
-        targetForm.all('input.customfield').remove();
-        hiddenElements.each(function(field) {
-            targetForm.appendChild(field.cloneNode())
-                .removeAttribute('id')
-                .addClass('customfield');
-        });
+        var parameters = Y.QueryString.parse(e.currentTarget.get('search').substring(1));
+        var form = this.container.one('form');
+        this.parameters_to_hidden_input(parameters, form, 'returnurl');
+        this.parameters_to_hidden_input(parameters, form, 'cmid');
+        this.parameters_to_hidden_input(parameters, form, 'category');
+        this.parameters_to_hidden_input(parameters, form, 'addonpage');
+        this.parameters_to_hidden_input(parameters, form, 'appendqnumstring');
 
         // Display the chooser dialogue.
         this.display_chooser(e);
+    },
+
+    parameters_to_hidden_input: function(parameters, form, name) {
+        var value;
+        if (parameters.hasOwnProperty(name)) {
+            value = parameters[name];
+        } else {
+            value = '';
+        }
+        var input = form.one('input[name=' + name + ']');
+        if (!input) {
+            input = form.appendChild('<input type="hidden">');
+            input.set('name', name);
+        }
+        input.set('value', value);
     }
 }, {
     NAME: 'mod_quiz-questionchooser'

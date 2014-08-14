@@ -545,11 +545,6 @@ class quiz_question_bank_view extends core_question\bank\view {
 function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledmodules = null, $config = null) {
     global $CFG, $PAGE, $SITE;
 
-    // Ensure that ajax should be included.
-    if (!course_ajax_enabled($course)) {
-        return false;
-    }
-
     if (!$config) {
         $config = new stdClass();
     }
@@ -597,7 +592,7 @@ function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledm
     // Include the question chooser.
     $PAGE->requires->yui_module('moodle-mod_quiz-questionchooser', 'M.mod_quiz.init_questionchooser');
 
-    // Include course dragdrop.
+    // Include course dragdrop. TODO MDL-43089 why this if?
     if ($course->id != $SITE->id) {
         $PAGE->requires->yui_module('moodle-mod_quiz-dragdrop', 'M.mod_quiz.init_section_dragdrop',
             array(array(
