@@ -317,12 +317,12 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
         this.resourcedraghandle = this.get_drag_handle(M.str.moodle.move, CSS.EDITINGMOVE, CSS.ICONCLASS, true);
 
         this.samenodelabel = {
-            identifier: 'afterresource',
-            component: 'moodle'
+            identifier: 'dragtoafterquestion',
+            component: 'quiz'
         };
         this.parentnodelabel = {
-            identifier: 'totopofsection',
-            component: 'moodle'
+            identifier: 'dragtostartofpage',
+            component: 'quiz'
         };
 
         // Go through all sections

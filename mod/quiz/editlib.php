@@ -630,6 +630,8 @@ function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledm
 
     $PAGE->requires->strings_for_js(array(
             'confirmremovequestion',
+            'dragtoafterquestion',
+            'dragtostartofpage',
         ), 'quiz');
 
     // For confirming resource deletion we need the name of the module in question.
