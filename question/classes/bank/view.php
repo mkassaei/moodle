@@ -727,6 +727,36 @@ class view {
         echo "</form>\n";
     }
 
+    /**
+     * Display the controls at the bottom of the list of questions.
+     * @param int      $totalnumber Total number of questions that might be shown (if it was not for paging).
+     * @param bool     $recurse     Whether to include subcategories.
+     * @param stdClass $category    The question_category row from the database.
+     * @param context  $catcontext  The context of the category being displayed.
+     * @param array    $addcontexts contexts where the user is allowed to add new questions.
+     */
+    protected function display_bottom_controls($totalnumber, $recurse, $category, \context $catcontext, array $addcontexts) {
+        $caneditall = has_capability('moodle/question:editall', $catcontext);
+        $canuseall = has_capability('moodle/question:useall', $catcontext);
+        $canmoveall = has_capability('moodle/question:moveall', $catcontext);
+
+        echo '<div class="modulespecificbuttonscontainer">';
+        if ($caneditall || $canmoveall || $canuseall) {
+            echo '<strong>&nbsp;'.get_string('withselected', 'question').':</strong><br />';
+
+            // Print delete and move selected question.
+            if ($caneditall) {
+                echo '<input type="submit" name="deleteselected" value="' . get_string('delete') . "\" />\n";
+            }
+
+            if ($canmoveall && count($addcontexts)) {
+                echo '<input type="submit" name="move" value="' . get_string('moveto', 'question') . "\" />\n";
+                question_category_select_menu($addcontexts, false, 0, "{$category->id},{$category->contextid}");
+            }
+        }
+        echo "</div>\n";
+    }
+
     protected function start_table() {
         echo '<table id="categoryquestions">' . "\n";
         echo "<thead>\n";
