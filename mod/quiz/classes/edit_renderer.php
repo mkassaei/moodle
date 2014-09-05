@@ -711,13 +711,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         global $USER;
         $output = '';
 
-        // Check if we are currently in the process of moving a module with JavaScript disabled.
-        $ismoving = ismoving($course->id);
-        if ($ismoving) {
-            $movingpix = new pix_icon('movehere', get_string('movehere'), 'moodle', array('class' => 'movetarget'));
-            $strmovefull = strip_tags(get_string("movefull", "", "'$USER->activitycopyname'"));
-        }
-
         // Get the list of question types visible to user (excluding the question type being moved if there is one).
         $questionshtml = array();
 
@@ -729,11 +722,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
                 $questionnumber = $slot->questionid;
                 $question = $quiz->fullquestions[$questionnumber];
 
-                if ($ismoving and $question->id == $USER->activitycopy) {
-                    // Do not display moving question type.
-                    continue;
-                }
-
                 if ($questiontypehtml = $this->quiz_section_question_list_item($course, $cm, $quiz, $contexts,
                         $pagevars, $structure, $question, $sectionreturn, $pageurl)) {
                     $questionshtml[$questionnumber] = $questiontypehtml;
@@ -742,20 +730,9 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         }
 
         $sectionoutput = '';
-        if (!empty($questionshtml) || $ismoving) {
+        if (!empty($questionshtml)) {
             foreach ($questionshtml as $questionnumber => $questiontypehtml) {
-                if ($ismoving) {
-                    $movingurl = new moodle_url('/quiz/edit.php', array('moveto' => $questionnumber, 'sesskey' => sesskey()));
-                    $sectionoutput .= html_writer::tag('li', html_writer::link($movingurl, $this->output->render($movingpix)),
-                            array('class' => 'movehere', 'title' => $strmovefull));
-                }
                 $sectionoutput .= $questiontypehtml;
-            }
-
-            if ($ismoving) {
-                $movingurl = new moodle_url('/quiz/edit.php', array('movetosection' => $section->id, 'sesskey' => sesskey()));
-                $sectionoutput .= html_writer::tag('li', html_writer::link($movingurl, $this->output->render($movingpix)),
-                        array('class' => 'movehere', 'title' => $strmovefull));
             }
         }
 
