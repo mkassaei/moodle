@@ -375,6 +375,16 @@ function question_edit_setup($edittab, $baseurl, $requirecmid = false, $requirec
 }
 
 /**
+ * Get the category id from $pagevars.
+ * @param array $pagevars from {@link question_edit_setup()}.
+ * @return int the category id.
+ */
+function question_get_category_id_from_pagevars(array $pagevars) {
+    list($questioncategoryid) = explode(',', $pagevars['cat']);
+    return $questioncategoryid;
+}
+
+/**
  * Get a particular question preference that is also stored as a user preference.
  * If the the value is given in the GET/POST request, then that value is used,
  * and the user preference is updated to that value. Otherwise, the last set
@@ -445,10 +455,7 @@ function print_choose_qtype_to_add_form($hiddenparams, array $allowedqtypes = nu
 
     if ($enablejs) {
         // Add the chooser.
-        $PAGE->requires->yui_module('moodle-question-chooser',
-            'M.question.init_chooser',
-            array(array('courseid' => $PAGE->course->id))
-        );
+        $PAGE->requires->yui_module('moodle-question-chooser', 'M.question.init_chooser', array(array()));
     }
 
     $realqtypes = array();

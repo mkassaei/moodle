@@ -871,7 +871,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div');
 
         // Display the link to the question (or do nothing if question has no url).
-        $cmname = $this->quiz_section_question_name($quiz, $question);
+        $cmname = $this->quiz_section_question_name($quiz, $question, $pageurl);
 
         if (!empty($cmname)) {
             // Start the div for the activity title, excluding the edit icons.
