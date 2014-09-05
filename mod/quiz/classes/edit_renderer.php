@@ -209,7 +209,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      */
     public function edit_page($course, $quiz, mod_quiz\structure  $structure, $cm,
             question_edit_contexts $contexts, moodle_url $pageurl, array $pagevars) {
-        global $DB, $CFG, $PAGE, $USER;
+        global $DB;
         $output = '';
 
         $modinfo = get_fast_modinfo($course);
@@ -234,7 +234,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         }
 
         if ($quiz->shufflequestions) {
-            $updateurl = new moodle_url("$CFG->wwwroot/course/mod.php",
+            $updateurl = new moodle_url('/course/mod.php',
                     array('return' => 'true', 'update' => $quiz->cmid, 'sesskey' => sesskey()));
             $updatelink = '<a href="'.$updateurl->out().'">' . get_string('updatethis', '',
                     get_string('modulename', 'quiz')) . '</a>';
@@ -268,20 +268,20 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         list($repaginatingdisabledhtml, $repaginatebutton) = $this->get_repaginate_button($quiz, $options);
         $output .= $repaginatebutton;
         if (!$repaginatingdisabledhtml) {
-            $PAGE->requires->yui_module('moodle-mod_quiz-repaginate', 'M.mod_quiz.repaginate.init');
+            $this->page->requires->yui_module('moodle-mod_quiz-repaginate', 'M.mod_quiz.repaginate.init');
         }
 
         // Add the form for question bank.
         $canaddfromqbank = has_capability('moodle/question:useall', $context);
         $qbankoptions = array('class' => 'questionbank', 'cmid' => $cm->id);
         if ($canaddfromqbank) {
-            $PAGE->requires->yui_module('moodle-mod_quiz-quizquestionbank', 'M.mod_quiz.quizquestionbank.init', $qbankoptions);
+            $this->page->requires->yui_module('moodle-mod_quiz-quizquestionbank', 'M.mod_quiz.quizquestionbank.init', $qbankoptions);
         }
 
         // Add the form for random question.
         $canaddrandom = has_capability('moodle/question:useall', $context);
         if ($canaddrandom) {
-            $PAGE->requires->yui_module('moodle-mod_quiz-randomquestion', 'M.mod_quiz.randomquestion.init');
+            $this->page->requires->yui_module('moodle-mod_quiz-randomquestion', 'M.mod_quiz.randomquestion.init');
         }
 
         $qtypes = question_bank::get_all_qtypes();
@@ -293,7 +293,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         quiz_edit_include_ajax($course, $quiz, $qtypenamesused);
 
         // Include course format js module.
-        $PAGE->requires->js('/mod/quiz/yui/edit.js');
+        $this->page->requires->js('/mod/quiz/yui/edit.js');
 
         // Address missing question types.
         foreach ($slots as $slot) {
@@ -593,7 +593,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      */
     public function quiz_section_question_list_item($course, $cm, $quiz, $contexts, $pagevars, $structure, $question,
             $sectionreturn, $pageurl) {
-        global $OUTPUT;
         $output = '';
         $slotid = $this->get_question_info($structure, $question->id, 'slotid');
         $slotnumber = $this->get_question_info($structure, $question->id, 'slot');
@@ -671,7 +670,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      */
     public function quiz_section_question_list($course, $cm, $quiz, $contexts, $pagevars, $structure,
             $section, $sectionreturn, $pageurl) {
-        global $USER;
         $output = '';
 
         // Get the list of question types visible to user (excluding the question type being moved if there is one).
@@ -718,7 +716,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @return string
      */
     public function quiz_section_question_name($quiz, $question, $pageurl) {
-        global $CFG;
         $output = '';
 
         $editurl = new moodle_url('/question/question.php', array(
@@ -828,7 +825,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             }
 
             $questionicons .= $this->marked_out_of_field($quiz, $question);
-            $questionicons .= ' ' . $this->regrade_action($question, $sectionreturn);
+            $questionicons .= ' ' . $this->regrade_action($question);
 
             $output .= html_writer::span($questionicons, 'actions'); // Required to add js spinner icon.
 
@@ -853,23 +850,11 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @param int $sr The section to link back to (used for creating the links)
      * @return The markup for the regrade action, or an empty string if not available.
      */
-    public function regrade_action($question, $sr = null) {
-        global $PAGE, $COURSE, $OUTPUT;
-
-        static $baseurl;
-
-        if (!isset($baseurl)) {
-            $baseurl = new moodle_url('/quiz/question.php', array('sesskey' => sesskey()));
-        }
-
-        if ($sr !== null) {
-            $baseurl->param('sr', $sr);
-        }
-
+    public function regrade_action($question) {
         return html_writer::span(
             html_writer::link(
                 new moodle_url($baseurl, array('update' => $question->id)),
-                $OUTPUT->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
+                $this->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
                 array(
                     'class' => 'editing_maxmark',
                     'data-action' => 'editmaxmark',
@@ -887,8 +872,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @return The markup for the move action, or an empty string if not available.
      */
     public function question_move($question, $sr = null) {
-        global $OUTPUT, $PAGE;
-
         static $str;
         static $baseurl;
 
@@ -906,7 +889,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
         return html_writer::link(
             new moodle_url($baseurl, array('copy' => $question->id)),
-            $OUTPUT->pix_icon('i/dragdrop', $str->move, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            $this->pix_icon('i/dragdrop', $str->move, 'moodle', array('class' => 'iconsmall', 'title' => '')),
             array('class' => 'editing_move', 'data-action' => 'move')
         );
     }
@@ -924,8 +907,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      */
     public function edit_menu_actions($page, moodle_url $pageurl, question_edit_contexts $contexts,
             array $pagevars, $course, $cm, $quiz) {
-        global $PAGE;
-
         $questioncategoryid = question_get_category_id_from_pagevars($pagevars);
         static $str;
         if (!isset($str)) {
@@ -981,7 +962,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      */
     public function add_menu_actions($page, moodle_url $pageurl, question_edit_contexts $contexts,
             array $pagevars, $course, $cm, $quiz) {
-        global $CFG;
 
         $actions = $this->edit_menu_actions($page, $pageurl, $contexts, $pagevars, $course, $cm, $quiz);
         if (empty($actions)) {
