@@ -35,7 +35,7 @@ M.mod_quiz.edit.get_config = function() {
  */
 M.mod_quiz.edit.swap_sections = function(Y, node1, node2) {
     var CSS = {
-        COURSECONTENT : 'course-content',
+        COURSECONTENT : 'mod-quiz-edit-content',
         SECTIONADDMENUS : 'section_add_menus'
     };
 

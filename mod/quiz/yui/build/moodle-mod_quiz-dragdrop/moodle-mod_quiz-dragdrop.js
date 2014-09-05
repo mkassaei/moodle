@@ -11,7 +11,7 @@ var CSS = {
     ACTIVITY: 'activity',
     ACTIVITYINSTANCE: 'activityinstance',
     CONTENT: 'content',
-    COURSECONTENT: 'course-content',
+    COURSECONTENT: 'mod-quiz-edit-content',
     EDITINGMOVE: 'editing_move',
     ICONCLASS: 'iconsmall',
     JUMPMENU: 'jumpmenu',
@@ -78,7 +78,7 @@ Y.extend(DRAGSECTION, M.core.dragdrop, {
                 moveOnEnd: false
             });
             del.dd.plug(Y.Plugin.DDConstrained, {
-                // Keep it inside the .course-content
+                // Keep it inside the .mod-quiz-edit-content
                 constrain: '#' + CSS.PAGECONTENT,
                 stickY: true
             });
@@ -342,7 +342,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
                 cloneNode: true
             });
             del.dd.plug(Y.Plugin.DDConstrained, {
-                // Keep it inside the .course-content
+                // Keep it inside the .mod-quiz-edit-content
                 constrain: '#' + CSS.SLOTS
             });
             del.dd.plug(Y.Plugin.DDWinScroll);

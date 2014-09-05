@@ -41,7 +41,7 @@ Y.extend(DRAGSECTION, M.core.dragdrop, {
                 moveOnEnd: false
             });
             del.dd.plug(Y.Plugin.DDConstrained, {
-                // Keep it inside the .course-content
+                // Keep it inside the .mod-quiz-edit-content
                 constrain: '#' + CSS.PAGECONTENT,
                 stickY: true
             });

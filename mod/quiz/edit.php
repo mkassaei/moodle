@@ -325,13 +325,12 @@ for ($pageiter = 1; $pageiter <= $numberoflisteners; $pageiter++) {
 $PAGE->requires->data_for_js('quiz_edit_config', $quizeditconfig);
 $PAGE->requires->js('/question/qengine.js');
 
-// TODO MDL-40987 either we don't need it, or we should rename course -> mod_quiz.
-// Course wrapper start.
-echo html_writer::start_tag('div', array('class' => 'course-content'));
+// Questions wrapper start.
+echo html_writer::start_tag('div', array('class' => 'mod-quiz-edit-content'));
 
 echo $output->edit_page($course, $quiz, $structure, $cm, $contexts, $thispageurl, $pagevars);
 
-// Content wrapper end.
+// Questions wrapper end.
 echo html_writer::end_tag('div');
 
 echo $OUTPUT->footer();

@@ -1357,7 +1357,7 @@ bank window's title is prominent enough*/
     padding:0;
 }
 .path-mod-quiz ul.slots li.section .content {
-    margin:0 40px;
+    margin:0 0 0 20px;
 }
 .path-mod-quiz ul.slots li.section .left {
     float:left;

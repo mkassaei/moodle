@@ -9,7 +9,7 @@ var CSS = {
     ACTIVITY: 'activity',
     ACTIVITYINSTANCE: 'activityinstance',
     CONTENT: 'content',
-    COURSECONTENT: 'course-content',
+    COURSECONTENT: 'mod-quiz-edit-content',
     EDITINGMOVE: 'editing_move',
     ICONCLASS: 'iconsmall',
     JUMPMENU: 'jumpmenu',
