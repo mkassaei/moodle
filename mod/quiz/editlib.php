@@ -592,24 +592,22 @@ function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledm
     // Include the question chooser.
     $PAGE->requires->yui_module('moodle-mod_quiz-questionchooser', 'M.mod_quiz.init_questionchooser');
 
-    // Include course dragdrop. TODO MDL-43089 why this if?
-    if ($course->id != $SITE->id) {
-        $PAGE->requires->yui_module('moodle-mod_quiz-dragdrop', 'M.mod_quiz.init_section_dragdrop',
-            array(array(
-                'courseid' => $course->id,
-                'quizid' => $quiz->id,
-                'ajaxurl' => $config->sectionurl,
-                'config' => $config,
-            )), null, true);
+    // Include course dragdrop.
+    $PAGE->requires->yui_module('moodle-mod_quiz-dragdrop', 'M.mod_quiz.init_section_dragdrop',
+        array(array(
+            'courseid' => $course->id,
+            'quizid' => $quiz->id,
+            'ajaxurl' => $config->sectionurl,
+            'config' => $config,
+        )), null, true);
 
-        $PAGE->requires->yui_module('moodle-mod_quiz-dragdrop', 'M.mod_quiz.init_resource_dragdrop',
-            array(array(
-                'courseid' => $course->id,
-                'quizid' => $quiz->id,
-                'ajaxurl' => $config->resourceurl,
-                'config' => $config,
-            )), null, true);
-    }
+    $PAGE->requires->yui_module('moodle-mod_quiz-dragdrop', 'M.mod_quiz.init_resource_dragdrop',
+        array(array(
+            'courseid' => $course->id,
+            'quizid' => $quiz->id,
+            'ajaxurl' => $config->resourceurl,
+            'config' => $config,
+        )), null, true);
 
     // Require various strings for the command toolbox.
     $PAGE->requires->strings_for_js(array(

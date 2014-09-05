@@ -158,7 +158,7 @@ class mod_quiz_repaginate {
                 $nextslot = $this->repaginate_next_slot($nextslotnumber, $type);
 
                 // Update DB.
-                $this->update_this_slot($nextslot);
+                $DB->update_record('quiz_slots', $slot, true);
 
                 // Update returning object.
                  $newslots[$slot->id] = $nextslot;
@@ -189,32 +189,6 @@ class mod_quiz_repaginate {
             return $this->repaginate_this_slot($nextslot, $nextslot->page + 1);
         }
         return null;
-    }
-
-    /**
-     * Update quiz_slots table for this slot
-     * @param object $slot
-     */
-    public function update_this_slot($slot) {
-        global $DB;
-        // Update quiz_slots table.
-        $transaction = $DB->start_delegated_transaction(); // TODO: Do i really need this?
-        $DB->update_record('quiz_slots', $slot, true);
-        $transaction->allow_commit();
-    }
-
-    /**
-     * Update quiz_slots table
-     *
-     */
-    public function update_quiz_slots_table($slots) {
-        global $DB;
-        // Update quiz_slots table.
-        $transaction = $DB->start_delegated_transaction();
-        foreach ($slots as $slot) {
-            $DB->update_record('quiz_slots', $slot, true);
-        }
-        $transaction->allow_commit();
     }
 
     /**

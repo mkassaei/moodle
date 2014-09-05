@@ -70,12 +70,6 @@ if (!$course) {
     print_error('invalidcourseid', 'error');
 }
 
-// TODO: Following code related to questionbank needs to be removed from this file
-// since it has been moved to /question/questionbank.php and js related functionality
-// will be done in /question/yui/src/questionbank/js/questionbank.js.
-$questionbank = new quiz_question_bank_view($contexts, $thispageurl, $course, $cm, $quiz);
-$questionbank->set_quiz_has_attempts($quizhasattempts);
-
 // You need mod/quiz:manage in addition to question capabilities to access this page.
 require_capability('mod/quiz:manage', $contexts->lowest());
 
@@ -291,6 +285,9 @@ if (optional_param('savechanges', false, PARAM_BOOL) && confirm_sesskey()) {
     redirect($afteractionurl);
 }
 
+// Get the question bank view.
+$questionbank = new quiz_question_bank_view($contexts, $thispageurl, $course, $cm, $quiz);
+$questionbank->set_quiz_has_attempts($quizhasattempts);
 $questionbank->process_actions($thispageurl, $cm);
 
 // End of process commands =====================================================.
