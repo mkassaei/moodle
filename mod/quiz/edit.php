@@ -57,9 +57,6 @@ $structure = \mod_quiz\structure::create_for($quiz);
 $defaultcategoryobj = question_make_default_categories($contexts->all());
 $defaultcategory = $defaultcategoryobj->id . ',' . $defaultcategoryobj->contextid;
 
-$canaddrandom = $contexts->have_cap('moodle/question:useall');
-$canaddquestion = (bool) $contexts->having_add_and_use();
-
 $quizhasattempts = quiz_has_attempts($quiz->id);
 
 $PAGE->set_url($thispageurl);

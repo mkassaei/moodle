@@ -895,8 +895,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
         static $baseurl;
 
-        $hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context);
-
         if (!isset($baseurl)) {
             $baseurl = new moodle_url('/quiz/question.php', array('sesskey' => sesskey()));
         }
@@ -905,21 +903,17 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             $baseurl->param('sr', $sr);
         }
 
-        // AJAX edit title.
-        if ($hasmanagequiz) {
-            return html_writer::span(
-                html_writer::link(
-                    new moodle_url($baseurl, array('update' => $question->id)),
-                    $OUTPUT->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
-                    array(
-                        'class' => 'editing_maxmark',
-                        'data-action' => 'editmaxmark',
-                        'title' => get_string('editmaxmark', 'quiz'),
-                    )
+        return html_writer::span(
+            html_writer::link(
+                new moodle_url($baseurl, array('update' => $question->id)),
+                $OUTPUT->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
+                array(
+                    'class' => 'editing_maxmark',
+                    'data-action' => 'editmaxmark',
+                    'title' => get_string('editmaxmark', 'quiz'),
                 )
-            );
-        }
-        return '';
+            )
+        );
     }
 
     /**
@@ -935,8 +929,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         static $str;
         static $baseurl;
 
-        $hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context);
-
         if (!isset($str)) {
             $str = get_strings(array('move'));
         }
@@ -949,16 +941,11 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             }
         }
 
-        if ($hasmanagequiz) {
-            $pixicon = 'i/dragdrop';
-
-            return html_writer::link(
-                new moodle_url($baseurl, array('copy' => $question->id)),
-                $OUTPUT->pix_icon($pixicon, $str->move, 'moodle', array('class' => 'iconsmall', 'title' => '')),
-                array('class' => 'editing_move', 'data-action' => 'move')
-            );
-        }
-        return '';
+        return html_writer::link(
+            new moodle_url($baseurl, array('copy' => $question->id)),
+            $OUTPUT->pix_icon('i/dragdrop', $str->move, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            array('class' => 'editing_move', 'data-action' => 'move')
+        );
     }
 
     /**
