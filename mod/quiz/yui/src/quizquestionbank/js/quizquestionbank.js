@@ -67,6 +67,9 @@ Y.extend(POPUP, Y.Base, {
     },
 
     initializer : function() {
+        if (!Y.one(CSS.QBANKLOADING)) {
+            return;
+        }
         this.create_dialogue();
         Y.one('body').delegate('click', this.display_dialogue, CSS.ADDQUESTIONLINKS, this);
     },

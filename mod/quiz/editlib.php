@@ -543,7 +543,7 @@ class quiz_question_bank_view extends core_question\bank\view {
  * @return bool
  */
 function quiz_edit_include_ajax($course, $quiz, $usedqtypes = array(), $enabledmodules = null, $config = null) {
-    global $CFG, $PAGE, $SITE;
+    global $PAGE;
 
     if (!$config) {
         $config = new stdClass();

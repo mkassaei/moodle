@@ -853,7 +853,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
     public function regrade_action($question) {
         return html_writer::span(
             html_writer::link(
-                new moodle_url($baseurl, array('update' => $question->id)),
+                new moodle_url('#'),
                 $this->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
                 array(
                     'class' => 'editing_maxmark',
