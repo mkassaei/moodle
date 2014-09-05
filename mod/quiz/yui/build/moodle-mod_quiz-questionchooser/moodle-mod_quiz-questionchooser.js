@@ -68,8 +68,8 @@ Y.extend(QUESTIONCHOOSER, M.core.chooserdialogue, {
 });
 
 M.mod_quiz = M.mod_quiz || {};
-M.mod_quiz.init_questionchooser = function(config) {
-    M.mod_quiz.question_chooser = new QUESTIONCHOOSER(config);
+M.mod_quiz.init_questionchooser = function() {
+    M.mod_quiz.question_chooser = new QUESTIONCHOOSER({});
     return M.mod_quiz.question_chooser;
 };
 

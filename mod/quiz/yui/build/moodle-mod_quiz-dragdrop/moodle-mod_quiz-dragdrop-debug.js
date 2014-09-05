@@ -366,7 +366,6 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
         Y.Node.all(baseselector).each(function(sectionnode) {
             var resources = sectionnode.one('.' + CSS.CONTENT + ' ul.' + CSS.SECTION);
             // See if resources ul exists, if not create one.
-            // TODO: We may need to modify this for creating section in quiz.
             if (!resources) {
                 resources = Y.Node.create('<ul></ul>');
                 resources.addClass(CSS.SECTION);
@@ -479,7 +478,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
                     this.ajax_failure(response);
                     this.unlock_drag_handle(drag, CSS.SECTIONHANDLE);
                     spinner.hide();
-                    // TODO: revert nodes location
+                    window.location.reload(true);
                 }
             },
             context:this

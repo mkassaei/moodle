@@ -123,7 +123,7 @@ Y.extend(POPUP, Y.Base, {
         Y.log('Load completed.');
 
         this.dialogue.bodyNode.setHTML(result.contents);
-        Y.use('moodle-question-chooser', function() {M.question.init_chooser({courseid: 2});}); // TODO hard-coded id.
+        Y.use('moodle-question-chooser', function() {M.question.init_chooser({});});
         this.dialogue.bodyNode.one('form').delegate('change', this.options_changed, '.searchoptions', this);
 
         if (this.dialogue.visible) {

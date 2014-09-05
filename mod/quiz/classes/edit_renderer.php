@@ -505,8 +505,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $questionbank = new quiz_question_bank_view($contexts, $thispageurl, $course, $cm, $quiz);
         $questionbank->set_quiz_has_attempts(quiz_has_attempts($quiz->id));
 
-        // TODO: remove the unnecessary code for the popup.
-        // Recategorising questions is better done on the stand-alone questionbank page.
         $output = $questionbank->render('editq',
                                         $pagevars['qpage'],
                                         $pagevars['qperpage'],
@@ -641,7 +639,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         // Put page in a span for easier styling.
         $page = html_writer::tag('span', $page, array('class' => 'text'));
 
-        $pagenumberclass = 'pagenumber'; // TODO MDL-43089 to add appropriate class name here.
+        $pagenumberclass = 'pagenumber';
         $dragdropclass = 'activity yui3-dd-drop';
         $prevpage = $this->get_previous_page($structure, $slotnumber - 1);
         $nextpage = $this->get_previous_page($structure, $slotnumber + 1);
@@ -654,7 +652,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
             // Add the form for the add new question chooser dialogue.
             $addquestionurl = new moodle_url('/question/addquestion.php');
-            $questioncategoryid = $this->get_question_category_id($pageurl);
+            $questioncategoryid = question_get_category_id_from_pagevars($pagevars);
 
             // Form fields.
             $addquestionformhtml = html_writer::tag('input', null,
@@ -779,18 +777,18 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @param question $question
      * @return string
      */
-    public function quiz_section_question_name($quiz, $question) {
+    public function quiz_section_question_name($quiz, $question, $pageurl) {
         global $CFG;
         $output = '';
-        $url = $this->get_edit_question_url($quiz, $question);
 
-        if (!$url) {
-            return $output;
-        }
+        $editurl = new moodle_url('/question/question.php', array(
+                'returnurl' => $pageurl->out_as_local_url(),
+                'cmid' => $quiz->cmid, 'id' => $question->id));
 
         // Accessibility: for files get description via icon, this is very ugly hack!
         $instancename = quiz_question_tostring($question);
         $altname = $question->name;
+
         // Avoid unnecessary duplication: if e.g. a forum name already
         // includes the word forum (or Forum, etc) then it is unhelpful
         // to include that in the accessible description that is added.
@@ -810,7 +808,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
                 'class' => 'icon activityicon', 'alt' => ' ', 'role' => 'presentation'));
         // Display link itself.
         $activitylink = $icon . html_writer::tag('span', $instancename . $altname, array('class' => 'instancename'));
-        $output .= html_writer::link($url, $activitylink);
+        $output .= html_writer::link($editurl, $activitylink);
         return $output;
     }
 
@@ -838,15 +836,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * This includes link, content, availability, completion info and additional information
      * that module type wants to display (i.e. number of unread forum posts)
      *
-     * This function calls:
-     * {@link mod_quiz_renderer::quiz_section_question_name()}
-     * {@link cm_info::get_after_link()}
-     * {@link mod_quiz_renderer::quiz_section_question_text()}
-     * {@link core_course_renderer::course_section_question_availability()}
-     * {@link core_course_renderer::course_section_question_completion()}
-     * {@link question_get_question_edit_actions()}
-     * {@link mod_quiz_renderer::quiz_section_question_edit_actions()}
-     *
      * @param stdClass $course
      * @param cm_info $question
      * @param int|null $sectionreturn
@@ -866,12 +855,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div');
 
         // Print slot number.
-        // TODO: MDL-43089 We have to write a function to deal with description questions.
-        // Currently there is a functionality that translates the slotnumber of a
-        // description question to 'i' for information. That could be confusing when
-        // you have lots of description questions, in particular if you have consecutive
-        // description question types. We can either have the slot number prefixes the 'i'
-        // or use 'i' followed by a number (when morethan one) which can be incremented.
         $slotnumber = $this->get_question_info($structure, $question->id, 'slot');
 
         if (!quiz_has_attempts($quiz->id)) {
@@ -1001,15 +984,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         return '';
     }
 
-    public function get_question_category_id($pageurl) {
-        list($questioncategoryid) = explode(',', $pageurl->param('cat'));
-        if (empty($questioncategoryid)) {
-            global $defaultcategoryobj; // TODO MDL-43089 undo this hack.
-            $questioncategoryid = $defaultcategoryobj->id;
-        }
-        return $questioncategoryid;
-    }
-
     /**
      * Returns the list of adding actions.
      * @param int $page the page the question will be added on.
@@ -1025,7 +999,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             array $pagevars, $course, $cm, $quiz) {
         global $PAGE;
 
-        $questioncategoryid = $this->get_question_category_id($pageurl);
+        $questioncategoryid = question_get_category_id_from_pagevars($pagevars);
         static $str;
         if (!isset($str)) {
             $str = get_strings(array('addaquestion', 'addarandomquestion',
@@ -1064,18 +1038,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $attributes = array_merge(array('data-header' => $title, 'data-addonpage' => $page), $attributes);
         $actions['addarandomquestion'] = new action_menu_link_secondary($url, $icon, $str->addarandomquestion, $attributes);
 
-        /*
-         * // Add a random selected question.
-         * // TODO: We have to refine the functionality when adding random selected questions.
-         * $returnurl = new moodle_url('/mod/quiz/edit.php', array('cmid' => $quiz->cmid));
-         * $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid);
-         * $actions['addarandomselectedquestion'] = new action_menu_link_secondary(
-         *     new moodle_url('/mod/quiz/addrandom.php', $params),
-         *     new pix_icon('t/add', $str->addarandomselectedquestion, 'moodle', array('class' => 'iconsmall', 'title' => '')),
-         *     $str->addarandomselectedquestion, array('class' => 'editing_addarandomselectedquestion',
-         *             'data-action' => 'addarandomselectedquestion')
-         *  );
-         */
         return $actions;
     }
 
@@ -1120,15 +1082,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $menu->prioritise = true;
 
         return $this->render($menu);
-    }
-
-    protected function get_edit_question_url($quiz, $question) {
-        // TODO MDL-43089 this should not be in the renderer.
-        $questionparams = array(
-                        'returnurl' => $this->page->url->out_as_local_url(),
-                        'cmid' => $quiz->cmid,
-                        'id' => $question->id);
-        return new moodle_url('/question/question.php', $questionparams);
     }
 
     /**
