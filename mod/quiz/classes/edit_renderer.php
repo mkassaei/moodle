@@ -598,6 +598,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $slotnumber = $this->get_question_info($structure, $question->id, 'slot');
         $pagenumber = $this->get_question_info($structure, $question->id, 'page');
         $page = $pagenumber ? get_string('pageshort', 'quiz') . ' ' . $pagenumber : null;
+        $pagealt = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
         // Put page in a span for easier styling.
         $page = html_writer::tag('span', $page, array('class' => 'text'));
 
@@ -633,7 +634,8 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
                     array('class' => 'addnewquestion', 'method' => 'post', 'action' => $addquestionurl));
 
             $output .= html_writer::tag('li', $page.$addmenu.$addquestionformhtml,
-                    array('class' => $pagenumberclass . ' ' . $dragdropclass.' page', 'id' => 'page-' . $pagenumber));
+                    array('class' => $pagenumberclass . ' ' . $dragdropclass.' page', 'id' => 'page-' . $pagenumber,
+                            'title' => $pagealt));
         }
 
         if ($nextpage != $pagenumber) {
@@ -726,8 +728,8 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $instancename = quiz_question_tostring($question);
         $altname = $question->name;
 
-        // Avoid unnecessary duplication: if e.g. a forum name already
-        // includes the word forum (or Forum, etc) then it is unhelpful
+        // Avoid unnecessary duplication: if a question name already
+        // includes the word question (or Question, etc) then it is unhelpful
         // to include that in the accessible description that is added.
         if (false !== strpos(core_text::strtolower($instancename),
                 core_text::strtolower($altname))) {
@@ -743,9 +745,12 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
         $icon = $this->pix_icon('icon', $namestr, $qtype->plugin_name(), array('title' => $namestr,
                 'class' => 'icon activityicon', 'alt' => ' ', 'role' => 'presentation'));
-        // Display link itself.
+        // Need plain question name without html tags for link title.
+        $title = shorten_text(format_string($question->name), 100);
+        // Display the link itself.
         $activitylink = $icon . html_writer::tag('span', $instancename . $altname, array('class' => 'instancename'));
-        $output .= html_writer::link($editurl, $activitylink);
+        $output .= html_writer::link($editurl, $activitylink,
+                array('title' => get_string('editquestion', 'quiz').' '.$title));
         return $output;
     }
 
@@ -755,7 +760,8 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @return the HTML for a marked out of question grade field.
      */
     public function marked_out_of_field($quiz, $question) {
-        return html_writer::span(self::get_question_grade($quiz, $question->maxmark), 'instancemaxmark');
+        return html_writer::span(self::get_question_grade($quiz, $question->maxmark), 'instancemaxmark',
+                array('title'=>get_string('maxmark', 'quiz')));
     }
 
     /**
