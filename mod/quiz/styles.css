@@ -1416,6 +1416,7 @@ bank window's title is prominent enough*/
 
 .path-mod-quiz ul.slots li.section li.activity .activityinstance {
     padding-right: 5.5em;
+    display: block;
 }
 .quizsavegradesform label[for=inputmaxgrade] {
     display: inline;
