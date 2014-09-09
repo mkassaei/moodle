@@ -1424,28 +1424,29 @@ bank window's title is prominent enough*/
 .path-mod-quiz ul.slots .activityinstance form {
     display: inline;
 }
-.path-mod-quiz.editing form.quizsavegradesform fieldset.invisiblefieldset,
-.path-mod-quiz.editing div.statusbar div.content {
+#page-mod-quiz-edit form.quizsavegradesform fieldset.invisiblefieldset {
     display: block;
     float: right;
     margin: 0em 1em;
     padding: .2em;
 }
 
-.path-mod-quiz.editing div.maxgrade,
-.path-mod-quiz.editing div.statusbar {
+#page-mod-quiz-edit div.maxgrade,
+#page-mod-quiz-edit div.statusbar {
     margin: 0em 40px;
     position: relative;
     padding: 5px 10px;
     clear: both;
     display: block;
+    display: inline-block;
+    margin: 0 1em 1em;
 }
 
-.path-mod-quiz.editing span.editinstructions {
+#page-mod-quiz-edit span.editinstructions {
     margin-left: 250px;
 }
 
-.path-mod-quiz.editing ul.slots .activityinstance span.instancename {
+#page-mod-quiz-edit ul.slots .activityinstance span.instancename {
     overflow: hidden;  
     /* white-space: nowrap; */
     width: 85%;
@@ -1460,7 +1461,6 @@ bank window's title is prominent enough*/
     padding: 0;
 }
 
-.path-mod-quiz.editing ul.slots .activityinstance img.activityicon {
+#page-mod-quiz-edit ul.slots .activityinstance img.activityicon {
     float: left;
-}
 }
