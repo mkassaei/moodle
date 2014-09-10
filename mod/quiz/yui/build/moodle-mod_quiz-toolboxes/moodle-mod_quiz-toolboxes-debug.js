@@ -848,6 +848,6 @@ M.mod_quiz.init_section_toolbox = function(config) {
         "node",
         "io",
         "moodle-mod_quiz-quizbase",
-        "moodle-mod_quiz-util"
+        "moodle-mod_quiz-util-slot"
     ]
 });
