@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/quiz/classes/repaginate.php');
 
-class mod_quiz_repaginate_testable extends mod_quiz_repaginate {
+class mod_quiz_repaginate_testable extends \mod_quiz\repaginate {
 
     public function set_pages($slots) {
         return parent::set_pages($slots);
@@ -268,7 +268,7 @@ class quiz_repaginate_test extends advanced_testcase {
     public function test_repaginate_the_rest() {
         $slots = $this->get_quiz_slots();
         $slotfrom = 1;
-        $type = mod_quiz_repaginate::LINK;
+        $type = \mod_quiz\repaginate::LINK;
         $expected = array();
         foreach ($slots as $slot) {
             if ($slot->slot > $slotfrom) {
@@ -288,7 +288,7 @@ class quiz_repaginate_test extends advanced_testcase {
             $newslots[$s->id] = $s;
         }
 
-        $type = mod_quiz_repaginate::UNLINK;
+        $type = \mod_quiz\repaginate::UNLINK;
         $expected = array();
         foreach ($slots as $slot) {
             if ($slot->slot > ($slotfrom - 1)) {

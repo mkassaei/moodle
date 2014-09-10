@@ -436,7 +436,7 @@ class structure {
         $repagtype = $type;
         $quizslots = $DB->get_records('quiz_slots', array('quizid' => $quizid), 'slot');
 
-        $repaginate = new \mod_quiz_repaginate($quizid, $quizslots);
+        $repaginate = new \mod_quiz\repaginate($quizid, $quizslots);
         $repaginate->repaginate($slotnumber, $repagtype);
         $updatedquizslots = $repaginate->get_slots();
 

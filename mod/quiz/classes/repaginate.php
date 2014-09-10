@@ -23,7 +23,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-class mod_quiz_repaginate {
+namespace mod_quiz;
+
+class repaginate {
 
     const LINK = 1; // This is used to join pages.
     const UNLINK = 2; // This is used to separate pages.
