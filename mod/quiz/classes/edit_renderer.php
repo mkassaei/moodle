@@ -217,10 +217,9 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
 
         $context = context_course::instance($course->id);
         // Title with completion help icon.
-        $output .= $this->output->heading($this->page_title(), 2, 'accesshide');
+        $output .= $this->heading_with_help(get_string('editingquizx', 'quiz', format_string($quiz->name)), 'editingquiz', 'quiz', '',
+                get_string('basicideasofquiz', 'quiz'), 2);
 
-        $output .= $this->heading(get_string('editingquizx', 'quiz', format_string($quiz->name)), 2);
-        $output .= $this->help_icon('editingquiz', 'quiz', get_string('basicideasofquiz', 'quiz'));
         // Show status bar.
         $output .= $this->status_bar($quiz);
 

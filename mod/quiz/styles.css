@@ -1438,7 +1438,6 @@ bank window's title is prominent enough*/
     padding: 5px 10px;
     clear: both;
     display: block;
-    display: inline-block;
     margin: 0 1em 1em;
 }
 
