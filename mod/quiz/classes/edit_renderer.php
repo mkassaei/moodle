@@ -989,7 +989,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             }
             $menu->add($action);
         }
-        $menu->attributes['class'] .= ' section-cm-edit-actions commands';
+        $menu->attributes['class'] .= ' page-add-actions commands';
 
         // Prioritise the menu ahead of all other actions.
         $menu->prioritise = true;

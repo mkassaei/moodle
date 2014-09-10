@@ -54,10 +54,13 @@ class behat_mod_quiz extends behat_question_base {
         $quizname = $this->escape($quizname);
         $editquiz = $this->escape(get_string('editquiz', 'quiz'));
         $addaquestion = $this->escape(get_string('addaquestion', 'quiz'));
+        $menuxpath = "//div[contains(@class, ' page-add-actions ')][last()]//a[contains(@class, ' textmenu')]";
+        $itemxpath = "//div[contains(@class, ' page-add-actions ')][last()]//a[contains(@class, ' addquestion ')]";
         return array_merge(array(
             new Given("I follow \"$quizname\""),
             new Given("I follow \"$editquiz\""),
-            new Given("I press \"$addaquestion\""),
+            new Given("I click on \"$menuxpath\" \"xpath_element\""),
+            new Given("I click on \"$itemxpath\" \"xpath_element\""),
                 ), $this->finish_adding_question($questiontype, $questiondata));
     }
 
