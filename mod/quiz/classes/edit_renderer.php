@@ -270,6 +270,8 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
             $this->page->requires->yui_module('moodle-mod_quiz-repaginate', 'M.mod_quiz.repaginate.init');
         }
 
+        $output .= $this->total_marks($quiz);
+
         // Add the form for question bank.
         $canaddfromqbank = has_capability('moodle/question:useall', $context);
         $qbankoptions = array('class' => 'questionbank', 'cmid' => $cm->id);
@@ -488,6 +490,17 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Render the total marks available for the quiz.
+     *
+     * @param object $quiz The quiz object of the quiz in question
+     */
+    public function total_marks($quiz) {
+        return html_writer::tag('span',
+                get_string('totalmarksx', 'quiz', quiz_format_grade($quiz, $quiz->sumgrades)),
+                array('class' => 'totalpoints'));
+    }
+
+    /**
      * Render the status bar.
      *
      * @param object $quiz The quiz object of the quiz in question
@@ -496,10 +509,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         global $DB;
 
         $bits = array();
-
-        $bits[] = html_writer::tag('span',
-                get_string('totalmarksx', 'quiz', quiz_format_grade($quiz, $quiz->sumgrades)),
-                array('class' => 'totalpoints'));
 
         $bits[] = html_writer::tag('span',
                 get_string('numquestionsx', 'quiz', $DB->count_records('quiz_slots', array('quizid' => $quiz->id))),
