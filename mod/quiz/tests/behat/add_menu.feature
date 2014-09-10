@@ -20,9 +20,9 @@ Feature: Edit quiz page
     And I add a "Quiz" to section "1" and I fill the form with:
       | Name        | Quiz 1 |
       | Description | This quiz is used to test all options of the add menu on the quiz editing page. |
-#    When I add a "Essay" question to the "Quiz 1" quiz with:
-#      | Question name | Essay new 01                       |
-#      | Question text | This is an essay in the background |
+   When I add a "Essay" question to the "Quiz 1" quiz with:
+     | Question name | Essay new 01                       |
+     | Question text | This is an essay in the background |
 #    Then I wait "10" seconds
 
 #  @javascript @addmenu_s1

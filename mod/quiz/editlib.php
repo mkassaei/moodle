@@ -527,6 +527,10 @@ class quiz_question_bank_view extends core_question\bank\view {
                 get_string('go') . '" />';
         echo '</div></noscript></fieldset></form>';
     }
+
+    protected function create_new_question_form($category, $canadd) {
+        // Don't display this.
+    }
 }
 
 /**
