@@ -1418,18 +1418,20 @@ bank window's title is prominent enough*/
     padding-right: 5.5em;
     display: block;
 }
-.quizsavegradesform label[for=inputmaxgrade] {
-    display: inline;
-}
+.quizsavegradesform label[for=inputmaxgrade],
 .path-mod-quiz ul.slots .activityinstance form {
     display: inline;
 }
-#page-mod-quiz-edit form.quizsavegradesform fieldset.invisiblefieldset,
+#page-mod-quiz-edit .maxgrade,
 #page-mod-quiz-edit .totalpoints {
     display: block;
     float: right;
     margin: 0em 1em;
     padding: .2em;
+}
+
+#page-mod-quiz-edit .maxgrade {
+    margin-top: -0.7em;
 }
 
 #page-mod-quiz-edit span.editinstructions {
@@ -1451,6 +1453,12 @@ bank window's title is prominent enough*/
     padding: 0;
 }
 
-#page-mod-quiz-edit ul.slots .activityinstance img.activityicon {
+#page-mod-quiz-edit ul.slots .activityinstance img.activityicon,
+#page-mod-quiz-edit .statusbar,
+#page-mod-quiz-edit .rpcontainerclass {
     float: left;
+}
+
+#page-mod-quiz-edit .statusbar {
+    margin: 0.4em;
 }
