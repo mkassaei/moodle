@@ -220,28 +220,13 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $output .= $this->heading_with_help(get_string('editingquizx', 'quiz', format_string($quiz->name)), 'editingquiz', 'quiz', '',
                 get_string('basicideasofquiz', 'quiz'), 2);
 
+        $output .= $this->notify_strings($quiz, $cm, $context);
+
         // Show status bar.
         $output .= $this->status_bar($quiz);
 
         $tabindex = 0;
         $output .= $this->maximum_grade_input($quiz, $this->page->url);
-
-        $notifystrings = array();
-        if (quiz_has_attempts($quiz->id)) {
-            $reviewlink = quiz_attempt_summary_link_to_reports($quiz, $cm, $context);
-            $notifystrings[] = get_string('cannoteditafterattempts', 'quiz', $reviewlink);
-        }
-
-        if ($quiz->shufflequestions) {
-            $updateurl = new moodle_url('/course/mod.php',
-                    array('return' => 'true', 'update' => $quiz->cmid, 'sesskey' => sesskey()));
-            $updatelink = '<a href="'.$updateurl->out().'">' . get_string('updatethis', '',
-                    get_string('modulename', 'quiz')) . '</a>';
-            $notifystrings[] = get_string('shufflequestionsselected', 'quiz', $updatelink);
-        }
-        if (!empty($notifystrings)) {
-            $output .= $this->box('<p>' . implode('</p><p>', $notifystrings) . '</p>', 'statusdisplay');
-        }
 
         $slots = $structure->get_quiz_slots();
         $sections = $structure->get_quiz_sections();
@@ -487,6 +472,32 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $container = html_writer::tag('div', print_choose_qtype_to_add_form(array(), null, false),
                 array('id' => 'qtypechoicecontainer'));
         return html_writer::tag('div', $container, array('class' => 'createnewquestion'));
+    }
+
+    /**
+     * Render the total marks available for the quiz.
+     *
+     * @param object $quiz The quiz object of the quiz in question
+     */
+    public function notify_strings($quiz, $cm, $context) {
+        $notifystrings = array();
+        $output = '';
+        if (quiz_has_attempts($quiz->id)) {
+            $reviewlink = quiz_attempt_summary_link_to_reports($quiz, $cm, $context);
+            $notifystrings[] = get_string('cannoteditafterattempts', 'quiz', $reviewlink);
+        }
+
+        if ($quiz->shufflequestions) {
+            $updateurl = new moodle_url('/course/mod.php',
+                    array('return' => 'true', 'update' => $quiz->cmid, 'sesskey' => sesskey()));
+            $updatelink = '<a href="'.$updateurl->out().'">' . get_string('updatethis', '',
+                    get_string('modulename', 'quiz')) . '</a>';
+            $notifystrings[] = get_string('shufflequestionsselected', 'quiz', $updatelink);
+        }
+        if (!empty($notifystrings)) {
+            $output .= $this->box('<p>' . implode('</p><p>', $notifystrings) . '</p>', 'statusdisplay');
+        }
+        return $output;
     }
 
     /**

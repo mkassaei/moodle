@@ -1426,12 +1426,8 @@ bank window's title is prominent enough*/
 #page-mod-quiz-edit .totalpoints {
     display: block;
     float: right;
-    margin: 0em 1em;
+    margin: -2.5em 1em 0em 1em;
     padding: .2em;
-}
-
-#page-mod-quiz-edit .maxgrade {
-    margin-top: -0.7em;
 }
 
 #page-mod-quiz-edit span.editinstructions {
@@ -1453,12 +1449,10 @@ bank window's title is prominent enough*/
     padding: 0;
 }
 
-#page-mod-quiz-edit ul.slots .activityinstance img.activityicon,
-#page-mod-quiz-edit .statusbar,
-#page-mod-quiz-edit .rpcontainerclass {
+#page-mod-quiz-edit ul.slots .activityinstance img.activityicon {
     float: left;
 }
 
 #page-mod-quiz-edit .statusbar {
-    margin: 0.4em;
+    margin: 0.6em 0.4em;
 }
