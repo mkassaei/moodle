@@ -26,14 +26,18 @@
 require_once("../../config.php");
 require_once("locallib.php");
 require_once('classes/repaginate.php');
+
 $cmid = required_param('cmid', PARAM_INT);
 $quizid = required_param('quizid', PARAM_INT);
 $slotnumber = required_param('slot', PARAM_INT);
 $repagtype = required_param('repag', PARAM_INT);
+
+$quizobj = quiz::create($quizid);
+
 $slotnumber++;
 $repage = new \mod_quiz\repaginate($quizid);
 $repage->repaginate($slotnumber, $repagtype);
-$quizobj = new quiz($quiz, $cm, null);
+
 $structure = $quizobj->get_structure();
 $slots = $structure->refresh_page_numbers_and_update_db($structure->get_quiz());
 

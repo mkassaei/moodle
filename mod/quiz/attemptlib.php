@@ -97,7 +97,7 @@ class quiz {
      * @param int $userid the the userid.
      * @return quiz the new quiz object
      */
-    public static function create($quizid, $userid) {
+    public static function create($quizid, $userid = null) {
         global $DB;
 
         $quiz = quiz_access_manager::load_quiz_and_settings($quizid);
@@ -105,7 +105,9 @@ class quiz {
         $cm = get_coursemodule_from_instance('quiz', $quiz->id, $course->id, false, MUST_EXIST);
 
         // Update quiz with override information.
-        $quiz = quiz_update_effective_access($quiz, $userid);
+        if ($userid) {
+            $quiz = quiz_update_effective_access($quiz, $userid);
+        }
 
         return new quiz($quiz, $cm, $course);
     }

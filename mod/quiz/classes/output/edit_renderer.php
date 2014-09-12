@@ -152,7 +152,7 @@ class edit_renderer extends \plugin_renderer_base {
 
         $output = '';
         if (!empty($warnings)) {
-            $output .= $this->box('<p>' . implode('</p><p>', $notifystrings) . '</p>', 'statusdisplay');
+            $output .= $this->box('<p>' . implode('</p><p>', $warnings) . '</p>', 'statusdisplay');
         }
         return $output;
     }
