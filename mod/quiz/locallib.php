@@ -1231,83 +1231,12 @@ function quiz_question_preview_url($quiz, $question) {
  * @return the HTML for a preview question icon.
  */
 function quiz_question_preview_button($quiz, $question, $label = false) {
-    global $CFG, $OUTPUT;
+    global $PAGE;
     if (!question_has_capability_on($question, 'use', $question->category)) {
         return '';
     }
 
-    $url = quiz_question_preview_url($quiz, $question);
-
-    // Do we want a label?
-    $strpreviewlabel = '';
-    if ($label) {
-        $strpreviewlabel = get_string('preview', 'quiz');
-    }
-
-    // Build the icon.
-    $strpreviewquestion = get_string('previewquestion', 'quiz');
-    $image = $OUTPUT->pix_icon('t/preview', $strpreviewquestion);
-
-    $action = new popup_action('click', $url, 'questionpreview',
-            question_preview_popup_params());
-
-    return $OUTPUT->action_link($url, $image, $action, array('title' => $strpreviewquestion, 'class' => 'preview'));
-}
-
-/**
- * @param object $quiz the quiz settings
- * @param object $question the question
- * @return the HTML for a delete icon and link.
- */
-function quiz_question_delete_button($quiz, $question) {
-    global $OUTPUT, $PAGE;
-
-    if (!$hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context)) {
-        return '';
-    }
-
-    $url = new moodle_url($PAGE->url, array('sesskey' => sesskey(), 'remove' => $question->slot));
-
-    $strdelete = get_string('delete');
-
-    // Build the icon.
-    $image = $OUTPUT->pix_icon('t/delete', $strdelete);
-
-    return $OUTPUT->action_link($url, $image, null, array('title' => $strdelete,
-                'class' => 'cm-edit-action editing_delete', 'data-action' => 'delete'));
-}
-
-/**
- * @param object $quiz the quiz settings
- * @param object $question the question
- * @return the HTML for a delete icon and link.
- */
-function page_split_join_button($quiz, $question, $linkpage) {
-    global $OUTPUT, $PAGE;
-
-    if (!$hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context)) {
-        return '';
-    }
-
-    $url = new moodle_url('repaginate.php', array('cmid' => $quiz->cmid, 'quizid' => $quiz->id,
-                'slot' => $question->slot, 'repag' => $linkpage, 'sesskey' => sesskey()));
-
-    if ($linkpage == 1) {
-        $title = get_string('linkpage', 'quiz');
-        $image = $OUTPUT->pix_icon('e/insert_page_break', $title); // Remove_link.
-        $action = 'linkpage';
-    } else {
-        $title = get_string('unlinkpage', 'quiz');
-        $image = $OUTPUT->pix_icon('e/remove_page_break', $title);
-        $action = 'unlinkpage';
-    }
-    // Disable the link if quiz has attempta.
-    $disabled = null;
-    if (quiz_has_attempts($quiz->id)) {
-        $disabled = "disabled";
-    }
-    return $OUTPUT->action_link($url, $image, null, array('title' => $title,
-                'class' => 'cm-edit-action editing_page_join', 'disabled' => $disabled, 'data-action' => $action));
+    return $PAGE->get_renderer('mod_quiz', 'edit')->question_preview_icon($quiz, $question, $label);
 }
 
 /**

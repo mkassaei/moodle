@@ -50,7 +50,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param array $pagevars the variables from {@link question_edit_setup()}.
      * @return string HTML to output.
      */
-    public function edit_page(\quiz $quizobj, structure  $structure,
+    public function edit_page(\quiz $quizobj, structure $structure,
             \question_edit_contexts $contexts, \moodle_url $pageurl, array $pagevars) {
         global $DB;
         $output = '';
@@ -442,7 +442,7 @@ class edit_renderer extends \plugin_renderer_base {
         $lastslot = $structure->get_last_slot();
         if ($lastslot->id != $slotid) {
             // Add pink page button.
-            $joinhtml = page_split_join_button($structure->get_quiz(), $question, $linkpage);
+            $joinhtml = $this->page_split_join_button($structure->get_quiz(), $question, $linkpage);
             $pagebreakclass = $linkpage == 1 ? 'break' : '';
             $output .= html_writer::tag('li', $joinhtml, array('class' => $dragdropclass.' page_join '.$pagebreakclass));
         }
@@ -587,10 +587,10 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= $questionname;
 
         $questionicons = '';
-        $questionicons .= quiz_question_preview_button($structure->get_quiz(), $question);
+        $questionicons .= $this->question_preview_icon($structure->get_quiz(), $question);
 
         if ($structure->can_be_edited()) {
-            $questionicons .= quiz_question_delete_button($structure->get_quiz(), $question);
+            $questionicons .= $this->question_remove_icon($question, $pageurl);
         }
 
         $questionicons .= $this->marked_out_of_field($structure->get_quiz(), $question);
@@ -634,6 +634,76 @@ class edit_renderer extends \plugin_renderer_base {
             $this->pix_icon('i/dragdrop', $str->move, 'moodle', array('class' => 'iconsmall', 'title' => '')),
             array('class' => 'editing_move', 'data-action' => 'move')
         );
+    }
+
+    /**
+     * Returns the move action.
+     *
+     * @param object $question The module to produce a move button for
+     * @return The markup for the move action, or an empty string if not available.
+     */
+    public function question_preview_icon($quiz, $question, $label = null) {
+        $url = quiz_question_preview_url($quiz, $question);
+
+        // Do we want a label?
+        $strpreviewlabel = '';
+        if ($label) {
+            $strpreviewlabel = get_string('preview', 'quiz');
+        }
+
+        // Build the icon.
+        $strpreviewquestion = get_string('previewquestion', 'quiz');
+        $image = $this->pix_icon('t/preview', $strpreviewquestion);
+
+        $action = new \popup_action('click', $url, 'questionpreview',
+                                        question_preview_popup_params());
+
+        return $this->action_link($url, $image, $action, array('title' => $strpreviewquestion, 'class' => 'preview'));
+    }
+
+    /**
+     * Returns the move action.
+     *
+     * @param object $question The module to produce a move button for
+     * @return The markup for the move action, or an empty string if not available.
+     */
+    public function question_remove_icon($question, $pageurl) {
+        $url = new \moodle_url($pageurl, array('sesskey' => sesskey(), 'remove' => $question->slot));
+
+        $strdelete = get_string('delete');
+        // Build the icon.
+        $image = $this->pix_icon('t/delete', $strdelete);
+
+        return $this->action_link($url, $image, null, array('title' => $strdelete,
+                    'class' => 'cm-edit-action editing_delete', 'data-action' => 'delete'));
+    }
+
+    /**
+     * @param object $quiz the quiz settings
+     * @param object $question the question
+     * @return the HTML for a delete icon and link.
+     */
+    public function page_split_join_button($quiz, $question, $linkpage) {
+        $url = new \moodle_url('repaginate.php', array('cmid' => $quiz->cmid, 'quizid' => $quiz->id,
+                    'slot' => $question->slot, 'repag' => $linkpage, 'sesskey' => sesskey()));
+
+        if ($linkpage == 1) {
+            $title = get_string('linkpage', 'quiz');
+            $image = $this->pix_icon('e/insert_page_break', $title); // Remove_link.
+            $action = 'linkpage';
+        } else {
+            $title = get_string('unlinkpage', 'quiz');
+            $image = $this->pix_icon('e/remove_page_break', $title);
+            $action = 'unlinkpage';
+        }
+
+        // Disable the link if quiz has attempta.
+        $disabled = null;
+        if (quiz_has_attempts($quiz->id)) {
+            $disabled = "disabled";
+        }
+        return $this->action_link($url, $image, null, array('title' => $title,
+                    'class' => 'cm-edit-action editing_page_join', 'disabled' => $disabled, 'data-action' => $action));
     }
 
     /**
