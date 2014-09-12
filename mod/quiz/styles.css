@@ -1327,8 +1327,8 @@ bank window's title is prominent enough*/
     padding-left: 2em;
 }
 
-/** 
- * Edit Quiz 
+/**
+ * Edit Quiz
  */
 .path-mod-quiz ul.slots li.section {
     border: 0;
@@ -1435,7 +1435,7 @@ bank window's title is prominent enough*/
 }
 
 #page-mod-quiz-edit ul.slots .activityinstance span.instancename {
-    overflow: hidden;  
+    overflow: hidden;
     /* white-space: nowrap; */
     width: 85%;
     /* display: inline; */

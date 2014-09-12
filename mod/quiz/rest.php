@@ -53,8 +53,10 @@ $PAGE->set_url('/mod/quiz/rest.php',
 require_sesskey();
 $quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
 $cm = get_coursemodule_from_instance('quiz', $quiz->id, $quiz->course);
-require_login($courseid, false, $cm);
-$structure = \mod_quiz\structure::create_for($quiz);
+$course = $DB->get_record('course', array('id' => $quiz->course), '*', MUST_EXIST);
+require_login($course, false, $cm);
+$quizobj = new quiz($quiz, $cm, $course);
+$structure = $quizobj->get_structure();
 $modcontext = context_module::instance($cm->id);
 
 echo $OUTPUT->header(); // Send headers.
@@ -88,7 +90,7 @@ switch($requestmethod) {
                         require_capability('mod/quiz:manage', $modcontext);
                         $slot = $DB->get_record('quiz_slots', array('id' => $id), '*', MUST_EXIST);
                         echo json_encode(array('instancemaxmark' =>
-                                \mod_quiz_edit_renderer::get_question_grade($quiz, $slot->maxmark)));
+                                quiz_format_question_grade($quiz, $slot->maxmark)));
                         break;
 
                     case 'updatemaxmark':
@@ -102,7 +104,7 @@ switch($requestmethod) {
                             quiz_update_all_final_grades($quiz);
                             quiz_update_grades($quiz, 0, true);
                         }
-                        echo json_encode(array('instancemaxmark' => \mod_quiz_edit_renderer::get_question_grade($quiz, $maxmark)));
+                        echo json_encode(array('instancemaxmark' => quiz_format_question_grade($quiz, $maxmark)));
                         break;
                     case 'linkslottopage':
                         require_capability('mod/quiz:manage', $modcontext);

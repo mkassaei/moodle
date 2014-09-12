@@ -30,8 +30,11 @@ namespace mod_quiz;
 
 class structure {
 
-    /** @var stdClass the quiz object. */
-    protected $quiz = null;
+    /** @var \quiz the quiz this is the structure of. */
+    protected $quizobj = null;
+
+    /** @var stdClass[] the quiz_slots rows for this quiz. */
+    protected $questions = array();
 
     /** @var stdClass[] the quiz_slots rows for this quiz. */
     protected $slots = array();
@@ -77,28 +80,14 @@ class structure {
     }
 
     /**
-     * Create an instance of this class representing the structure of a given quizid.
+     * Create an instance of this class representing the structure of a given quiz.
+     * @param quiz $quizobj the quiz.
      * @return structure
      */
-    public static function create_for_id($quizid) {
-        $structure = self::create();
-        $structure->set_quiz($structure->load_quiz($quizid));
-        $structure->populate_structure($structure->get_quiz());
+    public static function create_for_quiz($quizobj) {
+        $structure = self::create_for($quizobj->get_quiz());
+        $structure->quizobj = $quizobj;
         return $structure;
-    }
-
-    /**
-     * @return stdClass Return the current quiz object.
-     */
-    public function get_quiz() {
-        return $this->quiz;
-    }
-
-    /**
-     * @return void Set the current quiz objects.
-     */
-    public function set_quiz($quiz) {
-        $this->quiz = $quiz;
     }
 
     /**
@@ -107,6 +96,35 @@ class structure {
     public function load_quiz($quizid) {
         global $DB;
         return $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
+    }
+
+    public function has_questions() {
+        return !empty($this->questions);
+    }
+
+    public function get_question_count() {
+        return count($this->questions);
+    }
+
+    public function get_question_by_id($questionid) {
+        return $this->questions[$questionid];
+    }
+
+    public function get_cmid() {
+        return $this->quizobj->get_cmid();
+    }
+
+    public function is_shuffled() {
+        return $this->quizobj->get_quiz()->shufflequestions;
+    }
+
+    public function can_be_repaginated() {
+        return !$this->is_shuffled() && !quiz_has_attempts($this->quizobj->get_quizid())
+                && $this->get_question_count() >= 2;
+    }
+
+    public function get_questions_per_page() {
+        return $this->quizobj->get_quiz()->questionsperpage;
     }
 
     /**
@@ -189,31 +207,26 @@ class structure {
      * @param unknown_type $quiz
      */
     public function populate_structure($quiz) {
-        $this->populate_quiz_slots($quiz);
-        $this->populate_quiz_sections($quiz);
-        $this->populate_slot_to_sectionids($quiz);
-        $this->populate_slots_with_sectionids($quiz);
-    }
-
-    /**
-     * Populate quiz slots for the given quiz from the DB.
-     * @param stdClass $quiz
-     */
-    public function populate_quiz_slots($quiz) {
         global $DB;
+
+        $this->questions = $DB->get_records_sql(
+                "SELECT q.*, qc.contextid, slot.maxmark, slot.slot, slot.page
+                   FROM {question} q
+                   JOIN {question_categories} qc ON qc.id = q.category
+                   JOIN {quiz_slots} slot ON slot.questionid = q.id
+                  WHERE slot.quizid = ?", array($quiz->id));
+
         $this->slots = $DB->get_records('quiz_slots',
                 array('quizid' => $quiz->id), 'slot');
-    }
 
-    /**
-     * Populate quiz sections with dummy data while the database is waiting.
-     * @param stdClass $quiz
-     */
-    public function populate_quiz_sections($quiz) {
         $this->sections = array(
             1 => (object) array('id' => 1, 'quizid' => $quiz->id,
                     'heading' => 'Section 1', 'firstslot' => 1, 'shuffle' => false)
         );
+
+        $this->populate_slot_to_sectionids($quiz);
+        $this->populate_slots_with_sectionids($quiz);
+        $this->add_missing_questions();
     }
 
     public function populate_slot_to_sectionids($quiz) {
@@ -249,6 +262,31 @@ class structure {
             $slottoslotids[$slot->slot] = $slot->id;
         }
         return $slottoslotids;
+    }
+
+    protected function add_missing_questions() {
+        // Address missing question types.
+        foreach ($this->slots as $slot) {
+            $questionid = $slot->questionid;
+
+            // If the questiontype is missing change the question type.
+            if (!array_key_exists($questionid, $this->questions)) {
+                $fakequestion = new \stdClass();
+                $fakequestion->id = $questionid;
+                $fakequestion->category = 0;
+                $fakequestion->qtype = 'missingtype';
+                $fakequestion->name = get_string('missingquestion', 'quiz');
+                $fakequestion->slot = $slot->slot;
+                $fakequestion->maxmark = 0;
+                $fakequestion->questiontext = ' ';
+                $fakequestion->questiontextformat = FORMAT_HTML;
+                $fakequestion->length = 1;
+                $this->questions[$questionid] = $fakequestion;
+
+            } else if (!\question_bank::qtype_exists($this->questions[$questionid]->qtype)) {
+                $this->questions[$questionid]->qtype = 'missingtype';
+            }
+        }
     }
 
     /**
@@ -507,5 +545,25 @@ class structure {
             }
             return $slot;
         }
+    }
+
+    public function get_edit_page_warnings() {
+        $warnings = array();
+
+        if (quiz_has_attempts($this->quizobj->get_quizid())) {
+            $reviewlink = quiz_attempt_summary_link_to_reports($this->quizobj->get_quiz(),
+                    $this->quizobj->get_cm(), $this->quizobj->get_context());
+            $warnings[] = get_string('cannoteditafterattempts', 'quiz', $reviewlink);
+        }
+
+        if ($this->is_shuffled()) {
+            $updateurl = new moodle_url('/course/mod.php',
+                    array('return' => 'true', 'update' => $this->quizobj->get_cmid(), 'sesskey' => sesskey()));
+            $updatelink = '<a href="'.$updateurl->out().'">' . get_string('updatethis', '',
+                    get_string('modulename', 'quiz')) . '</a>';
+            $warnings[] = get_string('shufflequestionsselected', 'quiz', $updatelink);
+        }
+
+        return $warnings;
     }
 }

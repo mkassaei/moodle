@@ -153,6 +153,10 @@ class quiz {
         get_question_options($questionstoprocess);
     }
 
+    public function get_structure() {
+        return \mod_quiz\structure::create_for_quiz($this);
+    }
+
     // Simple getters ==========================================================
     /** @return int the course id. */
     public function get_courseid() {

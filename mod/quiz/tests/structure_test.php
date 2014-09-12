@@ -507,13 +507,12 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         $testslots = $this->get_default_quiz_slots($quiz);
         $structure->set_quiz_slots($testslots);
         $this->save_quiz_slots_to_db($structure);
-        $structure->populate_slots_with_sectionids($quiz);
+        $structure->populate_structure($quiz);
         return $structure->get_quiz_slots();
     }
 
     public function get_saved_quiz_slots($quiz, $structure) {
-        $structure->populate_quiz_slots($quiz);
-        $structure->populate_slots_with_sectionids($quiz);
+        $structure->populate_structure($quiz);
         $slots = $structure->get_quiz_slots();
         return $slots;
     }

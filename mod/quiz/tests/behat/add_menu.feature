@@ -13,7 +13,7 @@ Feature: Edit quiz page
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
- 
+
     When I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on

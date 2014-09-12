@@ -52,7 +52,6 @@ $scrollpos = optional_param('scrollpos', '', PARAM_INT);
 
 list($thispageurl, $contexts, $cmid, $cm, $quiz, $pagevars) =
         question_edit_setup('editq', '/mod/quiz/edit.php', true);
-$structure = \mod_quiz\structure::create_for($quiz);
 
 $defaultcategoryobj = question_make_default_categories($contexts->all());
 $defaultcategory = $defaultcategoryobj->id . ',' . $defaultcategoryobj->contextid;
@@ -62,10 +61,9 @@ $quizhasattempts = quiz_has_attempts($quiz->id);
 $PAGE->set_url($thispageurl);
 
 // Get the course object and related bits.
-$course = $DB->get_record('course', array('id' => $quiz->course));
-if (!$course) {
-    print_error('invalidcourseid', 'error');
-}
+$course = $DB->get_record('course', array('id' => $quiz->course), '*', MUST_EXIST);
+$quizobj = new quiz($quiz, $cm, $course);
+$structure = $quizobj->get_structure();
 
 // You need mod/quiz:manage in addition to question capabilities to access this page.
 require_capability('mod/quiz:manage', $contexts->lowest());
@@ -325,7 +323,7 @@ $PAGE->requires->js('/question/qengine.js');
 // Questions wrapper start.
 echo html_writer::start_tag('div', array('class' => 'mod-quiz-edit-content'));
 
-echo $output->edit_page($course, $quiz, $structure, $cm, $contexts, $thispageurl, $pagevars);
+echo $output->edit_page($quizobj, $structure, $contexts, $thispageurl, $pagevars);
 
 // Questions wrapper end.
 echo html_writer::end_tag('div');
