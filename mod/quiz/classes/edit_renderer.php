@@ -82,7 +82,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         $modinfo = get_fast_modinfo($course);
 
         // Display repaginate button and popup.
-        $output .= $this->get_repaginate_button($quiz, $cm);
+        $output .= $this->get_repaginate_button($quiz, $cm, $pageurl);
 
         $output .= $this->total_marks($quiz);
 
@@ -291,7 +291,7 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
      * @param object $quiz
      * @param object $options, array of options
      */
-    protected function get_repaginate_button($quiz, $cm) {
+    protected function get_repaginate_button($quiz, $cm, $pageurl) {
 
         if ($quiz->shufflequestions) {
             $repaginatingdisabledhtml = 'disabled="disabled"';
