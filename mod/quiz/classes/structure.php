@@ -45,21 +45,17 @@ class structure {
      */
     protected $sections = array();
 
-    /**
-     * @var int[] slot number => section id, for the first slot in each section.
-     */
+    /** @var int[] slot number => section id, for the first slot in each section. */
     protected $slottosectionids = array();
 
-    /**
-     * @var int[][] section number => slot ids, the slots in each section.
-     */
+    /** @var int[][] section number => slot ids, the slots in each section. */
     protected $sectiontoslotids = array();
 
-    /**
-     * @var int[] slot number => slot id.
-     */
+    /** @var int[] slot number => slot id. */
     protected $slottoslotids = array();
 
+    /** @var bool caches the results of can_be_edited. */
+    protected $canbeedited = null;
 
     /**
      * Create an instance of this class representing an empty quiz.
@@ -114,13 +110,28 @@ class structure {
         return $this->quizobj->get_cmid();
     }
 
+    public function get_quizid() {
+        return $this->quizobj->get_quizid();
+    }
+
+    public function get_quiz() {
+        return $this->quizobj->get_quiz();
+    }
+
     public function is_shuffled() {
         return $this->quizobj->get_quiz()->shufflequestions;
     }
 
     public function can_be_repaginated() {
-        return !$this->is_shuffled() && !quiz_has_attempts($this->quizobj->get_quizid())
+        return !$this->is_shuffled() && $this->can_be_edited()
                 && $this->get_question_count() >= 2;
+    }
+
+    public function can_be_edited() {
+        if ($this->canbeedited === null) {
+            $this->canbeedited = !quiz_has_attempts($this->quizobj->get_quizid());
+        }
+        return $this->canbeedited;
     }
 
     public function get_questions_per_page() {
@@ -226,7 +237,8 @@ class structure {
 
         $this->populate_slot_to_sectionids($quiz);
         $this->populate_slots_with_sectionids($quiz);
-        $this->add_missing_questions();
+        $this->populate_missing_questions();
+        $this->populate_question_numbers();
     }
 
     public function populate_slot_to_sectionids($quiz) {
@@ -264,7 +276,7 @@ class structure {
         return $slottoslotids;
     }
 
-    protected function add_missing_questions() {
+    protected function populate_missing_questions() {
         // Address missing question types.
         foreach ($this->slots as $slot) {
             $questionid = $slot->questionid;
@@ -285,6 +297,19 @@ class structure {
 
             } else if (!\question_bank::qtype_exists($this->questions[$questionid]->qtype)) {
                 $this->questions[$questionid]->qtype = 'missingtype';
+            }
+        }
+    }
+
+    protected function populate_question_numbers() {
+        $number = 1;
+        foreach ($this->slots as $slot) {
+            $question = $this->questions[$slot->questionid];
+            if ($question->length == 0) {
+                $question->displayednumber = get_string('infoshort', 'quiz');
+            } else {
+                $question->displayednumber = $number;
+                $number += 1;
             }
         }
     }
@@ -565,5 +590,46 @@ class structure {
         }
 
         return $warnings;
+    }
+
+    public function get_dates_summary() {
+        $timenow = time();
+        $quiz = $this->quizobj->get_quiz();
+
+        // Exact open and close dates for the tool-tip.
+        $dates = array();
+        if ($quiz->timeopen > 0) {
+            if ($timenow > $quiz->timeopen) {
+                $dates[] = get_string('quizopenedon', 'quiz', userdate($quiz->timeopen));
+            } else {
+                $dates[] = get_string('quizwillopen', 'quiz', userdate($quiz->timeopen));
+            }
+        }
+        if ($quiz->timeclose > 0) {
+            if ($timenow > $quiz->timeclose) {
+                $dates[] = get_string('quizclosed', 'quiz', userdate($quiz->timeclose));
+            } else {
+                $dates[] = get_string('quizcloseson', 'quiz', userdate($quiz->timeclose));
+            }
+        }
+        if (empty($dates)) {
+            $dates[] = get_string('alwaysavailable', 'quiz');
+        }
+        $explanation = implode(', ', $dates);
+
+        // Brief summary on the page.
+        if ($timenow < $quiz->timeopen) {
+            $currentstatus = get_string('quizisclosedwillopen', 'quiz',
+                    userdate($quiz->timeopen, get_string('strftimedatetimeshort', 'langconfig')));
+        } else if ($quiz->timeclose && $timenow <= $quiz->timeclose) {
+            $currentstatus = get_string('quizisopenwillclose', 'quiz',
+                    userdate($quiz->timeclose, get_string('strftimedatetimeshort', 'langconfig')));
+        } else if ($quiz->timeclose && $timenow > $quiz->timeclose) {
+            $currentstatus = get_string('quizisclosed', 'quiz');
+        } else {
+            $currentstatus = get_string('quizisopen', 'quiz');
+        }
+
+        return array($currentstatus, $explanation);
     }
 }

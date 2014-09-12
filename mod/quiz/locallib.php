@@ -1282,7 +1282,7 @@ function quiz_question_delete_button($quiz, $question) {
  * @param object $question the question
  * @return the HTML for a delete icon and link.
  */
-function quiz_question_page_join_button($quiz, $question, $linkpage) {
+function page_split_join_button($quiz, $question, $linkpage) {
     global $OUTPUT, $PAGE;
 
     if (!$hasmanagequiz = has_capability('mod/quiz:manage', $PAGE->cm->context)) {
