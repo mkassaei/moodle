@@ -365,24 +365,12 @@ class edit_renderer extends \plugin_renderer_base {
                 $questionnumber = $slot->questionid;
                 $question = $structure->get_question_by_id($questionnumber);
 
-                if ($questiontypehtml = $this->quiz_section_question_list_item($structure, $question,
-                        $contexts, $pagevars, $pageurl)) {
-                    $questionshtml[$questionnumber] = $questiontypehtml;
-                }
-            }
-        }
-
-        $sectionoutput = '';
-        if (!empty($questionshtml)) {
-            foreach ($questionshtml as $questionnumber => $questiontypehtml) {
-                $sectionoutput .= $questiontypehtml;
+                $output .= $this->question_row($structure, $question, $contexts, $pagevars, $pageurl);
             }
         }
 
         // Always output the section module list.
-        $output .= html_writer::tag('ul', $sectionoutput, array('class' => 'section img-text'));
-
-        return $output;
+        return html_writer::tag('ul', $output, array('class' => 'section img-text'));
     }
 
     /**
@@ -396,8 +384,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param int|null $sectionreturn
      * @return String
      */
-    public function quiz_section_question_list_item(structure $structure, $question,
-            $contexts, $pagevars, $pageurl) {
+    public function question_row(structure $structure, $question, $contexts, $pagevars, $pageurl) {
         $output = '';
         $slotid = $this->get_question_info($structure, $question->id, 'slotid');
         $slotnumber = $this->get_question_info($structure, $question->id, 'slot');
@@ -447,9 +434,9 @@ class edit_renderer extends \plugin_renderer_base {
             $linkpage = 1; // Link.
         }
 
-        if ($questiontypehtml = $this->quiz_section_question($structure, $question, $pageurl)) {
+        if ($questionhtml = $this->question($structure, $question, $pageurl)) {
             $questionclasses = 'activity ' . $question->qtype . ' qtype_' . $question->qtype . ' slot';
-            $output .= html_writer::tag('li', $questiontypehtml, array('class' => $questionclasses, 'id' => 'slot-' . $slotid));
+            $output .= html_writer::tag('li', $questionhtml, array('class' => $questionclasses, 'id' => 'slot-' . $slotid));
         }
 
         $lastslot = $structure->get_last_slot();
@@ -571,16 +558,8 @@ class edit_renderer extends \plugin_renderer_base {
      * @param int|null $sectionreturn
      * @return string
      */
-    public function quiz_section_question(structure $structure, $question, $pageurl) {
+    public function question(structure $structure, $question, $pageurl) {
         $output = '';
-
-        $indentclasses = 'mod-indent';
-        if (!empty($question->indent)) {
-            $indentclasses .= ' mod-indent-'.$question->indent;
-            if ($question->indent > 15) {
-                $indentclasses .= ' mod-indent-huge';
-            }
-        }
 
         $output .= html_writer::start_tag('div');
 
@@ -595,7 +574,7 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::tag('span', $question->displayednumber, array('class' => 'slotnumber'));
 
         // This div is used to indent the content.
-        $output .= html_writer::div('', $indentclasses);
+        $output .= html_writer::div('', 'mod-indent');
 
         // Start a wrapper for the actual content to keep the indentation consistent.
         $output .= html_writer::start_tag('div');
