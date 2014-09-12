@@ -29,6 +29,10 @@
 namespace mod_quiz;
 
 class structure {
+
+    /** @var stdClass the quiz object. */
+    protected $quiz = null;
+
     /** @var stdClass[] the quiz_slots rows for this quiz. */
     protected $slots = array();
 
@@ -70,6 +74,39 @@ class structure {
         $structure = self::create();
         $structure->populate_structure($quiz);
         return $structure;
+    }
+
+    /**
+     * Create an instance of this class representing the structure of a given quizid.
+     * @return structure
+     */
+    public static function create_for_id($quizid) {
+        $structure = self::create();
+        $structure->set_quiz($structure->load_quiz($quizid));
+        $structure->populate_structure($structure->get_quiz());
+        return $structure;
+    }
+
+    /**
+     * @return stdClass Return the current quiz object.
+     */
+    public function get_quiz() {
+        return $this->quiz;
+    }
+
+    /**
+     * @return void Set the current quiz objects.
+     */
+    public function set_quiz($quiz) {
+        $this->quiz = $quiz;
+    }
+
+    /**
+     * @return stdClass Retrieve a quiz from the DB with the given id.
+     */
+    public function load_quiz($quizid) {
+        global $DB;
+        return $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
     }
 
     /**
@@ -438,9 +475,10 @@ class structure {
 
         $repaginate = new \mod_quiz\repaginate($quizid, $quizslots);
         $repaginate->repaginate($slotnumber, $repagtype);
-        $updatedquizslots = $repaginate->get_slots();
+//         $updatedquizslots = $repaginate->get_slots();
+        $slots = $this->refresh_page_numbers_and_update_db($quiz);
 
-        return $updatedquizslots;
+        return $slots;
     }
 
     public function get_last_slot() {

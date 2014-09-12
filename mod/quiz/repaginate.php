@@ -33,5 +33,7 @@ $repagtype = required_param('repag', PARAM_INT);
 $slotnumber++;
 $repage = new \mod_quiz\repaginate($quizid);
 $repage->repaginate($slotnumber, $repagtype);
+$structure = \mod_quiz\structure::create_for_id($quizid);
+$slots = $structure->refresh_page_numbers_and_update_db($structure->get_quiz());
 
 redirect(new moodle_url('edit.php', array('cmid' => $cmid)));
