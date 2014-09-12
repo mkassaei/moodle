@@ -558,7 +558,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param int|null $sectionreturn
      * @return string
      */
-    public function question(structure $structure, $question, $pageurl) {
+    public function question(structure $structure, $question, \moodle_url $pageurl) {
         $output = '';
 
         $output .= html_writer::start_tag('div');
@@ -580,30 +580,26 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::start_tag('div');
 
         // Display the link to the question (or do nothing if question has no url).
-        $cmname = $this->question_name($structure, $question, $pageurl);
+        $questionname = $this->question_name($structure, $question, $pageurl);
 
-        if (!empty($cmname)) {
-            // Start the div for the activity title, excluding the edit icons.
-            $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
-            $output .= $cmname;
+        // Start the div for the activity title, excluding the edit icons.
+        $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
+        $output .= $questionname;
 
-            $questionicons = '';
-            $questionicons .= quiz_question_preview_button($structure->get_quiz(), $question);
+        $questionicons = '';
+        $questionicons .= quiz_question_preview_button($structure->get_quiz(), $question);
 
-            // You cannot delete questions when quiz has been attempted,
-            // display delete ion only when there is no attepts.
-            if ($structure->can_be_edited()) {
-                $questionicons .= quiz_question_delete_button($structure->get_quiz(), $question);
-            }
-
-            $questionicons .= $this->marked_out_of_field($structure->get_quiz(), $question);
-            $questionicons .= ' ' . $this->regrade_action($question);
-
-            $output .= html_writer::span($questionicons, 'actions'); // Required to add js spinner icon.
-
-            // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
-            $output .= html_writer::end_tag('div'); // .activityinstance.
+        if ($structure->can_be_edited()) {
+            $questionicons .= quiz_question_delete_button($structure->get_quiz(), $question);
         }
+
+        $questionicons .= $this->marked_out_of_field($structure->get_quiz(), $question);
+        $questionicons .= ' ' . $this->regrade_action($question);
+
+        $output .= html_writer::span($questionicons, 'actions'); // Required to add js spinner icon.
+
+        // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
+        $output .= html_writer::end_tag('div'); // .activityinstance.
 
         $output .= html_writer::end_tag('div'); // ...$indentclasses.
 
