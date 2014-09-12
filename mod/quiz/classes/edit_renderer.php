@@ -450,6 +450,52 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Renders HTML to display a list of course modules in a course section
+     * Also displays "move here" controls in Javascript-disabled mode
+     *
+     * This function calls {@link core_course_renderer::quiz_section_question()}
+     *
+     * @param stdClass $course course object
+     * @param int|stdClass|section_info $section relative section number or section object
+     * @param int $sectionreturn section number to return to
+     * @return void
+     */
+    public function quiz_section_question_list($course, $cm, $quiz, $contexts, $pagevars, $structure,
+            $section, $sectionreturn, $pageurl) {
+        $output = '';
+
+        // Get the list of question types visible to user (excluding the question type being moved if there is one).
+        $questionshtml = array();
+
+        $slots = $structure->get_quiz_slots();
+        $sectiontoslotids = $structure->get_sections_and_slots();
+        if (!empty($sectiontoslotids[$section->id])) {
+            foreach ($sectiontoslotids[$section->id] as $slotid) {
+                $slot = $slots[$slotid];
+                $questionnumber = $slot->questionid;
+                $question = $quiz->fullquestions[$questionnumber];
+
+                if ($questiontypehtml = $this->quiz_section_question_list_item($course, $cm, $quiz, $contexts,
+                        $pagevars, $structure, $question, $sectionreturn, $pageurl)) {
+                    $questionshtml[$questionnumber] = $questiontypehtml;
+                }
+            }
+        }
+
+        $sectionoutput = '';
+        if (!empty($questionshtml)) {
+            foreach ($questionshtml as $questionnumber => $questiontypehtml) {
+                $sectionoutput .= $questiontypehtml;
+            }
+        }
+
+        // Always output the section module list.
+        $output .= html_writer::tag('ul', $sectionoutput, array('class' => 'section img-text'));
+
+        return $output;
+    }
+
+    /**
      * Renders HTML to display one course module for display within a section.
      *
      * This function calls:
@@ -529,169 +575,100 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Generate the edit controls of a section
-     *
-     * @param stdClass $course The course entry from DB
-     * @param stdClass $section The quiz_section entry from DB
-     * @param bool $onsectionpage true if being printed on a section page
-     * @return array of links with edit controls
+     * Returns the add menu.
+     * @param int $page the page the question will be added on.
+     * @param moodle_url $thispageurl the URL to reload this page.
+     * @param question_edit_contexts $contexts the relevant question bank contexts.
+     * @param array $pagevars the variables from {@link question_edit_setup()}.
+     * @param stdClass $course the course settings.
+     * @param stdClass $cm course_modules row.
+     * @param stdClass $quiz the quiz settings.
+     * @return string HTML for the menu.
      */
-    protected function section_edit_controls($course, $section, $onsectionpage = false) {
+    public function add_menu_actions($page, moodle_url $pageurl, question_edit_contexts $contexts,
+            array $pagevars, $course, $cm, $quiz) {
 
-        $coursecontext = context_course::instance($course->id);
-
-        if ($onsectionpage) {
-            $baseurl = course_get_url($course, $section->section);
-        } else {
-            $baseurl = course_get_url($course);
+        $actions = $this->edit_menu_actions($page, $pageurl, $contexts, $pagevars, $course, $cm, $quiz);
+        if (empty($actions)) {
+            return '';
         }
-        $baseurl->param('sesskey', sesskey());
+        $menu = new action_menu();
+        $menu->set_alignment(action_menu::BR, action_menu::BR);
+        $trigger = html_writer::tag('span', get_string('add', 'quiz'), array('class' => 'add-menu'));
+        $menu->set_menu_trigger($trigger);
 
-        $controls = array();
-
-        $url = clone($baseurl);
-
-        if (!$onsectionpage && has_capability('moodle/course:movesections', $coursecontext)) {
-            $url = clone($baseurl);
-            if ($section->section > 1) { // Add a arrow to move section up.
-                $url->param('section', $section->section);
-                $url->param('move', -1);
-                $strmoveup = get_string('moveup');
-
-                $controls[] = html_writer::link($url,
-                    html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/up'),
-                    'class' => 'icon up', 'alt' => $strmoveup)),
-                    array('title' => $strmoveup, 'class' => 'moveup'));
-            }
-
-            $url = clone($baseurl);
-            if ($section->section < $course->numsections) { // Add a arrow to move section down.
-                $url->param('section', $section->section);
-                $url->param('move', 1);
-                $strmovedown = get_string('movedown');
-
-                $controls[] = html_writer::link($url,
-                    html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/down'),
-                    'class' => 'icon down', 'alt' => $strmovedown)),
-                    array('title' => $strmovedown, 'class' => 'movedown'));
-            }
+        // Disable the link if quiz has attempta.
+        if (quiz_has_attempts($quiz->id)) {
+            return $this->render($menu);
         }
 
-        return $controls;
+        foreach ($actions as $action) {
+            if ($action instanceof action_menu_link) {
+                $action->add_class('add-menu');
+            }
+            $menu->add($action);
+        }
+        $menu->attributes['class'] .= ' page-add-actions commands';
+
+        // Prioritise the menu ahead of all other actions.
+        $menu->prioritise = true;
+
+        return $this->render($menu);
     }
 
     /**
-     * Renders HTML to display a list of course modules in a course section
-     * Also displays "move here" controls in Javascript-disabled mode
-     *
-     * This function calls {@link core_course_renderer::quiz_section_question()}
-     *
-     * @param stdClass $course course object
-     * @param int|stdClass|section_info $section relative section number or section object
-     * @param int $sectionreturn section number to return to
-     * @return void
+     * Returns the list of adding actions.
+     * @param int $page the page the question will be added on.
+     * @param moodle_url $thispageurl the URL to reload this page.
+     * @param question_edit_contexts $contexts the relevant question bank contexts.
+     * @param array $pagevars the variables from {@link question_edit_setup()}.
+     * @param stdClass $course the course settings.
+     * @param stdClass $cm course_modules row.
+     * @param stdClass $quiz the quiz settings.
+     * @return array the actions.
      */
-    public function quiz_section_question_list($course, $cm, $quiz, $contexts, $pagevars, $structure,
-            $section, $sectionreturn, $pageurl) {
-        $output = '';
-
-        // Get the list of question types visible to user (excluding the question type being moved if there is one).
-        $questionshtml = array();
-
-        $slots = $structure->get_quiz_slots();
-        $sectiontoslotids = $structure->get_sections_and_slots();
-        if (!empty($sectiontoslotids[$section->id])) {
-            foreach ($sectiontoslotids[$section->id] as $slotid) {
-                $slot = $slots[$slotid];
-                $questionnumber = $slot->questionid;
-                $question = $quiz->fullquestions[$questionnumber];
-
-                if ($questiontypehtml = $this->quiz_section_question_list_item($course, $cm, $quiz, $contexts,
-                        $pagevars, $structure, $question, $sectionreturn, $pageurl)) {
-                    $questionshtml[$questionnumber] = $questiontypehtml;
-                }
-            }
+    public function edit_menu_actions($page, moodle_url $pageurl, question_edit_contexts $contexts,
+            array $pagevars, $course, $cm, $quiz) {
+        $questioncategoryid = question_get_category_id_from_pagevars($pagevars);
+        static $str;
+        if (!isset($str)) {
+            $str = get_strings(array('addaquestion', 'addarandomquestion',
+                    'addarandomselectedquestion', 'questionbank'), 'quiz');
         }
 
-        $sectionoutput = '';
-        if (!empty($questionshtml)) {
-            foreach ($questionshtml as $questionnumber => $questiontypehtml) {
-                $sectionoutput .= $questiontypehtml;
-            }
-        }
+        // Get section, page, slotnumber and maxmark.
+        $actions = array();
 
-        // Always output the section module list.
-        $output .= html_writer::tag('ul', $sectionoutput, array('class' => 'section img-text'));
+        // Add a new question to the quiz.
+        $returnurl = new moodle_url($pageurl, array('addonpage' => $page));
+        $params = array('returnurl' => $returnurl->out_as_local_url(false),
+                'cmid' => $quiz->cmid, 'category' => $questioncategoryid,
+                'addonpage' => $page, 'appendqnumstring' => 'addquestion');
 
-        return $output;
-    }
+        $actions['addaquestion'] = new action_menu_link_secondary(
+            new moodle_url('/question/addquestion.php', $params),
+            new pix_icon('t/add', $str->addaquestion, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+            $str->addaquestion, array('class' => 'cm-edit-action addquestion', 'data-action' => 'addquestion')
+        );
 
-    /**
-     * Renders html to display a name with the link to the question on a quiz edit page
-     *
-     * If question is unavailable for the user but still needs to be displayed
-     * in the list, just the name is returned without a link
-     *
-     * Note, that for question that never have separate pages (i.e. labels)
-     * this function returns an empty string
-     *
-     * @param question $question
-     * @return string
-     */
-    public function quiz_section_question_name($quiz, $question, $pageurl) {
-        $output = '';
+        // Call question bank.
+        $icon = new pix_icon('t/add', $str->questionbank, 'moodle', array('class' => 'iconsmall', 'title' => ''));
+        $title = get_string('addquestionfrombanktopage', 'quiz', $page);
+        $attributes = array('class' => 'cm-edit-action questionbank',
+                'data-header' => $title, 'data-action' => 'questionbank', 'data-addonpage' => $page);
+        $actions['questionbank'] = new action_menu_link_secondary($pageurl, $icon, $str->questionbank, $attributes);
 
-        $editurl = new moodle_url('/question/question.php', array(
-                'returnurl' => $pageurl->out_as_local_url(),
-                'cmid' => $quiz->cmid, 'id' => $question->id));
+        // Add a random question.
+        $returnurl = new moodle_url('/mod/quiz/edit.php', array('cmid' => $quiz->cmid, 'data-addonpage' => $page));
+        $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid, 'appendqnumstring' => 'addarandomquestion');
+        $url = new moodle_url('/mod/quiz/addrandom.php', $params);
+        $icon = new pix_icon('t/add', $str->addarandomquestion, 'moodle', array('class' => 'iconsmall', 'title' => ''));
+        $attributes = array('class' => 'cm-edit-action addarandomquestion', 'data-action' => 'addarandomquestion');
+        $title = get_string('addrandomquestiontopage', 'quiz', $page);
+        $attributes = array_merge(array('data-header' => $title, 'data-addonpage' => $page), $attributes);
+        $actions['addarandomquestion'] = new action_menu_link_secondary($url, $icon, $str->addarandomquestion, $attributes);
 
-        // Accessibility: for files get description via icon, this is very ugly hack!
-        $instancename = quiz_question_tostring($question);
-        $altname = $question->name;
-
-        // Avoid unnecessary duplication: if a question name already
-        // includes the word question (or Question, etc) then it is unhelpful
-        // to include that in the accessible description that is added.
-        if (false !== strpos(core_text::strtolower($instancename),
-                core_text::strtolower($altname))) {
-            $altname = '';
-        }
-        // File type after name, for alphabetic lists (screen reader).
-        if ($altname) {
-            $altname = get_accesshide(' '.$altname);
-        }
-
-        $qtype = question_bank::get_qtype($question->qtype, false);
-        $namestr = $qtype->local_name();
-
-        $icon = $this->pix_icon('icon', $namestr, $qtype->plugin_name(), array('title' => $namestr,
-                'class' => 'icon activityicon', 'alt' => ' ', 'role' => 'presentation'));
-        // Need plain question name without html tags for link title.
-        $title = shorten_text(format_string($question->name), 100);
-        // Display the link itself.
-        $activitylink = $icon . html_writer::tag('span', $instancename . $altname, array('class' => 'instancename'));
-        $output .= html_writer::link($editurl, $activitylink,
-                array('title' => get_string('editquestion', 'quiz').' '.$title));
-        return $output;
-    }
-
-    /**
-     * @param object $quiz The quiz object of the quiz in question
-     * @param object $question the question
-     * @return the HTML for a marked out of question grade field.
-     */
-    public function marked_out_of_field($quiz, $question) {
-        return html_writer::span(self::get_question_grade($quiz, $question->maxmark), 'instancemaxmark',
-                array('title'=>get_string('maxmark', 'quiz')));
-    }
-
-    /**
-     * @param object $quiz The quiz object of the quiz in question
-     * @param int $grade question grade/maxmark
-     * @return value for a marked out of question grade field formatted for display.
-     */
-    public static function get_question_grade($quiz, $grade) {
-        return quiz_format_question_grade($quiz, $grade);
+        return $actions;
     }
 
     /**
@@ -771,27 +748,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Returns the regrade action.
-     *
-     * @param stdClass $question The question to produce editing buttons for
-     * @param int $sr The section to link back to (used for creating the links)
-     * @return The markup for the regrade action, or an empty string if not available.
-     */
-    public function regrade_action($question) {
-        return html_writer::span(
-            html_writer::link(
-                new moodle_url('#'),
-                $this->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
-                array(
-                    'class' => 'editing_maxmark',
-                    'data-action' => 'editmaxmark',
-                    'title' => get_string('editmaxmark', 'quiz'),
-                )
-            )
-        );
-    }
-
-    /**
      * Returns the move action.
      *
      * @param object $question The module to produce a move button for
@@ -822,160 +778,6 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Returns the list of adding actions.
-     * @param int $page the page the question will be added on.
-     * @param moodle_url $thispageurl the URL to reload this page.
-     * @param question_edit_contexts $contexts the relevant question bank contexts.
-     * @param array $pagevars the variables from {@link question_edit_setup()}.
-     * @param stdClass $course the course settings.
-     * @param stdClass $cm course_modules row.
-     * @param stdClass $quiz the quiz settings.
-     * @return array the actions.
-     */
-    public function edit_menu_actions($page, moodle_url $pageurl, question_edit_contexts $contexts,
-            array $pagevars, $course, $cm, $quiz) {
-        $questioncategoryid = question_get_category_id_from_pagevars($pagevars);
-        static $str;
-        if (!isset($str)) {
-            $str = get_strings(array('addaquestion', 'addarandomquestion',
-                    'addarandomselectedquestion', 'questionbank'), 'quiz');
-        }
-
-        // Get section, page, slotnumber and maxmark.
-        $actions = array();
-
-        // Add a new question to the quiz.
-        $returnurl = new moodle_url($pageurl, array('addonpage' => $page));
-        $params = array('returnurl' => $returnurl->out_as_local_url(false),
-                'cmid' => $quiz->cmid, 'category' => $questioncategoryid,
-                'addonpage' => $page, 'appendqnumstring' => 'addquestion');
-
-        $actions['addaquestion'] = new action_menu_link_secondary(
-            new moodle_url('/question/addquestion.php', $params),
-            new pix_icon('t/add', $str->addaquestion, 'moodle', array('class' => 'iconsmall', 'title' => '')),
-            $str->addaquestion, array('class' => 'cm-edit-action addquestion', 'data-action' => 'addquestion')
-        );
-
-        // Call question bank.
-        $icon = new pix_icon('t/add', $str->questionbank, 'moodle', array('class' => 'iconsmall', 'title' => ''));
-        $title = get_string('addquestionfrombanktopage', 'quiz', $page);
-        $attributes = array('class' => 'cm-edit-action questionbank',
-                'data-header' => $title, 'data-action' => 'questionbank', 'data-addonpage' => $page);
-        $actions['questionbank'] = new action_menu_link_secondary($pageurl, $icon, $str->questionbank, $attributes);
-
-        // Add a random question.
-        $returnurl = new moodle_url('/mod/quiz/edit.php', array('cmid' => $quiz->cmid, 'data-addonpage' => $page));
-        $params = array('returnurl' => $returnurl, 'cmid' => $quiz->cmid, 'appendqnumstring' => 'addarandomquestion');
-        $url = new moodle_url('/mod/quiz/addrandom.php', $params);
-        $icon = new pix_icon('t/add', $str->addarandomquestion, 'moodle', array('class' => 'iconsmall', 'title' => ''));
-        $attributes = array('class' => 'cm-edit-action addarandomquestion', 'data-action' => 'addarandomquestion');
-        $title = get_string('addrandomquestiontopage', 'quiz', $page);
-        $attributes = array_merge(array('data-header' => $title, 'data-addonpage' => $page), $attributes);
-        $actions['addarandomquestion'] = new action_menu_link_secondary($url, $icon, $str->addarandomquestion, $attributes);
-
-        return $actions;
-    }
-
-    /**
-     * Returns the add menu.
-     * @param int $page the page the question will be added on.
-     * @param moodle_url $thispageurl the URL to reload this page.
-     * @param question_edit_contexts $contexts the relevant question bank contexts.
-     * @param array $pagevars the variables from {@link question_edit_setup()}.
-     * @param stdClass $course the course settings.
-     * @param stdClass $cm course_modules row.
-     * @param stdClass $quiz the quiz settings.
-     * @return string HTML for the menu.
-     */
-    public function add_menu_actions($page, moodle_url $pageurl, question_edit_contexts $contexts,
-            array $pagevars, $course, $cm, $quiz) {
-
-        $actions = $this->edit_menu_actions($page, $pageurl, $contexts, $pagevars, $course, $cm, $quiz);
-        if (empty($actions)) {
-            return '';
-        }
-        $menu = new action_menu();
-        $menu->set_alignment(action_menu::BR, action_menu::BR);
-        $trigger = html_writer::tag('span', get_string('add', 'quiz'), array('class' => 'add-menu'));
-        $menu->set_menu_trigger($trigger);
-
-        // Disable the link if quiz has attempta.
-        if (quiz_has_attempts($quiz->id)) {
-            return $this->render($menu);
-        }
-
-        foreach ($actions as $action) {
-            if ($action instanceof action_menu_link) {
-                $action->add_class('add-menu');
-            }
-            $menu->add($action);
-        }
-        $menu->attributes['class'] .= ' page-add-actions commands';
-
-        // Prioritise the menu ahead of all other actions.
-        $menu->prioritise = true;
-
-        return $this->render($menu);
-    }
-
-    /**
-     * @param object $quiz
-     * @param int $questionid
-     * @return array, a list (sectionid, page-number, slot-number, maxmark)
-     */
-    protected function get_section($structure, $sectionid) {
-        if (!$sectionid) {
-            // Possible, printout a notification or an error, but that should not happen.
-            return null;
-        }
-        $sections = $structure->get_quiz_sections();
-        if (!$sections) {
-            return null;
-        }
-        foreach ($sections as $key => $section) {
-            if ((int)$section->id === (int)$sectionid) {
-                return $section->heading;
-            }
-        }
-        return null;
-    }
-
-    /**
-     *
-     * @param object $quiz
-     * @param int $questionid
-     * @param string, 'all' for returning list (sectionid, page-number, slot-number, maxmark),
-     * 'section' for returning section heding, 'page' for returning page number,
-     * 'slot' for returning slot-number and 'mark' for returning maxmark.
-     * @return array, a list (sectionid, page-number, slot-number, maxmark), or the value for the given string
-     */
-    protected function get_question_info($structure, $questionid, $info = 'all') {
-        foreach ($structure->get_quiz_slots() as $slotid => $slot) {
-            if ((int)$slot->questionid === (int)$questionid) {
-                if ($info === 'all') {
-                    return array($slot->sectionid, $slot->page, $slot->id, $slot->maxmark);
-                }
-                if ($info === 'section') {
-                    return $this->get_section($structure, $slot->sectionid);
-                }
-                if ($info === 'page') {
-                    return $slot->page;
-                }
-                if ($info === 'slot') {
-                    return $slot->slot;
-                }
-                if ($info === 'mark') {
-                    return $slot->maxmark;
-                }
-                if ($info === 'slotid') {
-                    return $slot->id;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
      * display_question_number takes the slot number and returns a sequence
      * where the description questions are shown as 'i' for  information and
      * other question types are shown as number respectively.
@@ -991,16 +793,84 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         return $slotnumber - $info;
     }
 
-    protected function get_previous_page($structure, $prevslotnumber) {
-        if ($prevslotnumber < 1) {
-            return 0;
+    /**
+     * Renders html to display a name with the link to the question on a quiz edit page
+     *
+     * If question is unavailable for the user but still needs to be displayed
+     * in the list, just the name is returned without a link
+     *
+     * Note, that for question that never have separate pages (i.e. labels)
+     * this function returns an empty string
+     *
+     * @param question $question
+     * @return string
+     */
+    public function quiz_section_question_name($quiz, $question, $pageurl) {
+        $output = '';
+
+        $editurl = new moodle_url('/question/question.php', array(
+                'returnurl' => $pageurl->out_as_local_url(),
+                'cmid' => $quiz->cmid, 'id' => $question->id));
+
+        // Accessibility: for files get description via icon, this is very ugly hack!
+        $instancename = quiz_question_tostring($question);
+        $altname = $question->name;
+
+        // Avoid unnecessary duplication: if a question name already
+        // includes the word question (or Question, etc) then it is unhelpful
+        // to include that in the accessible description that is added.
+        if (false !== strpos(core_text::strtolower($instancename),
+                core_text::strtolower($altname))) {
+            $altname = '';
         }
-        foreach ($structure->get_quiz_slots() as $slotid => $slot) {
-            if ($slot->slot == $prevslotnumber) {
-                return $slot->page;
-            }
+        // File type after name, for alphabetic lists (screen reader).
+        if ($altname) {
+            $altname = get_accesshide(' '.$altname);
         }
-        return 0;
+
+        $qtype = question_bank::get_qtype($question->qtype, false);
+        $namestr = $qtype->local_name();
+
+        $icon = $this->pix_icon('icon', $namestr, $qtype->plugin_name(), array('title' => $namestr,
+                'class' => 'icon activityicon', 'alt' => ' ', 'role' => 'presentation'));
+        // Need plain question name without html tags for link title.
+        $title = shorten_text(format_string($question->name), 100);
+        // Display the link itself.
+        $activitylink = $icon . html_writer::tag('span', $instancename . $altname, array('class' => 'instancename'));
+        $output .= html_writer::link($editurl, $activitylink,
+                array('title' => get_string('editquestion', 'quiz').' '.$title));
+        return $output;
+    }
+
+    /**
+     * @param object $quiz The quiz object of the quiz in question
+     * @param object $question the question
+     * @return the HTML for a marked out of question grade field.
+     */
+    public function marked_out_of_field($quiz, $question) {
+        return html_writer::span(self::get_question_grade($quiz, $question->maxmark), 'instancemaxmark',
+                array('title'=>get_string('maxmark', 'quiz')));
+    }
+
+    /**
+     * Returns the regrade action.
+     *
+     * @param stdClass $question The question to produce editing buttons for
+     * @param int $sr The section to link back to (used for creating the links)
+     * @return The markup for the regrade action, or an empty string if not available.
+     */
+    public function regrade_action($question) {
+        return html_writer::span(
+            html_writer::link(
+                new moodle_url('#'),
+                $this->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
+                array(
+                    'class' => 'editing_maxmark',
+                    'data-action' => 'editmaxmark',
+                    'title' => get_string('editmaxmark', 'quiz'),
+                )
+            )
+        );
     }
 
     /**
@@ -1078,5 +948,83 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
                                         $pagevars['qbshowtext']);
         $form = html_writer::tag('div', $output, array('class' => 'bd'));
         return html_writer::tag('div', $form, array('class' => 'questionbankformforpopup'));
+    }
+
+    /**
+     * @param object $quiz The quiz object of the quiz in question
+     * @param int $grade question grade/maxmark
+     * @return value for a marked out of question grade field formatted for display.
+     */
+    public static function get_question_grade($quiz, $grade) {
+        return quiz_format_question_grade($quiz, $grade);
+    }
+
+    /**
+     * @param object $quiz
+     * @param int $questionid
+     * @return array, a list (sectionid, page-number, slot-number, maxmark)
+     */
+    protected function get_section($structure, $sectionid) {
+        if (!$sectionid) {
+            // Possible, printout a notification or an error, but that should not happen.
+            return null;
+        }
+        $sections = $structure->get_quiz_sections();
+        if (!$sections) {
+            return null;
+        }
+        foreach ($sections as $key => $section) {
+            if ((int)$section->id === (int)$sectionid) {
+                return $section->heading;
+            }
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param object $quiz
+     * @param int $questionid
+     * @param string, 'all' for returning list (sectionid, page-number, slot-number, maxmark),
+     * 'section' for returning section heding, 'page' for returning page number,
+     * 'slot' for returning slot-number and 'mark' for returning maxmark.
+     * @return array, a list (sectionid, page-number, slot-number, maxmark), or the value for the given string
+     */
+    protected function get_question_info($structure, $questionid, $info = 'all') {
+        foreach ($structure->get_quiz_slots() as $slotid => $slot) {
+            if ((int)$slot->questionid === (int)$questionid) {
+                if ($info === 'all') {
+                    return array($slot->sectionid, $slot->page, $slot->id, $slot->maxmark);
+                }
+                if ($info === 'section') {
+                    return $this->get_section($structure, $slot->sectionid);
+                }
+                if ($info === 'page') {
+                    return $slot->page;
+                }
+                if ($info === 'slot') {
+                    return $slot->slot;
+                }
+                if ($info === 'mark') {
+                    return $slot->maxmark;
+                }
+                if ($info === 'slotid') {
+                    return $slot->id;
+                }
+            }
+        }
+        return null;
+    }
+
+    protected function get_previous_page($structure, $prevslotnumber) {
+        if ($prevslotnumber < 1) {
+            return 0;
+        }
+        foreach ($structure->get_quiz_slots() as $slotid => $slot) {
+            if ($slot->slot == $prevslotnumber) {
+                return $slot->page;
+            }
+        }
+        return 0;
     }
 }
