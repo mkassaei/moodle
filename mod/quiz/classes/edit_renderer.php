@@ -35,167 +35,6 @@ defined('MOODLE_INTERNAL') || die();
 class mod_quiz_edit_renderer extends plugin_renderer_base {
 
     /**
-     * Generate the starting container html for a list of sections
-     * @return string HTML to output.
-     */
-    protected function start_section_list() {
-        return html_writer::start_tag('ul', array('class' => 'slots'));
-    }
-
-    /**
-     * Generate the closing container html for a list of sections
-     * @return string HTML to output.
-     */
-    protected function end_section_list() {
-        return html_writer::end_tag('ul');
-    }
-
-    /**
-     * Generate the title for this section page
-     * @return string the page title
-     */
-    protected function page_title() {
-        return get_string('weeklyoutline');
-    }
-
-    /**
-     * Generate the content to displayed on the right part of a section
-     * before course modules are included
-     *
-     * @param stdClass $section The quiz_section entry from DB
-     * @param stdClass $course The course entry from DB
-     * @param bool $onsectionpage true if being printed on a section page
-     * @return string HTML to output.
-     */
-    protected function section_right_content($section, $course, $onsectionpage) {
-        $o = $this->output->spacer();
-        return $o;
-    }
-
-    /**
-     * Generate the content to be displayed on the left part of a section
-     * before course modules are included
-     *
-     * @param stdClass $section The quiz_section entry from DB
-     * @param stdClass $course The course entry from DB
-     * @param bool $onsectionpage true if being printed on a section page
-     * @return string HTML to output.
-     */
-    protected function section_left_content($section) {
-        $o = $this->output->spacer();
-
-        return $o;
-    }
-
-    /**
-     * Generate the display of the header part of a section before
-     * course modules are included
-     *
-     * @param stdClass $section The quiz_section entry from DB
-     * @param stdClass $course The course entry from DB
-     * @param bool $onsectionpage true if being printed on a single-section page
-     * @param int $sectionreturn The section to return to after an action
-     * @return string HTML to output.
-     */
-    protected function section_header($section, $course, $onsectionpage, $sectionreturn=null) {
-
-        $o = '';
-        $currenttext = '';
-        $sectionstyle = '';
-
-        $o .= html_writer::start_tag('li', array('id' => 'section-'.$section->id,
-            'class' => 'section main clearfix'.$sectionstyle, 'role' => 'region',
-            'aria-label' => $section->heading));
-
-        $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
-        $o .= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
-
-        $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
-        $o .= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
-        $o .= html_writer::start_tag('div', array('class' => 'content'));
-
-        return $o;
-    }
-
-    /**
-     * Generate the display of the footer part of a section
-     *
-     * @return string HTML to output.
-     */
-    protected function section_footer() {
-        $o = html_writer::end_tag('div');
-        $o .= html_writer::end_tag('li');
-
-        return $o;
-    }
-
-    /**
-     * Generate html for a section summary text
-     *
-     * @param stdClass $section The quiz_section entry from DB
-     * @return string HTML to output.
-     */
-    protected function format_summary_text($section) {
-
-        $options = new stdClass();
-        $options->noclean = true;
-        $options->overflowdiv = true;
-        return format_text($section->heading, FORMAT_MOODLE, $options);
-    }
-
-    /**
-     * Generate the edit controls of a section
-     *
-     * @param stdClass $course The course entry from DB
-     * @param stdClass $section The quiz_section entry from DB
-     * @param bool $onsectionpage true if being printed on a section page
-     * @return array of links with edit controls
-     */
-    protected function section_edit_controls($course, $section, $onsectionpage = false) {
-
-        $coursecontext = context_course::instance($course->id);
-
-        if ($onsectionpage) {
-            $baseurl = course_get_url($course, $section->section);
-        } else {
-            $baseurl = course_get_url($course);
-        }
-        $baseurl->param('sesskey', sesskey());
-
-        $controls = array();
-
-        $url = clone($baseurl);
-
-        if (!$onsectionpage && has_capability('moodle/course:movesections', $coursecontext)) {
-            $url = clone($baseurl);
-            if ($section->section > 1) { // Add a arrow to move section up.
-                $url->param('section', $section->section);
-                $url->param('move', -1);
-                $strmoveup = get_string('moveup');
-
-                $controls[] = html_writer::link($url,
-                    html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/up'),
-                    'class' => 'icon up', 'alt' => $strmoveup)),
-                    array('title' => $strmoveup, 'class' => 'moveup'));
-            }
-
-            $url = clone($baseurl);
-            if ($section->section < $course->numsections) { // Add a arrow to move section down.
-                $url->param('section', $section->section);
-                $url->param('move', 1);
-                $strmovedown = get_string('movedown');
-
-                $controls[] = html_writer::link($url,
-                    html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/down'),
-                    'class' => 'icon down', 'alt' => $strmovedown)),
-                    array('title' => $strmovedown, 'class' => 'movedown'));
-            }
-        }
-
-        return $controls;
-    }
-
-    /**
      * Generates the edit page
      *
      * @param stdClass $course The course entry from DB
@@ -341,6 +180,145 @@ class mod_quiz_edit_renderer extends plugin_renderer_base {
         }
 
         return $output;
+    }
+
+    /**
+     * Generate the starting container html for a list of sections
+     * @return string HTML to output.
+     */
+    protected function start_section_list() {
+        return html_writer::start_tag('ul', array('class' => 'slots'));
+    }
+
+    /**
+     * Generate the closing container html for a list of sections
+     * @return string HTML to output.
+     */
+    protected function end_section_list() {
+        return html_writer::end_tag('ul');
+    }
+
+    /**
+     * Generate the content to displayed on the right part of a section
+     * before course modules are included
+     *
+     * @param stdClass $section The quiz_section entry from DB
+     * @param stdClass $course The course entry from DB
+     * @param bool $onsectionpage true if being printed on a section page
+     * @return string HTML to output.
+     */
+    protected function section_right_content($section, $course, $onsectionpage) {
+        $o = $this->output->spacer();
+        return $o;
+    }
+
+    /**
+     * Generate the content to be displayed on the left part of a section
+     * before course modules are included
+     *
+     * @param stdClass $section The quiz_section entry from DB
+     * @param stdClass $course The course entry from DB
+     * @param bool $onsectionpage true if being printed on a section page
+     * @return string HTML to output.
+     */
+    protected function section_left_content($section) {
+        $o = $this->output->spacer();
+
+        return $o;
+    }
+
+    /**
+     * Generate the display of the header part of a section before
+     * course modules are included
+     *
+     * @param stdClass $section The quiz_section entry from DB
+     * @param stdClass $course The course entry from DB
+     * @param bool $onsectionpage true if being printed on a single-section page
+     * @param int $sectionreturn The section to return to after an action
+     * @return string HTML to output.
+     */
+    protected function section_header($section, $course, $onsectionpage, $sectionreturn=null) {
+
+        $o = '';
+        $currenttext = '';
+        $sectionstyle = '';
+
+        $o .= html_writer::start_tag('li', array('id' => 'section-'.$section->id,
+            'class' => 'section main clearfix'.$sectionstyle, 'role' => 'region',
+            'aria-label' => $section->heading));
+
+        $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
+        $o .= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
+
+        $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
+        $o .= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
+        $o .= html_writer::start_tag('div', array('class' => 'content'));
+
+        return $o;
+    }
+
+    /**
+     * Generate the display of the footer part of a section
+     *
+     * @return string HTML to output.
+     */
+    protected function section_footer() {
+        $o = html_writer::end_tag('div');
+        $o .= html_writer::end_tag('li');
+
+        return $o;
+    }
+
+    /**
+     * Generate the edit controls of a section
+     *
+     * @param stdClass $course The course entry from DB
+     * @param stdClass $section The quiz_section entry from DB
+     * @param bool $onsectionpage true if being printed on a section page
+     * @return array of links with edit controls
+     */
+    protected function section_edit_controls($course, $section, $onsectionpage = false) {
+
+        $coursecontext = context_course::instance($course->id);
+
+        if ($onsectionpage) {
+            $baseurl = course_get_url($course, $section->section);
+        } else {
+            $baseurl = course_get_url($course);
+        }
+        $baseurl->param('sesskey', sesskey());
+
+        $controls = array();
+
+        $url = clone($baseurl);
+
+        if (!$onsectionpage && has_capability('moodle/course:movesections', $coursecontext)) {
+            $url = clone($baseurl);
+            if ($section->section > 1) { // Add a arrow to move section up.
+                $url->param('section', $section->section);
+                $url->param('move', -1);
+                $strmoveup = get_string('moveup');
+
+                $controls[] = html_writer::link($url,
+                    html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/up'),
+                    'class' => 'icon up', 'alt' => $strmoveup)),
+                    array('title' => $strmoveup, 'class' => 'moveup'));
+            }
+
+            $url = clone($baseurl);
+            if ($section->section < $course->numsections) { // Add a arrow to move section down.
+                $url->param('section', $section->section);
+                $url->param('move', 1);
+                $strmovedown = get_string('movedown');
+
+                $controls[] = html_writer::link($url,
+                    html_writer::empty_tag('img', array('src' => $this->output->pix_url('i/down'),
+                    'class' => 'icon down', 'alt' => $strmovedown)),
+                    array('title' => $strmovedown, 'class' => 'movedown'));
+            }
+        }
+
+        return $controls;
     }
 
     /**
