@@ -13,56 +13,113 @@ Feature: Edit quiz page
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
-
+     And the following "activities" exist:
+      | activity   | name   | intro                           | course | idnumber |
+      | quiz       | Quiz 1 | Quiz 1 for testing the Add menu | C1     | quiz1    |
+ 
     When I log in as "teacher1"
     And I follow "Course 1"
-    And I turn editing mode on
-    And I add a "Quiz" to section "1" and I fill the form with:
-      | Name        | Quiz 1 |
-      | Description | This quiz is used to test all options of the add menu on the quiz editing page. |
-   When I add a "Essay" question to the "Quiz 1" quiz with:
-     | Question name | Essay new 01                       |
-     | Question text | This is an essay in the background |
-#    Then I wait "10" seconds
+    And I follow "Quiz 1"
+    And I follow "Edit quiz"
+    Then I should see "Editing quiz: Quiz 1"
 
-#  @javascript @addmenu_s1
-#  Scenario: Add a new question to the quiz.
-#    And I follow "Quiz 1"
-#    And I follow "Edit quiz"
-#    Then I should see "Editing quiz: Quiz 1"
+  @javascript @addmenu_s1
+  Scenario: Add some new question to the quiz using '+ a new question' options of the 'Add' menu.
+    And I follow "Add"
+    And I follow "a new question"
+    And I set the field "qtype_qtype_essay" to "1"
+    And I press "submitbutton"
+    Then I should see "Adding an Essay question"
+    And I set the field "Question name" to "Essay 01 new"
+    And I set the field "Question text" to "Please write 200 words about Essay 01"
+    And I press "id_submitbutton"
+    Then I should see "Editing quiz: Quiz 1"
+    And I should see "P 1"
+    And I should see "Essay 01 new"
 
-#    And I follow "Add"
-#    And I follow "a new question"
-#    And I set the field "qtype_qtype_essay" to "1"
-#    And I press "Add"
-#    Then I should see "Adding an Essay question"
-#    And I set the field "Question name" to "Essay 01"
-#    And I set the field "Question text" to "Please write 200 words about Essay 01"
-#    And I press "id_submitbutton"
-#    Then I should see "Editing quiz: Quiz 1"
-#    And I should see "Essay 01"
+    And I follow "Add"
+    And I follow "a new question"
+    And I set the field "qtype_qtype_essay" to "1"
+    And I press "submitbutton"
+    Then I should see "Adding an Essay question"
+    And I set the field "Question name" to "Essay 02 new"
+    And I set the field "Question text" to "Please write 200 words about Essay 02"
+    And I press "id_submitbutton"
+    Then I should see "Editing quiz: Quiz 1"
+    And I should see "Essay 01 new"
+    And I should see "Essay 02 new"
 
-#    And I should see "Course 1"
-#    And I follow "Course 1"
-#    And I follow "Quiz 1"
-#    And I follow "Edit quiz"
-#    And I follow "Add"
-#    And I follow "a new question"
-#    And I set the field "qtype_qtype_essay" to "1"
-#    And I press "Add"
-#    Then I should see "Adding an Essay question"
-#    And I set the field "Question name" to "Essay 03"
-#    And I set the field "Question text" to "Please write 300 words about Essay 03"
-#    And I press "id_submitbutton"
-#    And I follow "Quiz 1"
-#    And I follow "Edit quiz"
-#    Then I should see "Editing quiz: Quiz 1"
+    And I follow "Add"
+    And I follow "a new question"
+    And I set the field "qtype_qtype_essay" to "1"
+    And I press "submitbutton"
+    Then I should see "Adding an Essay question"
+    And I set the field "Question name" to "Essay 03 new"
+    And I set the field "Question text" to "Please write 300 words about Essay 03"
+    And I press "id_submitbutton"
+    Then I should see "Editing quiz: Quiz 1"
+    And I should see "Essay 01 new"
+    And I should see "Essay 02 new"
+    And I should see "Essay 03 new"
+
+    And I follow "Add"
+    And I follow "a new question"
+    And I set the field "qtype_qtype_essay" to "1"
+    And I press "submitbutton"
+    Then I should see "Adding an Essay question"
+    And I set the field "Question name" to "Essay 04 new"
+    And I set the field "Question text" to "Please write 300 words about Essay 04"
+    And I press "id_submitbutton"
+    Then I should see "Editing quiz: Quiz 1"
+    And I should see "Essay 01 new"
+    And I should see "Essay 02 new"
+    And I should see "Essay 03 new"
+    And I should see "Essay 04 new"
+
+    # Repaginate as two questions per page.
+    And I should see "P 1"
+    And I should not see "P 2"
+    And I press "Repaginate"
+    When I press "Repaginate"
+    Then I should see "Repaginate with"
+    And I set the field "menuquestionsperpage" to "2"
+    When I press "Go"
+    Then I should see "P 1"
+    And I should see "P 2"
+
+    # Add a question to page 2.
+    And I click on "//a[@id=\"action-menu-toggle-1\"]" "xpath_element"
+    And I click on "//li[@id='page-2']//a[contains(., 'a new question')]" "xpath_element"
+    And I set the field "qtype_qtype_essay" to "1"
+    And I press "submitbutton"
+    Then I should see "Adding an Essay question"
+    And I set the field "Question name" to "Essay for page 2"
+    And I set the field "Question text" to "Please write 200 words about Essay for page 2"
+    And I press "id_submitbutton"
+    Then I should see "Editing quiz: Quiz 1"
+    And I should see "Essay for page 2"
 
   @javascript @addmenu_s2
-  Scenario: Add questions from question bank to the quiz.
-    # In order to be able to add questions from question bank to the quiz,
-    # first we create some new questions in various ctegories.
+  Scenario: Add questions from question bank to the quiz. In order to be able to
+      add questions from question bank to the quiz, first we create some new questions
+      in various categories and add them to the question bank.
+
+    # Create a couple of sub categories.
     And I follow "Course 1"
+    And I navigate to "Categories" node in "Course administration > Question bank"
+    Then I should see "Add category"
+    Then I set the field "Parent category" to "Default for C1"
+    And I set the field "Name" to "Subcat 1"
+    And I set the field "Category info" to "This is sub category 1"
+    Then I press "id_submitbutton"
+    And I should see "Subcat 1"
+    
+    Then I set the field "Parent category" to "Default for C1"
+    And I set the field "Name" to "Subcat 2"
+    And I set the field "Category info" to "This is sub category 2"
+    Then I press "id_submitbutton"
+    And I should see "Subcat 2"
+
     And I navigate to "Questions" node in "Course administration > Question bank"
     Then I should see "Question bank"
     And I should see "Select a category"
@@ -79,6 +136,8 @@ Feature: Edit quiz page
     And I should see "Essay 01"
 
     # Create the Essay 02 question.
+    And I should see "Select a category"
+    And I set the field "Select a category:" to "Subcat 1"
     When I press "Create a new question ..."
     And I set the field "qtype_qtype_essay" to "1"
     And I press "Add"
@@ -132,7 +191,8 @@ Feature: Edit quiz page
     And I follow "Edit quiz"
     And I follow "Add"
     And I follow "from question bank"
-    And I click on "Add to quiz" "link" in the "Essay 03" "table_row"
+    #And I click on "Add to quiz" "link" in the "Essay 03" "table_row"
+    And I click on "//a[@title=\"Add to quiz\"]" "xpath_element" in the "Essay 03" "table_row"
     Then I should see "Editing quiz: Quiz 1"
     And I should see "Essay 03"
 
@@ -146,6 +206,8 @@ Feature: Edit quiz page
     # Add Esay 02 from question bank.
     And I follow "Add"
     And I follow "from question bank"
+    And I should see "Select a category"
+    And I set the field "Select a category" to "Subcat 1"
     And I click on "Add to quiz" "link" in the "Essay 02" "table_row"
     Then I should see "Editing quiz: Quiz 1"
     And I should see "Essay 02"
@@ -156,3 +218,27 @@ Feature: Edit quiz page
     And I press "Add random question"
     Then I should see "Editing quiz: Quiz 1"
     And I should see "Random"
+
+    # Repaginate as one question per page.
+    And I should see "P 1"
+    And I should not see "P 2"
+    When I press "Repaginate"
+    Then I should see "Repaginate with"
+    And I set the field "menuquestionsperpage" to "1"
+    When I press "Go"
+    Then I should see "P 2"
+    And I should see "P 3"
+    And I should see "P 4"
+
+    # Add a random question to page 4.
+    And I click on "//a[@id=\"action-menu-toggle-3\"]" "xpath_element"
+    And I click on "//li[@id='page-4']//a[contains(., 'a new question')]" "xpath_element"
+    And I set the field "qtype_qtype_essay" to "1"
+    And I press "submitbutton"
+    Then I should see "Adding an Essay question"
+    And I set the field "Question name" to "Essay for page 4"
+    And I set the field "Question text" to "Please write 200 words about Essay for page 4"
+    And I press "id_submitbutton"
+    Then I should see "Editing quiz: Quiz 1"
+    And I should see "Essay for page 4"
+    And I wait "10" seconds
