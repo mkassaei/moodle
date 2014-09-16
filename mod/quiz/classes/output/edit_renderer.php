@@ -69,9 +69,8 @@ class edit_renderer extends \plugin_renderer_base {
 
         // If the quiz is empty, display an add menu.
         if (!$structure->has_questions()) {
-            $output .= html_writer::tag('span', $this->add_menu_actions(0,
-                    $pageurl, $contexts, $pagevars, $quizobj->get_course(),
-                        $quizobj->get_cm(), $quizobj->get_quiz()), array('class' => 'add-menu-outer'));
+            $output .= html_writer::tag('span', $this->add_menu_actions($structure, 0,
+                    $pageurl, $contexts, $pagevars), array('class' => 'add-menu-outer'));
         }
 
         // Show the questions organised into sections and pages.
