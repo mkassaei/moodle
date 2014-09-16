@@ -527,14 +527,19 @@ class structure {
      * @param float    $maxmark the new maxmark.
      * @return bool true if the new grade is different from the old one.
      */
-    public function link_slot_to_page($quiz, $slot, $type) {
+    public function link_slot_to_page($quiz, $slotid, $type) {
         global $DB;
         require_once("locallib.php");
         require_once('classes/repaginate.php');
         $quizid = $quiz->id;
-        $slotnumber = $slot + 1;
+
         $repagtype = $type;
         $quizslots = $DB->get_records('quiz_slots', array('quizid' => $quizid), 'slot');
+        global $Out;
+//         $Out->print_r($quizslots, '$quizslots = ');
+//         $slotnumber = $slot + 1;
+        $slot = $quizslots[$slotid];
+        $slotnumber = $slot->slot;
 
         $repaginate = new \mod_quiz\repaginate($quizid, $quizslots);
         $repaginate->repaginate($slotnumber, $repagtype);

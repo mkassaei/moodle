@@ -311,7 +311,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             case 'unlinkpage':
                 // The user is linking or unlinking pages.
                 // TODO MDL-43089 finish link page functionality.
-                // this.link_page(ev, node, activity, value);
+                 this.link_page(ev, node, activity, action);
                 break;
             default:
                 // Nothing to do here!
@@ -556,28 +556,31 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
      * @param {Node} activity The activity node that this action will be performed on.
      * @chainable
      */
-    link_page: function(ev, button, activity, value) {
+    link_page: function(ev, button, activity, action) {
         // Prevent the default button action
         ev.preventDefault();
 
+        activity = activity.next('li.activity.slot');
         var spinner = this.add_spinner(activity),
-            slotnumber = 0;
+            slotid = 0;
+        var value = action == 'linkpage' ? 1:2;
 
         var data = {
             'class': 'resource',
             'field': 'linkslottopage',
-            'id':    slotnumber,
+            'id':    slotid,
             'value': value
         };
 
-        slotnumber = Y.Moodle.mod_quiz.util.slot.getNumber(activity.previous('li.activity'));
-        if (slotnumber) {
-            data.id = Number(slotnumber);
+        slotid = Y.Moodle.mod_quiz.util.slot.getId(activity);
+        if (slotid) {
+            data.id = Number(slotid);
         }
         this.send_request(data, spinner, function(response) {
-            if (response.slots) {
-                this.repaginate_slots(response.slots);
-            }
+            window.location.reload(true);
+//            if (response.slots) {
+//                this.repaginate_slots(response.slots);
+//            }
         });
 
         return this;
