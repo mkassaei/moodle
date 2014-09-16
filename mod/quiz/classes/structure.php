@@ -535,15 +535,9 @@ class structure {
 
         $repagtype = $type;
         $quizslots = $DB->get_records('quiz_slots', array('quizid' => $quizid), 'slot');
-        global $Out;
-//         $Out->print_r($quizslots, '$quizslots = ');
-//         $slotnumber = $slot + 1;
         $slot = $quizslots[$slotid];
-        $slotnumber = $slot->slot;
-
         $repaginate = new \mod_quiz\repaginate($quizid, $quizslots);
-        $repaginate->repaginate($slotnumber, $repagtype);
-//         $updatedquizslots = $repaginate->get_slots();
+        $repaginate->repaginate($slot->slot, $repagtype);
         $slots = $this->refresh_page_numbers_and_update_db($quiz);
 
         return $slots;
