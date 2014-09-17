@@ -575,7 +575,6 @@ class edit_renderer extends \plugin_renderer_base {
         }
 
         $questionicons .= $this->marked_out_of_field($structure->get_quiz(), $question);
-        $questionicons .= ' ' . $this->edit_marked_out_of_icon($question);
 
         $output .= html_writer::span($questionicons, 'actions'); // Required to add js spinner icon.
 
@@ -731,27 +730,19 @@ class edit_renderer extends \plugin_renderer_base {
 
     /**
      * Display the 'marked out of' information for a question.
-     *
+     * Along with the regrade action.
      * @param stdClass $quiz the quiz settings from the database.
      * @param stdClass $question data from the question and quiz_slots tables.
      * @return string HTML to output.
      */
     public function marked_out_of_field($quiz, $question) {
-        return html_writer::span(quiz_format_question_grade($quiz, $question->maxmark), 'instancemaxmark',
+        $output = html_writer::span(quiz_format_question_grade($quiz, $question->maxmark), 'instancemaxmark',
                 array('title'=>get_string('maxmark', 'quiz')));
-    }
 
-    /**
-     * Returns the regrade action.
-     *
-     * @param stdClass $question data from the question and quiz_slots tables.
-     * @return string HTML to output.
-     */
-    public function edit_marked_out_of_icon($question) {
-        return html_writer::span(
+        $output .= html_writer::span(
             html_writer::link(
                 new \moodle_url('#'),
-                $this->pix_icon('t/editstring', '', 'moodle', array('class' => 'iconsmall visibleifjs', 'title' => '')),
+                $this->pix_icon('t/editstring', '', 'moodle', array('class' => 'smallicon visibleifjs', 'title' => '')),
                 array(
                     'class' => 'editing_maxmark',
                     'data-action' => 'editmaxmark',
@@ -759,6 +750,7 @@ class edit_renderer extends \plugin_renderer_base {
                 )
             )
         );
+        return html_writer::span($output, 'instancemaxmarkcontainer');
     }
 
     /**

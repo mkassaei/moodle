@@ -1067,14 +1067,16 @@ table#categoryquestions td,
     margin-right: 50em;
 }
 
-.path-mod-quiz ul.slots li.section li.activity a.preview {
-    margin-left: 5px
+.path-mod-quiz ul.slots li.section li.activity .instancemaxmarkcontainer {
+    background: white;
+    padding: .3em;
+    margin: .5em;
 }
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmark {
-    margin-left: 5px
-}
+
 .path-mod-quiz ul.slots li.section li.activity .edit_icon,
-.path-mod-quiz ul.slots li.section li.activity .editing_delete {
+.path-mod-quiz ul.slots li.section li.activity a.preview,
+.path-mod-quiz ul.slots li.section li.activity .editing_delete,
+.path-mod-quiz ul.slots li.section li.activity .editing_maxmark {
     margin-left: 5px
 }
 
