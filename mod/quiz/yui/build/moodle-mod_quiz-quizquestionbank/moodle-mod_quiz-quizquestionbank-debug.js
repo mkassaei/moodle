@@ -81,11 +81,11 @@ Y.extend(POPUP, Y.Base, {
         this.dialogue.set('headerContent', e.currentTarget.getData(PARAMS.HEADER));
 
         this.addonpage = e.currentTarget.getData(PARAMS.PAGE);
-        var controlsDiv = this.dialogue.bodyNode.one('.modulespecificbuttonscontainer')
+        var controlsDiv = this.dialogue.bodyNode.one('.modulespecificbuttonscontainer');
         if (controlsDiv) {
             var hidden = controlsDiv.one('input[name=addonpage]');
             if (!hidden) {
-                hidden = controlsDiv.appendChild('<input type="hidden" name="addonpage">')
+                hidden = controlsDiv.appendChild('<input type="hidden" name="addonpage">');
             }
             hidden.set('value', this.addonpage);
         }
@@ -132,6 +132,7 @@ Y.extend(POPUP, Y.Base, {
         if (this.dialogue.visible) {
             Y.later(0, this.dialogue, this.dialogue.centerDialogue);
         }
+        M.question.qbankmanager.init();
     },
 
     load_failed: function() {
@@ -161,4 +162,4 @@ M.mod_quiz.quizquestionbank.init = function() {
 };
 
 
-}, '@VERSION@', {"requires": ["base", "event", "node", "io", "io-form", "yui-later"]});
+}, '@VERSION@', {"requires": ["base", "event", "node", "io", "io-form", "yui-later", "moodle-question-qbankmanager"]});

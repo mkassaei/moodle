@@ -6,7 +6,8 @@
             "node",
             "io",
             "io-form",
-            "yui-later"
+            "yui-later",
+            "moodle-question-qbankmanager"
         ]
     }
 }

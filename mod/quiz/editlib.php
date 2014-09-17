@@ -373,7 +373,7 @@ class quiz_question_bank_view extends core_question\bank\view {
         return $out;
     }
 
-    public function display($tabname, $page, $perpage, $cat,
+    public function xxxxdisplay($tabname, $page, $perpage, $cat,
             $recurse, $showhidden, $showquestiontext) {
         global $OUTPUT;
         if ($this->process_actions_needing_ui()) {
