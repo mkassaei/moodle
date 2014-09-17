@@ -28,6 +28,7 @@
 
 namespace mod_quiz;
 
+use core\plugininfo\theme;
 class structure {
     /** Constant to represent splitting two pages. */
     const SPLIT = 'split';
@@ -37,23 +38,23 @@ class structure {
     /** @var \quiz the quiz this is the structure of. */
     protected $quizobj = null;
 
-    /** @var stdClass[] the quiz_slots rows for this quiz. */
+    /**
+     * @var stdClass[] the questions in this quiz. Contains the row from the questions
+     * table, with the data from the quiz_slots table added, and also question_categories.contextid.
+     */
     protected $questions = array();
 
-    /** @var stdClass[] the quiz_slots rows for this quiz. */
+    /** @var stdClass[] quiz_slots.id => the quiz_slots rows for this quiz, agumented by sectionid. */
     protected $slots = array();
 
+    /** @var stdClass[] quiz_slots.slot => the quiz_slots rows for this quiz, agumented by sectionid. . */
+    protected $slotsinorder = array();
+
     /**
-     * @var stdClass[] will be the quiz_sections rows, once that table exists.
-     * For now contains one dummy section.
+     * @var stdClass[] currently a dummy. Holds data that will match the
+     * quiz_sections, once it exists.
      */
     protected $sections = array();
-
-    /** @var int[] slot number => section id, for the first slot in each section. */
-    protected $slottosectionids = array();
-
-    /** @var int[][] section number => slot ids, the slots in each section. */
-    protected $sectiontoslotids = array();
 
     /** @var int[] slot number => slot id. */
     protected $slottoslotids = array();
@@ -91,46 +92,71 @@ class structure {
     }
 
     /**
-     * @return stdClass Retrieve a quiz from the DB with the given id.
+     * @return boolean whether there are any questions in the quiz.
      */
-    public function load_quiz($quizid) {
-        global $DB;
-        return $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
-    }
-
     public function has_questions() {
         return !empty($this->questions);
     }
 
+    /**
+     * @return int the number of questions in the quiz.
+     */
     public function get_question_count() {
         return count($this->questions);
     }
 
+    /**
+     * Get the information about the question with this id.
+     * @param int $questionid The question id.
+     * @return \stdClass the data from the questions table, augmented with
+     * question_category.contextid, and the quiz_slots data for the question in this quiz.
+     */
     public function get_question_by_id($questionid) {
         return $this->questions[$questionid];
     }
 
+    /**
+     * @return int the course_modules.id for the quiz.
+     */
     public function get_cmid() {
         return $this->quizobj->get_cmid();
     }
 
+    /**
+     * @return int the quiz.id for the quiz.
+     */
     public function get_quizid() {
         return $this->quizobj->get_quizid();
     }
 
+    /**
+     * @return \stdClass the quiz settings row from the database.
+     */
     public function get_quiz() {
         return $this->quizobj->get_quiz();
     }
 
+    /**
+     * @return bool whether the question in the quiz are shuffled for each attempt.
+     */
     public function is_shuffled() {
         return $this->quizobj->get_quiz()->shufflequestions;
     }
 
+    /**
+     * Quizzes can only be repaginated if they have not been attempted, the
+     * questions are not shuffled, and there are two or more questions.
+     * @return bool whether this quiz can be repaginated.
+     */
     public function can_be_repaginated() {
         return !$this->is_shuffled() && $this->can_be_edited()
                 && $this->get_question_count() >= 2;
     }
 
+    /**
+     * Quizzes can only be edited if they have not been attempted.
+     * @return bool whether the quiz can be edited.
+     */
     public function can_be_edited() {
         if ($this->canbeedited === null) {
             $this->canbeedited = !quiz_has_attempts($this->quizobj->get_quizid());
@@ -138,6 +164,10 @@ class structure {
         return $this->canbeedited;
     }
 
+    /**
+     * @return int the number of questions that should be on each page of the
+     * quiz by default.
+     */
     public function get_questions_per_page() {
         return $this->quizobj->get_quiz()->questionsperpage;
     }
@@ -185,16 +215,14 @@ class structure {
 
     /**
      * Get a slot by it's id. Throws an exception if it is missing.
-     * @return stdClass the requested slot.
+     * @param int $slotid the slot id.
+     * @return stdClass the requested quiz_slots row.
      */
-    public function get_slot_by_id($slotid, $slots = array()) {
-        if (!count($slots)) {
-            $slots = $this->slots;
-        }
-        if (!array_key_exists($slotid, $slots)) {
+    public function get_slot_by_id($slotid) {
+        if (!array_key_exists($slotid, $this->slots)) {
             throw new \coding_exception('The \'slotid\' could not be found.');
         }
-        return $slots[$slotid];
+        return $this->slots[$slotid];
     }
 
     /**
@@ -204,49 +232,12 @@ class structure {
      */
     public function get_questions_in_section($sectionid) {
         $questions = array();
-        $slots = $this->get_quiz_slots();
-        $sectiontoslotids = $this->get_sections_and_slots();
-        if (!empty($sectiontoslotids[$sectionid])) {
-            foreach ($sectiontoslotids[$sectionid] as $slotid) {
-                $slot = $slots[$slotid];
-                $questionnumber = $slot->questionid;
-                $questions[] = $this->get_question_by_id($questionnumber);
+        foreach ($this->slotsinorder as $slot) {
+            if ($slot->sectionid == $sectionid) {
+                $questions[] = $this->questions[$slot->questionid];
             }
         }
         return $questions;
-    }
-
-    /**
-     * Get a slot by it's slot number. Throws an exception if it is missing.
-     * @return stdClass the requested slot.
-     */
-    public function get_slot_by_slot_number($slotnumber, $slots = array()) {
-        $slotnumber = strval($slotnumber);
-        if (!count($slots)) {
-            $slots = $this->slots;
-        }
-        foreach ($slots as $slot) {
-            if ($slot->slot !== $slotnumber) {
-                continue;
-            }
-
-            return $slot;
-        }
-
-        return null;
-    }
-
-    /**
-     * Get a slotid by it's slot number. Throws an exception if it is missing.
-     * @return stdClass the requested slot.
-     */
-    public function get_slot_id_by_slot_number($slotnumber, $slots = array()) {
-        $slot = $this->get_slot_by_slot_number($slotnumber, $slots);
-        if (!$slot) {
-            return null;
-        }
-
-        return $slot->id;
     }
 
     /**
@@ -257,17 +248,72 @@ class structure {
     }
 
     /**
-     * @return int[][] the slots in each section.
+     * @return array of strings. Warnings to show at the top of the edit page.
      */
-    public function get_sections_and_slots() {
-        return $this->sectiontoslotids;
+    public function get_edit_page_warnings() {
+        $warnings = array();
+
+        if (quiz_has_attempts($this->quizobj->get_quizid())) {
+            $reviewlink = quiz_attempt_summary_link_to_reports($this->quizobj->get_quiz(),
+                    $this->quizobj->get_cm(), $this->quizobj->get_context());
+            $warnings[] = get_string('cannoteditafterattempts', 'quiz', $reviewlink);
+        }
+
+        if ($this->is_shuffled()) {
+            $updateurl = new moodle_url('/course/mod.php',
+                    array('return' => 'true', 'update' => $this->quizobj->get_cmid(), 'sesskey' => sesskey()));
+            $updatelink = '<a href="'.$updateurl->out().'">' . get_string('updatethis', '',
+                    get_string('modulename', 'quiz')) . '</a>';
+            $warnings[] = get_string('shufflequestionsselected', 'quiz', $updatelink);
+        }
+
+        return $warnings;
     }
 
-    public function get_quiz_section_heading($section) {
-        if (!property_exists($section, 'heading')) {
-            return '';
+    /**
+     * Get the date information about the current state of the quiz.
+     * @return array of two strings. First a short summary, then a longer
+     * explanation of the current state, e.g. for a tool-tip.
+     */
+    public function get_dates_summary() {
+        $timenow = time();
+        $quiz = $this->quizobj->get_quiz();
+
+        // Exact open and close dates for the tool-tip.
+        $dates = array();
+        if ($quiz->timeopen > 0) {
+            if ($timenow > $quiz->timeopen) {
+                $dates[] = get_string('quizopenedon', 'quiz', userdate($quiz->timeopen));
+            } else {
+                $dates[] = get_string('quizwillopen', 'quiz', userdate($quiz->timeopen));
+            }
         }
-        return $section->heading;
+        if ($quiz->timeclose > 0) {
+            if ($timenow > $quiz->timeclose) {
+                $dates[] = get_string('quizclosed', 'quiz', userdate($quiz->timeclose));
+            } else {
+                $dates[] = get_string('quizcloseson', 'quiz', userdate($quiz->timeclose));
+            }
+        }
+        if (empty($dates)) {
+            $dates[] = get_string('alwaysavailable', 'quiz');
+        }
+        $explanation = implode(', ', $dates);
+
+        // Brief summary on the page.
+        if ($timenow < $quiz->timeopen) {
+            $currentstatus = get_string('quizisclosedwillopen', 'quiz',
+                    userdate($quiz->timeopen, get_string('strftimedatetimeshort', 'langconfig')));
+        } else if ($quiz->timeclose && $timenow <= $quiz->timeclose) {
+            $currentstatus = get_string('quizisopenwillclose', 'quiz',
+                    userdate($quiz->timeclose, get_string('strftimedatetimeshort', 'langconfig')));
+        } else if ($quiz->timeclose && $timenow > $quiz->timeclose) {
+            $currentstatus = get_string('quizisclosed', 'quiz');
+        } else {
+            $currentstatus = get_string('quizisopen', 'quiz');
+        }
+
+        return array($currentstatus, $explanation);
     }
 
     /**
@@ -278,55 +324,55 @@ class structure {
         global $DB;
 
         $this->questions = $DB->get_records_sql(
-                "SELECT q.*, qc.contextid, slot.id AS slotid, slot.maxmark, slot.slot, slot.page
+                "SELECT q.*, qc.contextid, slot.id AS slotid, slot.slot, slot.page, slot.maxmark
                    FROM {question} q
                    JOIN {question_categories} qc ON qc.id = q.category
                    JOIN {quiz_slots} slot ON slot.questionid = q.id
-                  WHERE slot.quizid = ?", array($quiz->id));
+                  WHERE slot.quizid = ?
+               ORDER BY slot.slot", array($quiz->id));
 
-        $this->slots = $DB->get_records('quiz_slots',
-                array('quizid' => $quiz->id), 'slot');
+        $this->slots = array();
         $this->slotsinorder = array();
-        foreach ($this->slots as $slot) {
+        foreach ($this->questions as $question) {
+            $slot = new \stdClass();
+            $slot->id = $question->slotid;
+            $slot->slot = $question->slot;
+            $slot->quizid = $quiz->id;
+            $slot->page = $question->page;
+            $slot->questionid = $question->id;
+            $slot->maxmark = $question->maxmark;
+
+            $this->slots[$slot->id] = $slot;
             $this->slotsinorder[$slot->slot] = $slot;
         }
 
-        $this->sections = array(
-            1 => (object) array('id' => 1, 'quizid' => $quiz->id,
-                    'heading' => 'Section 1', 'firstslot' => 1, 'shuffle' => false)
-        );
+        $section = new \stdClass();
+        $section->id = 1;
+        $section->quizid = $quiz->id;
+        $section->heading = '';
+        $section->firstslot = 1;
+        $section->shuffle = false;
+        $this->sections = array(1 => $section);
 
-        $this->populate_slot_to_sectionids($quiz);
         $this->populate_slots_with_sectionids($quiz);
         $this->populate_missing_questions();
         $this->populate_question_numbers();
     }
 
-    public function populate_slot_to_sectionids($quiz) {
-        foreach ($this->sections as $section) {
-            $this->slottosectionids[$section->firstslot] = $section->id;
-        }
-    }
-
-    public function populate_slots_with_sectionids($quiz) {
-        $slots = $this->get_quiz_slots($quiz);
-        $sectionid = 0;
-        $sectiontoslotids = array();
-        $currentslottosectionid = 1;
-        foreach ($slots as $slot) {
-            if (array_key_exists($slot->slot, $this->slottosectionids)) {
-                $sectionid = $this->slottosectionids[$slot->slot];
+    public function populate_slots_with_sectionids() {
+        $nextsection = reset($this->sections);
+        foreach ($this->slotsinorder as $slot) {
+            if ($slot->slot == $nextsection->firstslot) {
+                $currentsectionid = $nextsection->id;
+                $nextsection = next($this->sections);
+                if (!$nextsection) {
+                    $nextsection = new \stdClass();
+                    $nextsection->firstslot = -1;
+                }
             }
 
-            $slot->sectionid = $sectionid;
-            if (!array_key_exists($slot->sectionid, $sectiontoslotids)) {
-                $sectiontoslotids[$slot->sectionid] = array();
-            }
-
-            $sectiontoslotids[$slot->sectionid][] = $slot->id;
+            $slot->sectionid = $currentsectionid;
         }
-
-        $this->sectiontoslotids = $sectiontoslotids;
     }
 
     public function create_slot_to_slotids($slots) {
@@ -475,6 +521,7 @@ class structure {
 
         return $slots;
     }
+
     /**
      * Refresh page numbering of quiz slots
      * @param object $quiz the quiz object.
@@ -604,11 +651,11 @@ class structure {
         return $slots;
     }
 
+    /**
+     * @return stdClass get the last slot in the quiz.
+     */
     public function get_last_slot() {
-        $slots = $this->get_quiz_slots();
-        $keys = array_keys($slots);
-        $id = array_pop($keys);
-        return $slots[$id];
+        return end($this->slotsinorder);
     }
 
     public function set_quiz_slots(array $slots) {
@@ -630,66 +677,5 @@ class structure {
             }
             return $slot;
         }
-    }
-
-    public function get_edit_page_warnings() {
-        $warnings = array();
-
-        if (quiz_has_attempts($this->quizobj->get_quizid())) {
-            $reviewlink = quiz_attempt_summary_link_to_reports($this->quizobj->get_quiz(),
-                    $this->quizobj->get_cm(), $this->quizobj->get_context());
-            $warnings[] = get_string('cannoteditafterattempts', 'quiz', $reviewlink);
-        }
-
-        if ($this->is_shuffled()) {
-            $updateurl = new moodle_url('/course/mod.php',
-                    array('return' => 'true', 'update' => $this->quizobj->get_cmid(), 'sesskey' => sesskey()));
-            $updatelink = '<a href="'.$updateurl->out().'">' . get_string('updatethis', '',
-                    get_string('modulename', 'quiz')) . '</a>';
-            $warnings[] = get_string('shufflequestionsselected', 'quiz', $updatelink);
-        }
-
-        return $warnings;
-    }
-
-    public function get_dates_summary() {
-        $timenow = time();
-        $quiz = $this->quizobj->get_quiz();
-
-        // Exact open and close dates for the tool-tip.
-        $dates = array();
-        if ($quiz->timeopen > 0) {
-            if ($timenow > $quiz->timeopen) {
-                $dates[] = get_string('quizopenedon', 'quiz', userdate($quiz->timeopen));
-            } else {
-                $dates[] = get_string('quizwillopen', 'quiz', userdate($quiz->timeopen));
-            }
-        }
-        if ($quiz->timeclose > 0) {
-            if ($timenow > $quiz->timeclose) {
-                $dates[] = get_string('quizclosed', 'quiz', userdate($quiz->timeclose));
-            } else {
-                $dates[] = get_string('quizcloseson', 'quiz', userdate($quiz->timeclose));
-            }
-        }
-        if (empty($dates)) {
-            $dates[] = get_string('alwaysavailable', 'quiz');
-        }
-        $explanation = implode(', ', $dates);
-
-        // Brief summary on the page.
-        if ($timenow < $quiz->timeopen) {
-            $currentstatus = get_string('quizisclosedwillopen', 'quiz',
-                    userdate($quiz->timeopen, get_string('strftimedatetimeshort', 'langconfig')));
-        } else if ($quiz->timeclose && $timenow <= $quiz->timeclose) {
-            $currentstatus = get_string('quizisopenwillclose', 'quiz',
-                    userdate($quiz->timeclose, get_string('strftimedatetimeshort', 'langconfig')));
-        } else if ($quiz->timeclose && $timenow > $quiz->timeclose) {
-            $currentstatus = get_string('quizisclosed', 'quiz');
-        } else {
-            $currentstatus = get_string('quizisopen', 'quiz');
-        }
-
-        return array($currentstatus, $explanation);
     }
 }

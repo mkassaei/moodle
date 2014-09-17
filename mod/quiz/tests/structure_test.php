@@ -90,19 +90,9 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         list($quiz, $cm, $course) = $this->prepare_quiz_data();
         $structure = \mod_quiz\structure::create_for($quiz);
 
-        // Append sections to the quiz.
-        $testsections = $this->get_dummy_quiz_sections($quiz);
-
         // Are the correct sections returned?
         $sections = $structure->get_quiz_sections();
-        $this->assertCount(count($testsections), $sections);
-        $this->assertEquals($testsections, $sections);
-
-        // When no sections exist or sections property is not set.
-        $structure->set_quiz_sections(array());
-        $sections = $structure->get_quiz_sections();
-        $this->assertInternalType('array', $sections);
-        $this->assertCount(0, $sections);
+        $this->assertCount(count(1), $sections);
     }
 
     public function test_move_slot() {
@@ -459,12 +449,12 @@ class mod_quiz_structure_testcase extends advanced_testcase {
     /*
      * Refresh the slot and page numbers of a given array of slots.
      */
-    private function refresh_slots_and_pages ($quiz, $structure, $slots) {
+    private function refresh_slots_and_pages($quiz, $structure, $slots) {
         $structure->refresh_slot_numbers($quiz, $slots);
         $structure->refresh_page_numbers($quiz, $slots);
     }
 
-    private function update_slot_page_and_slot ($slots, $slotnumber, $pagenumber, $slot) {
+    private function update_slot_page_and_slot($slots, $slotnumber, $pagenumber, $slot) {
         $currentslot = $slots[$this->get_slot_id_by_slot_number($slotnumber, $slots)];
         $currentslot->page = $pagenumber;
         $currentslot->slot = $slot;
@@ -547,8 +537,6 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         }
 
         // Get updated slot ids.
-        $savedslots = $DB->get_records($table);
-
         $structure->set_quiz_slots($slots);
         $structure->set_quiz_slottoslotids($structure->create_slot_to_slotids($slots));
     }
@@ -603,13 +591,9 @@ class mod_quiz_structure_testcase extends advanced_testcase {
             $record->sectionid = 1;
         }
 
-        $this->set_default_slots($records);
+        $this->defaultslots = $records;
 
         return $this->get_default_slots();
-    }
-
-    public function set_default_slots($slots) {
-        $this->defaultslots = $slots;
     }
 
     public function get_default_slots() {
@@ -618,38 +602,5 @@ class mod_quiz_structure_testcase extends advanced_testcase {
             $slots[$slot->id] = clone $slot;
         }
         return $slots;
-    }
-
-    /**
-     * Populate quiz sections with dummy data while the database is waiting
-     * to be changed
-     * @param object $quiz
-     * @return array
-     */
-    public function get_dummy_quiz_sections($quiz) {
-        // TODO MDL-43089: When DB structure in place, get these from DB.
-        $data = array();
-        // Rows are in the format array(id, quizid, firstslot, heading, shuffle).
-        // Match \mod_quiz\structure::populate_quiz_sections().
-        $data[] = array(1, $quiz->id, 1, 'Section 1', false);
-        $records = array();
-
-        // Temp: create number of sections.
-        foreach ($data as $row) {
-            $record = new \stdClass();
-            $record->id = $row[0];
-            $record->quizid = $row[1];
-            $record->firstslot = $row[2];
-            $record->heading = $row[3];
-            $record->shuffle = $row[4];
-            $records[$record->id] = $record;
-        }
-
-        return $records;
-    }
-
-    public function empty_database_table($table) {
-        global $DB;
-        $DB->delete_records($table);
     }
 }
