@@ -20,7 +20,7 @@ Feature: Edit quiz page
     When I log in as "teacher1"
     And I follow "Course 1"
     And I follow "Quiz 1"
-    And I follow "Edit quiz"
+    And I navigate to "Edit quiz" node in "Quiz administration"
     Then I should see "Editing quiz: Quiz 1"
 
   @javascript @addmenu_s1
@@ -77,10 +77,9 @@ Feature: Edit quiz page
     And I should see "Essay 04 new"
 
     # Repaginate as two questions per page.
-    And I should see "P 1"
+    When I should see "P 1"
     And I should not see "P 2"
     And I press "Repaginate"
-    When I press "Repaginate"
     Then I should see "Repaginate with"
     And I set the field "menuquestionsperpage" to "2"
     When I press "Go"
