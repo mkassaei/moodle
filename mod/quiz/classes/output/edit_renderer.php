@@ -188,10 +188,10 @@ class edit_renderer extends \plugin_renderer_base {
         $header = html_writer::tag('span', get_string('repaginatecommand', 'quiz'), array('class' => 'repaginatecommand'));
         $form = $this->repaginate_form($structure, $pageurl);
         $containeroptions = array(
-                'class' => 'rpcontainerclass',
-                'cmid' => $structure->get_cmid(),
+                'class'  => 'rpcontainerclass',
+                'cmid'   => $structure->get_cmid(),
                 'header' => $header,
-                'form' => $form,
+                'form'   => $form,
         );
 
         $buttonoptions = array(
@@ -217,16 +217,10 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function repaginate_form(structure $structure, \moodle_url $pageurl) {
-        $perpage = array();
-        $perpage[0] = get_string('allinone', 'quiz');
-        for ($i = 1; $i <= 50; ++$i) {
-            $perpage[$i] = $i;
-        }
-
         $hiddenurl = clone($pageurl);
         $hiddenurl->param('sesskey', sesskey());
 
-        $select = html_writer::select($perpage, 'questionsperpage',
+        $select = html_writer::select(quiz_questions_per_page_options(), 'questionsperpage',
                 $structure->get_questions_per_page(), false);
 
         $buttonattributes = array('type' => 'submit', 'name' => 'repaginate', 'value' => get_string('go'));

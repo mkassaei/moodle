@@ -151,17 +151,9 @@ class mod_quiz_mod_form extends moodleform_mod {
         $mform->setAdvanced('shufflequestions', $quizconfig->shufflequestions_adv);
         $mform->setDefault('shufflequestions', $quizconfig->shufflequestions);
 
-        // Questions per page.
-        $pageoptions = array();
-        $pageoptions[0] = get_string('neverallononepage', 'quiz');
-        $pageoptions[1] = get_string('everyquestion', 'quiz');
-        for ($i = 2; $i <= QUIZ_MAX_QPP_OPTION; ++$i) {
-            $pageoptions[$i] = get_string('everynquestions', 'quiz', $i);
-        }
-
         $pagegroup = array();
         $pagegroup[] = $mform->createElement('select', 'questionsperpage',
-                get_string('newpage', 'quiz'), $pageoptions, array('id' => 'id_questionsperpage'));
+                get_string('newpage', 'quiz'), quiz_questions_per_page_options(), array('id' => 'id_questionsperpage'));
         $mform->setDefault('questionsperpage', $quizconfig->questionsperpage);
 
         if (!empty($this->_cm)) {

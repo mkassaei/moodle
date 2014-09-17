@@ -1120,6 +1120,20 @@ function quiz_get_user_image_options() {
 }
 
 /**
+ * Get the choices to offer for the 'Questions per page' option.
+ * @return array int => string.
+ */
+function quiz_questions_per_page_options() {
+    $pageoptions = array();
+    $pageoptions[0] = get_string('neverallononepage', 'quiz');
+    $pageoptions[1] = get_string('everyquestion', 'quiz');
+    for ($i = 2; $i <= QUIZ_MAX_QPP_OPTION; ++$i) {
+        $pageoptions[$i] = get_string('everynquestions', 'quiz', $i);
+    }
+    return $pageoptions;
+}
+
+/**
  * Get the human-readable name for a quiz attempt state.
  * @param string $state one of the state constants like {@link quiz_attempt::IN_PROGRESS}.
  * @return string The lang string to describe that state.
