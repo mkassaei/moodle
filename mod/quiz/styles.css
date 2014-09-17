@@ -972,9 +972,9 @@ table#categoryquestions td,
 #page-mod-quiz-edit .slotnumber{
     background-color: #D3D3D3;
     text-align: center;
-    margin-left: 0.5em;
     margin-right: 0.5em;
-    padding: 2px 5px 2px 5px;
+    min-width: 2em;
+    display: inline-block;
 }
 #page-mod-quiz-edit .pagenumber{
     text-align: left;
