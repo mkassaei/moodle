@@ -973,6 +973,7 @@ table#categoryquestions td,
     background-color: #D3D3D3;
     text-align: center;
     margin-right: 0.5em;
+    margin-top: 0.2em;
     min-width: 2em;
     display: inline-block;
 }
@@ -1069,8 +1070,8 @@ table#categoryquestions td,
 
 .path-mod-quiz ul.slots li.section li.activity .instancemaxmarkcontainer {
     background: white;
-    padding: .3em;
-    margin: .5em;
+    padding: .2em;
+    margin: .4em;
 }
 
 .path-mod-quiz ul.slots li.section li.activity .edit_icon,
@@ -1083,7 +1084,9 @@ table#categoryquestions td,
 .path-mod-quiz ul.slots li.section li.activity .activityinstance {
     padding-right: 5.5em;
     display: block;
+    min-height: 1.7em;
 }
+
 .quizsavegradesform label[for=inputmaxgrade],
 .path-mod-quiz ul.slots .activityinstance form {
     display: inline;
@@ -1121,4 +1124,8 @@ table#categoryquestions td,
 
 #page-mod-quiz-edit .statusbar {
     margin: 0.6em 0.4em;
+}
+
+.section .activity .actions {
+    padding-top: .2em;
 }
