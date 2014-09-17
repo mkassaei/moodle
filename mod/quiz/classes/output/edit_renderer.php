@@ -154,23 +154,23 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function maximum_grade_input($quiz, \moodle_url $pageurl) {
-        $o = '';
-        $o .= html_writer::start_tag('div', array('class' => 'maxgrade'));
-        $o .= html_writer::start_tag('form', array('method' => 'post', 'action' => 'edit.php',
+        $output = '';
+        $output .= html_writer::start_tag('div', array('class' => 'maxgrade'));
+        $output .= html_writer::start_tag('form', array('method' => 'post', 'action' => 'edit.php',
                 'class' => 'quizsavegradesform'));
-        $o .= html_writer::start_tag('fieldset', array('class' => 'invisiblefieldset'));
-        $o .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-        $o .= html_writer::input_hidden_params($pageurl);
+        $output .= html_writer::start_tag('fieldset', array('class' => 'invisiblefieldset'));
+        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+        $output .= html_writer::input_hidden_params($pageurl);
         $a = html_writer::empty_tag('input', array('type' => 'text', 'id' => 'inputmaxgrade',
                 'name' => 'maxgrade', 'size' => ($quiz->decimalpoints + 2),
                 'value' => quiz_format_grade($quiz, $quiz->grade)));
-        $o .= html_writer::tag('label', get_string('maximumgradex', '', $a),
+        $output .= html_writer::tag('label', get_string('maximumgradex', '', $a),
                 array('for' => 'inputmaxgrade'));
-        $o .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'savechanges', 'value' => get_string('save', 'quiz')));
-        $o .= html_writer::end_tag('fieldset');
-        $o .= html_writer::end_tag('form');
-        $o .= html_writer::end_tag('div');
-        return $o;
+        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'savechanges', 'value' => get_string('save', 'quiz')));
+        $output .= html_writer::end_tag('fieldset');
+        $output .= html_writer::end_tag('form');
+        $output .= html_writer::end_tag('div');
+        return $output;
     }
 
     /**
@@ -271,22 +271,22 @@ class edit_renderer extends \plugin_renderer_base {
      */
     protected function start_section($section) {
 
-        $o = '';
+        $output = '';
         $currenttext = '';
         $sectionstyle = '';
 
-        $o .= html_writer::start_tag('li', array('id' => 'section-'.$section->id,
+        $output .= html_writer::start_tag('li', array('id' => 'section-'.$section->id,
             'class' => 'section main clearfix'.$sectionstyle, 'role' => 'region',
             'aria-label' => $section->heading));
 
         $leftcontent = $this->section_left_content($section);
-        $o .= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
+        $output .= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
 
         $rightcontent = $this->section_right_content($section);
-        $o .= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
-        $o .= html_writer::start_tag('div', array('class' => 'content'));
+        $output .= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
+        $output .= html_writer::start_tag('div', array('class' => 'content'));
 
-        return $o;
+        return $output;
     }
 
     /**
@@ -295,10 +295,10 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function end_section() {
-        $o = html_writer::end_tag('div');
-        $o .= html_writer::end_tag('li');
+        $output = html_writer::end_tag('div');
+        $output .= html_writer::end_tag('li');
 
-        return $o;
+        return $output;
     }
 
     /**
@@ -308,9 +308,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function section_left_content($section) {
-        $o = $this->output->spacer();
-
-        return $o;
+        return $this->output->spacer();
     }
 
     /**
@@ -320,8 +318,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function section_right_content($section) {
-        $o = $this->output->spacer();
-        return $o;
+        return $this->output->spacer();
     }
 
     /**
