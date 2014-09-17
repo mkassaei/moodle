@@ -125,7 +125,11 @@ class edit_renderer extends \plugin_renderer_base {
             return '';
         }
 
-        return $this->box('<p>' . implode('</p><p>', $warnings) . '</p>', 'statusdisplay');
+        $output = array();
+        foreach ($warnings as $warning) {
+            $output[] = \html_writer::tag('p', $warning);
+        }
+        return $this->box(implode("\n", $output), 'statusdisplay');
     }
 
     /**
@@ -181,26 +185,29 @@ class edit_renderer extends \plugin_renderer_base {
      */
     protected function repaginate_button(structure $structure, \moodle_url $pageurl) {
 
-        if ($structure->can_be_repaginated()) {
-            $repaginatingdisabledhtml = '';
-        } else {
-            $repaginatingdisabledhtml = 'disabled="disabled"';
-        }
-
         $header = html_writer::tag('span', get_string('repaginatecommand', 'quiz'), array('class' => 'repaginatecommand'));
         $form = $this->repaginate_form($structure, $pageurl);
-        $options = array('cmid' => $structure->get_cmid(), 'header' => $header, 'form' => $form);
+        $containeroptions = array(
+                'class' => 'rpcontainerclass',
+                'cmid' => $structure->get_cmid(),
+                'header' => $header,
+                'form' => $form,
+        );
 
-        $rpbutton = '<input id="repaginatecommand"' . $repaginatingdisabledhtml .
-        ' type="submit" name="repaginate" value="'. get_string('repaginatecommand', 'quiz') . '"/>';
-        $rpcontainer = html_writer::tag('div', $rpbutton,
-                array_merge(array('class' => 'rpcontainerclass'), $options));
-
-        if (!$repaginatingdisabledhtml) {
+        $buttonoptions = array(
+            'type'  => 'submit',
+            'name'  => 'repaginate',
+            'id'    => 'repaginatecommand',
+            'value' => get_string('repaginatecommand', 'quiz'),
+        );
+        if (!$structure->can_be_repaginated()) {
+            $buttonoptions['disabled'] = 'disabled';
+        } else {
             $this->page->requires->yui_module('moodle-mod_quiz-repaginate', 'M.mod_quiz.repaginate.init');
         }
 
-        return $rpcontainer;
+        return html_writer::tag('div',
+                html_writer::empty_tag('input', $buttonoptions), $containeroptions);
     }
 
     /**
@@ -216,21 +223,19 @@ class edit_renderer extends \plugin_renderer_base {
             $perpage[$i] = $i;
         }
 
+        $hiddenurl = clone($pageurl);
+        $hiddenurl->param('sesskey', sesskey());
+
         $select = html_writer::select($perpage, 'questionsperpage',
                 $structure->get_questions_per_page(), false);
 
-        $gostring = get_string('go');
+        $buttonattributes = array('type' => 'submit', 'name' => 'repaginate', 'value' => get_string('go'));
 
-        $formcontent = '<div class="bd">' .
-                '<form action="edit.php" method="post">' .
-                '<fieldset class="invisiblefieldset">' .
-                html_writer::input_hidden_params($pageurl) .
-                '<input type="hidden" name="sesskey" value="'.sesskey().'" />' .
-                '<input type="hidden" name="repaginate" value="1" />' .
-                get_string('repaginate', 'quiz', $select) .
-                '<div class="quizquestionlistcontrols">' .
-                ' <input type="submit" name="repaginate" value="'. get_string('go') . '"  />' .
-                '</div></fieldset></form></div>';
+        $formcontent = html_writer::tag('form', html_writer::div(
+                    html_writer::input_hidden_params($hiddenurl) .
+                    get_string('repaginate', 'quiz', $select) .
+                    html_writer::empty_tag('input', $buttonattributes)
+                ), array('action' => 'edit.php', 'method' => 'post'));
 
         return html_writer::tag('div', $formcontent, array('id' => 'repaginatedialog'));
     }
