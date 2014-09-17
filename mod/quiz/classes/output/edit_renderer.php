@@ -64,18 +64,18 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= $this->repaginate_button($structure, $pageurl);
         $output .= $this->total_marks($quizobj->get_quiz());
 
-        // If the quiz is empty, display an add menu.
-        if (!$structure->has_questions()) {
-            $output .= html_writer::tag('span', $this->add_menu_actions($structure, 0,
-                    $pageurl, $contexts, $pagevars), array('class' => 'add-menu-outer'));
-        }
-
         // Show the questions organised into sections and pages.
         $output .= $this->start_section_list();
 
-        foreach ($structure->get_quiz_sections() as $section) {
+        $sections = $structure->get_quiz_sections();
+        $lastsection = end($sections);
+        foreach ($sections as $section) {
             $output .= $this->start_section($section);
             $output .= $this->questions_in_section($structure, $section, $contexts, $pagevars, $pageurl);
+            if ($section === $lastsection) {
+                $output .= html_writer::tag('span', $this->add_menu_actions($structure, 0,
+                        $pageurl, $contexts, $pagevars), array('class' => 'add-menu-outer'));
+            }
             $output .= $this->end_section();
         }
 
