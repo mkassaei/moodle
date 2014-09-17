@@ -50,7 +50,6 @@ class edit_renderer extends \plugin_renderer_base {
      */
     public function edit_page(\quiz $quizobj, structure $structure,
             \question_edit_contexts $contexts, \moodle_url $pageurl, array $pagevars) {
-        global $DB;
         $output = '';
 
         // Page title.
@@ -82,39 +81,30 @@ class edit_renderer extends \plugin_renderer_base {
 
         $output .= $this->end_section_list();
 
-        // Add all the required JavaScript, and pop-up HTML.
-        $context = $quizobj->get_context();
-        $canaddfromqbank = has_capability('moodle/question:useall', $context);
-        $qbankoptions = array('class' => 'questionbank', 'cmid' => $structure->get_cmid());
-        if ($canaddfromqbank) {
-            $this->page->requires->yui_module('moodle-mod_quiz-quizquestionbank', 'M.mod_quiz.quizquestionbank.init', $qbankoptions);
-        }
-
-        // Add the form for random question.
-        $canaddrandom = has_capability('moodle/question:useall', $context);
-        if ($canaddrandom) {
-            $this->page->requires->yui_module('moodle-mod_quiz-randomquestion', 'M.mod_quiz.randomquestion.init');
-        }
-
-        $qtypes = \question_bank::get_all_qtypes();
-        $qtypenamesused = array();
-        foreach ($qtypes as $qtypename => $qtypedata) {
-            $qtypenamesused[$qtypename] = $qtypename;
-        }
-        // Include course AJAX.
-        quiz_edit_include_ajax($quizobj->get_course(), $quizobj->get_quiz(), $qtypenamesused);
+        // Inialise the JavaScript.
+        $this->initialise_editing_javascript($quizobj->get_course(), $quizobj->get_quiz());
 
         // Include course format js module.
         $this->page->requires->js('/mod/quiz/yui/edit.js');
 
-        $output .= $this->question_chooser();
-
-        // Call random question form.
+        // Include the contents of any other popups required.
         if ($structure->can_be_edited()) {
-            $output .= '<div class="mod_quiz_edit_forms">';
-            $output .= $this->question_bank_loading();
-            $output .= $this->random_question_form($pageurl, $contexts, $pagevars);
-            $output .= '</div>';
+            $popups = '';
+
+            $popups .= $this->question_bank_loading();
+            $this->page->requires->yui_module('moodle-mod_quiz-quizquestionbank',
+                    'M.mod_quiz.quizquestionbank.init',
+                    array('class' => 'questionbank', 'cmid' => $structure->get_cmid()));
+
+            $popups .= $this->random_question_form($pageurl, $contexts, $pagevars);
+            $this->page->requires->yui_module('moodle-mod_quiz-randomquestion',
+                    'M.mod_quiz.randomquestion.init');
+
+            $output .= html_writer::div($popups, 'mod_quiz_edit_forms');
+
+            // Include the question chooser.
+            $output .= $this->question_chooser();
+            $this->page->requires->yui_module('moodle-mod_quiz-questionchooser', 'M.mod_quiz.init_questionchooser');
         }
 
         return $output;
@@ -810,6 +800,91 @@ class edit_renderer extends \plugin_renderer_base {
                 'cmid' => $thispageurl->param('cmid'),
         ));
         return html_writer::tag('div', $randomform->render(), array('class' => 'randomquestionformforpopup'));
+    }
+
+    /**
+     * Initialise the JavaScript for the general editing. (JavaScript for popups
+     * is handled with the specific code for those.)
+     *
+     * @param stdClass $course the course settings from the database.
+     * @param stdClass $quiz the quiz settings from the database.
+     */
+    protected function initialise_editing_javascript($course, $quiz) {
+
+        $config = new \stdClass();
+        $config->resourceurl = '/mod/quiz/rest.php';
+        $config->sectionurl = '/mod/quiz/rest.php';
+        $config->pageparams = array();
+        $config->questiondecimalpoints = $quiz->questiondecimalpoints;
+
+        // Include toolboxes.
+        $this->page->requires->yui_module('moodle-mod_quiz-toolboxes',
+                'M.mod_quiz.init_resource_toolbox',
+                array(array(
+                        'courseid' => $course->id,
+                        'quizid' => $quiz->id,
+                        'ajaxurl' => $config->resourceurl,
+                        'config' => $config,
+                ))
+        );
+        $this->page->requires->yui_module('moodle-mod_quiz-toolboxes',
+                'M.mod_quiz.init_section_toolbox',
+                array(array(
+                        'courseid' => $course->id,
+                        'quizid' => $quiz->id,
+                        'format' => $course->format,
+                        'ajaxurl' => $config->sectionurl,
+                        'config' => $config,
+                ))
+        );
+
+        // Include course dragdrop.
+        $this->page->requires->yui_module('moodle-mod_quiz-dragdrop', 'M.mod_quiz.init_section_dragdrop',
+                array(array(
+                        'courseid' => $course->id,
+                        'quizid' => $quiz->id,
+                        'ajaxurl' => $config->sectionurl,
+                        'config' => $config,
+                )), null, true);
+
+        $this->page->requires->yui_module('moodle-mod_quiz-dragdrop', 'M.mod_quiz.init_resource_dragdrop',
+                array(array(
+                        'courseid' => $course->id,
+                        'quizid' => $quiz->id,
+                        'ajaxurl' => $config->resourceurl,
+                        'config' => $config,
+                )), null, true);
+
+        // Require various strings for the command toolbox.
+        $this->page->requires->strings_for_js(array(
+                'moveleft',
+                'deletechecktype',
+                'deletechecktypename',
+                'edittitle',
+                'edittitleinstructions',
+                'show',
+                'hide',
+                'clicktochangeinbrackets',
+                'markthistopic',
+                'markedthistopic',
+                'move',
+                'movesection',
+                'movecontent',
+                'tocontent',
+                'emptydragdropregion'
+        ), 'moodle');
+
+        $this->page->requires->strings_for_js(array(
+                'confirmremovequestion',
+                'dragtoafterquestion',
+                'dragtostartofpage',
+        ), 'quiz');
+
+        foreach (\question_bank::get_all_qtypes() as $qtype => $notused) {
+            $this->page->requires->string_for_js('pluginname', 'qtype_' . $qtype);
+        }
+
+        return true;
     }
 
     /**
