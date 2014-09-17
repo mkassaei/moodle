@@ -23,35 +23,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 define('AJAX_SCRIPT', true);
 
 
 require_once('../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/editlib.php');
 
-
 list($thispageurl, $contexts, $cmid, $cm, $quiz, $pagevars) =
         question_edit_setup('editq', '/mod/quiz/edit.php', true);
 
-$defaultcategoryobj = question_make_default_categories($contexts->all());
-$defaultcategory = $defaultcategoryobj->id . ',' . $defaultcategoryobj->contextid;
-
-$quizhasattempts = quiz_has_attempts($quiz->id);
-
 // Get the course object and related bits.
 $course = $DB->get_record('course', array('id' => $quiz->course), '*', MUST_EXIST);
-
-$questionbank = new quiz_question_bank_view($contexts, $thispageurl, $course, $cm, $quiz);
-$questionbank->set_quiz_has_attempts($quizhasattempts);
-
-// You need mod/quiz:manage in addition to question capabilities to access this page.
 require_capability('mod/quiz:manage', $contexts->lowest());
 
-$output = $PAGE->get_renderer('mod_quiz', 'edit');
+// Create quiz question bank view.
+$questionbank = new quiz_question_bank_view($contexts, $thispageurl, $course, $cm, $quiz);
+$questionbank->set_quiz_has_attempts(quiz_has_attempts($quiz->id));
 
-// Course wrapper start.
-$contents = $output->get_questionbank_contents($thispageurl, $contexts, $pagevars, $course, $cm, $quiz);
+// Output.
+$output = $PAGE->get_renderer('mod_quiz', 'edit');
+$contents = $output->question_bank_contents($questionbank, $pagevars);
 echo json_encode(array(
     'status'   => 'OK',
     'contents' => $contents,

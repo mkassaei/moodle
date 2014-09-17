@@ -159,7 +159,7 @@ class edit_renderer extends \plugin_renderer_base {
      */
     public function maximum_grade_input($quiz, \moodle_url $pageurl) {
         $output = '';
-        $output .= html_writer::start_tag('div', array('class' => 'maxgrade'));
+        $output .= html_writer::start_div('maxgrade');
         $output .= html_writer::start_tag('form', array('method' => 'post', 'action' => 'edit.php',
                 'class' => 'quizsavegradesform'));
         $output .= html_writer::start_tag('fieldset', array('class' => 'invisiblefieldset'));
@@ -237,7 +237,7 @@ class edit_renderer extends \plugin_renderer_base {
                     html_writer::empty_tag('input', $buttonattributes)
                 ), array('action' => 'edit.php', 'method' => 'post'));
 
-        return html_writer::tag('div', $formcontent, array('id' => 'repaginatedialog'));
+        return html_writer::div($formcontent, '', array('id' => 'repaginatedialog'));
     }
 
     /**
@@ -285,11 +285,11 @@ class edit_renderer extends \plugin_renderer_base {
             'aria-label' => $section->heading));
 
         $leftcontent = $this->section_left_content($section);
-        $output .= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
+        $output .= html_writer::div($leftcontent, 'left side');
 
         $rightcontent = $this->section_right_content($section);
-        $output .= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
-        $output .= html_writer::start_tag('div', array('class' => 'content'));
+        $output .= html_writer::div($rightcontent, 'right side');
+        $output .= html_writer::start_div('content');
 
         return $output;
     }
@@ -548,7 +548,7 @@ class edit_renderer extends \plugin_renderer_base {
             $output .= $this->question_move_icon($question);
         }
 
-        $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
+        $output .= html_writer::start_div('mod-indent-outer');
         $output .= html_writer::tag('span', $question->displayednumber, array('class' => 'slotnumber'));
 
         // This div is used to indent the content.
@@ -561,7 +561,7 @@ class edit_renderer extends \plugin_renderer_base {
         $questionname = $this->question_name($structure, $question, $pageurl);
 
         // Start the div for the activity title, excluding the edit icons.
-        $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
+        $output .= html_writer::start_div('activityinstance');
         $output .= $questionname;
 
         $questionicons = '';
@@ -755,9 +755,9 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function question_chooser() {
-        $container = html_writer::tag('div', print_choose_qtype_to_add_form(array(), null, false),
+        $container = html_writer::div(print_choose_qtype_to_add_form(array(), null, false), '',
                 array('id' => 'qtypechoicecontainer'));
-        return html_writer::tag('div', $container, array('class' => 'createnewquestion'));
+        return html_writer::div($container, 'createnewquestion');
     }
 
     /**
@@ -766,9 +766,9 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function question_bank_loading() {
-        return html_writer::tag('div', html_writer::empty_tag('img',
+        return html_writer::div(html_writer::empty_tag('img',
                 array('alt' => 'loading', 'class' => 'loading-icon', 'src' => $this->pix_url('i/loading'))),
-                array('class' => 'questionbankloading'));
+                'questionbankloading');
     }
 
     /**
@@ -790,7 +790,7 @@ class edit_renderer extends \plugin_renderer_base {
                 'returnurl' => $thispageurl->out_as_local_url(true),
                 'cmid' => $thispageurl->param('cmid'),
         ));
-        return html_writer::tag('div', $randomform->render(), array('class' => 'randomquestionformforpopup'));
+        return html_writer::div($randomform->render(), 'randomquestionformforpopup');
     }
 
     /**
@@ -881,26 +881,15 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Return the contents of the question bank, to be displayed in the question-bank pop-up.
      *
-     * @param int $page the page the question will be added on.
-     * @param \moodle_url $thispageurl the URL to reload this page.
-     * @param \question_edit_contexts $contexts the relevant question bank contexts.
+     * @param quiz_question_bank_view $questionbank the question bank view object.
      * @param array $pagevars the variables from {@link question_edit_setup()}.
-     * @param stdClass $course the course settings from the database.
-     * @param stdClass $cm course_modules row.
-     * @param stdClass $quiz the quiz settings from the database.
      * @return string HTML to output / send back in response to an AJAX request.
      */
-    public function get_questionbank_contents(\moodle_url $thispageurl,
-            \question_edit_contexts $contexts, array $pagevars, $course, $cm, $quiz) {
+    public function question_bank_contents(\quiz_question_bank_view $questionbank, array $pagevars) {
 
-        // Create quiz question bank view.
-        $questionbank = new \quiz_question_bank_view($contexts, $thispageurl, $course, $cm, $quiz);
-        $questionbank->set_quiz_has_attempts(quiz_has_attempts($quiz->id));
-
-        $output = $questionbank->render('editq', $pagevars['qpage'], $pagevars['qperpage'],
+        $qbank = $questionbank->render('editq', $pagevars['qpage'], $pagevars['qperpage'],
                 $pagevars['cat'], $pagevars['recurse'], $pagevars['showhidden'], $pagevars['qbshowtext']);
-        $form = html_writer::tag('div', $output, array('class' => 'bd'));
-        return html_writer::tag('div', $form, array('class' => 'questionbankformforpopup'));
+        return html_writer::div(html_writer::div($qbank, 'bd'), 'questionbankformforpopup');
     }
 
     /**
