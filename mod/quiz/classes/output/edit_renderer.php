@@ -340,24 +340,12 @@ class edit_renderer extends \plugin_renderer_base {
      */
     public function questions_in_section(structure $structure, $section,
             $contexts, $pagevars, $pageurl) {
+
         $output = '';
-
-        // Get the list of question types visible to user (excluding the question type being moved if there is one).
-        $questionshtml = array();
-
-        $slots = $structure->get_quiz_slots();
-        $sectiontoslotids = $structure->get_sections_and_slots();
-        if (!empty($sectiontoslotids[$section->id])) {
-            foreach ($sectiontoslotids[$section->id] as $slotid) {
-                $slot = $slots[$slotid];
-                $questionnumber = $slot->questionid;
-                $question = $structure->get_question_by_id($questionnumber);
-
-                $output .= $this->question_row($structure, $question, $contexts, $pagevars, $pageurl);
-            }
+        foreach ($structure->get_questions_in_section($section->id) as $question) {
+            $output .= $this->question_row($structure, $question, $contexts, $pagevars, $pageurl);
         }
 
-        // Always output the section module list.
         return html_writer::tag('ul', $output, array('class' => 'section img-text'));
     }
 
@@ -890,27 +878,5 @@ class edit_renderer extends \plugin_renderer_base {
         $qbank = $questionbank->render('editq', $pagevars['qpage'], $pagevars['qperpage'],
                 $pagevars['cat'], $pagevars['recurse'], $pagevars['showhidden'], $pagevars['qbshowtext']);
         return html_writer::div(html_writer::div($qbank, 'bd'), 'questionbankformforpopup');
-    }
-
-    /**
-     * @param object $quiz
-     * @param int $questionid
-     * @return array, a list (sectionid, page-number, slot-number, maxmark)
-     */
-    protected function get_section($structure, $sectionid) {
-        if (!$sectionid) {
-            // Possible, printout a notification or an error, but that should not happen.
-            return null;
-        }
-        $sections = $structure->get_quiz_sections();
-        if (!$sections) {
-            return null;
-        }
-        foreach ($sections as $key => $section) {
-            if ((int)$section->id === (int)$sectionid) {
-                return $section->heading;
-            }
-        }
-        return null;
     }
 }

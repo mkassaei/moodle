@@ -198,6 +198,25 @@ class structure {
     }
 
     /**
+     * Get all the questions in a section of the quiz.
+     * @param int $sectionid the section id.
+     * @return array of question/slot objects.
+     */
+    public function get_questions_in_section($sectionid) {
+        $questions = array();
+        $slots = $this->get_quiz_slots();
+        $sectiontoslotids = $this->get_sections_and_slots();
+        if (!empty($sectiontoslotids[$sectionid])) {
+            foreach ($sectiontoslotids[$sectionid] as $slotid) {
+                $slot = $slots[$slotid];
+                $questionnumber = $slot->questionid;
+                $questions[] = $this->get_question_by_id($questionnumber);
+            }
+        }
+        return $questions;
+    }
+
+    /**
      * Get a slot by it's slot number. Throws an exception if it is missing.
      * @return stdClass the requested slot.
      */
