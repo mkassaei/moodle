@@ -84,9 +84,6 @@ class edit_renderer extends \plugin_renderer_base {
         // Inialise the JavaScript.
         $this->initialise_editing_javascript($quizobj->get_course(), $quizobj->get_quiz());
 
-        // Include course format js module.
-        $this->page->requires->js('/mod/quiz/yui/edit.js');
-
         // Include the contents of any other popups required.
         if ($structure->can_be_edited()) {
             $popups = '';

@@ -71,8 +71,15 @@ M.mod_quiz.edit = M.mod_quiz.edit || {};
  * @param {string} node2 node to swap with
  * @return {NodeList} section list
  */
-M.mod_quiz.edit.swap_sections = M.mod_quiz.edit.swap_sections || function() {
-    return null;
+M.mod_quiz.edit.swap_sections = function(Y, node1, node2) {
+    var CSS = {
+        COURSECONTENT : 'mod-quiz-edit-content',
+        SECTIONADDMENUS : 'section_add_menus'
+    };
+
+    var sectionlist = Y.Node.all('.'+CSS.COURSECONTENT+' '+M.mod_quiz.edit.get_section_selector(Y));
+    // Swap menus.
+    sectionlist.item(node1).one('.'+CSS.SECTIONADDMENUS).swap(sectionlist.item(node2).one('.'+CSS.SECTIONADDMENUS));
 };
 
 /**
@@ -87,8 +94,46 @@ M.mod_quiz.edit.swap_sections = M.mod_quiz.edit.swap_sections || function() {
  * @param {string} sectionto last affected section
  * @return void
  */
-M.mod_quiz.edit.process_sections = M.mod_quiz.edit.process_sections || function() {
-    return null;
+M.mod_quiz.edit.process_sections = function(Y, sectionlist, response, sectionfrom, sectionto) {
+    var CSS = {
+        SECTIONNAME : 'sectionname'
+    },
+    SELECTORS = {
+        SECTIONLEFTSIDE : '.left .section-handle img'
+    };
+
+    if (response.action === 'move') {
+        // If moving up swap around 'sectionfrom' and 'sectionto' so the that loop operates.
+        if (sectionfrom > sectionto) {
+            var temp = sectionto;
+            sectionto = sectionfrom;
+            sectionfrom = temp;
+        }
+
+        // Update titles and move icons in all affected sections.
+        var ele, str, stridx, newstr;
+
+        for (var i = sectionfrom; i <= sectionto; i++) {
+            // Update section title.
+            sectionlist.item(i).one('.'+CSS.SECTIONNAME).setContent(response.sectiontitles[i]);
+
+            // Update move icon.
+            ele = sectionlist.item(i).one(SELECTORS.SECTIONLEFTSIDE);
+            str = ele.getAttribute('alt');
+            stridx = str.lastIndexOf(' ');
+            newstr = str.substr(0, stridx +1) + i;
+            ele.setAttribute('alt', newstr);
+            ele.setAttribute('title', newstr); // For FireFox as 'alt' is not refreshed.
+
+            // Remove the current class as section has been moved.
+            sectionlist.item(i).removeClass('current');
+        }
+        // If there is a current section, apply corresponding class in order to highlight it.
+        if (response.current !== -1) {
+            // Add current class to the required section.
+            sectionlist.item(response.current).addClass('current');
+        }
+    }
 };
 
 /**
@@ -97,14 +142,12 @@ M.mod_quiz.edit.process_sections = M.mod_quiz.edit.process_sections || function(
 *
 * @return {object} section list configuration
 */
-M.mod_quiz.edit.get_config = M.mod_quiz.edit.get_config || function() {
+M.mod_quiz.edit.get_config = function() {
     return {
-        container_node : null, // compulsory
-        container_class : null, // compulsory
-        section_wrapper_node : null, // optional
-        section_wrapper_class : null, // optional
-        section_node : null,  // compulsory
-        section_class : null  // compulsory
+        container_node : 'ul',
+        container_class : 'slots',
+        section_node : 'li',
+        section_class : 'section'
     };
 };
 
@@ -114,7 +157,7 @@ M.mod_quiz.edit.get_config = M.mod_quiz.edit.get_config || function() {
  * @param {YUI} Y YUI3 instance
  * @return {string} section selector
  */
-M.mod_quiz.edit.get_section_selector = M.mod_quiz.edit.get_section_selector || function() {
+M.mod_quiz.edit.get_section_selector = function() {
     var config = M.mod_quiz.edit.get_config();
     if (config.section_node && config.section_class) {
         return config.section_node + '.' + config.section_class;
@@ -131,7 +174,7 @@ M.mod_quiz.edit.get_section_selector = M.mod_quiz.edit.get_section_selector || f
  * @return {string} section wrapper selector or M.mod_quiz.format.get_section_selector
  * if section_wrapper_node and section_wrapper_class are not defined in the format config.
  */
-M.mod_quiz.edit.get_section_wrapper = M.mod_quiz.edit.get_section_wrapper || function(Y) {
+M.mod_quiz.edit.get_section_wrapper = function(Y) {
     var config = M.mod_quiz.edit.get_config();
     if (config.section_wrapper_node && config.section_wrapper_class) {
         return config.section_wrapper_node + '.' + config.section_wrapper_class;
@@ -144,7 +187,7 @@ M.mod_quiz.edit.get_section_wrapper = M.mod_quiz.edit.get_section_wrapper || fun
  *
  * @return {string} tag of container node.
  */
-M.mod_quiz.edit.get_containernode = M.mod_quiz.edit.get_containernode || function() {
+M.mod_quiz.edit.get_containernode = function() {
     var config = M.mod_quiz.edit.get_config();
     if (config.container_node) {
         return config.container_node;
@@ -158,7 +201,7 @@ M.mod_quiz.edit.get_containernode = M.mod_quiz.edit.get_containernode || functio
  *
  * @return {string} class of the container node.
  */
-M.mod_quiz.edit.get_containerclass = M.mod_quiz.edit.get_containerclass || function() {
+M.mod_quiz.edit.get_containerclass = function() {
     var config = M.mod_quiz.edit.get_config();
     if (config.container_class) {
         return config.container_class;
@@ -172,7 +215,7 @@ M.mod_quiz.edit.get_containerclass = M.mod_quiz.edit.get_containerclass || funct
  *
  * @return {string} tag of the draggable node.
  */
-M.mod_quiz.edit.get_sectionwrappernode = M.mod_quiz.edit.get_sectionwrappernode || function() {
+M.mod_quiz.edit.get_sectionwrappernode = function() {
     var config = M.mod_quiz.edit.get_config();
     if (config.section_wrapper_node) {
         return config.section_wrapper_node;
@@ -186,7 +229,7 @@ M.mod_quiz.edit.get_sectionwrappernode = M.mod_quiz.edit.get_sectionwrappernode 
  *
  * @return {string} class of the draggable node.
  */
-M.mod_quiz.edit.get_sectionwrapperclass = M.mod_quiz.edit.get_sectionwrapperclass || function() {
+M.mod_quiz.edit.get_sectionwrapperclass = function() {
     var config = M.mod_quiz.edit.get_config();
     if (config.section_wrapper_class) {
         return config.section_wrapper_class;
@@ -200,7 +243,7 @@ M.mod_quiz.edit.get_sectionwrapperclass = M.mod_quiz.edit.get_sectionwrapperclas
  *
  * @return {string} tag of section node.
  */
-M.mod_quiz.edit.get_sectionnode = M.mod_quiz.edit.get_sectionnode || function() {
+M.mod_quiz.edit.get_sectionnode = function() {
     var config = M.mod_quiz.edit.get_config();
     if (config.section_node) {
         return config.section_node;
@@ -214,7 +257,7 @@ M.mod_quiz.edit.get_sectionnode = M.mod_quiz.edit.get_sectionnode || function() 
  *
  * @return {string} class of the section node.
  */
-M.mod_quiz.edit.get_sectionclass = M.mod_quiz.edit.get_sectionclass || function() {
+M.mod_quiz.edit.get_sectionclass = function() {
     var config = M.mod_quiz.edit.get_config();
     if (config.section_class) {
         return config.section_class;
