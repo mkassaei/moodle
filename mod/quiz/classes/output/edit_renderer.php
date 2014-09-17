@@ -379,11 +379,11 @@ class edit_renderer extends \plugin_renderer_base {
         }
 
         if ($structure->is_last_slot_on_page($question->slot)) {
-            $splitorjoin = structure::SPLIT;
-            $pagebreakclass = 'break';
-        } else {
             $splitorjoin = structure::JOIN;
             $pagebreakclass = '';
+        } else {
+            $splitorjoin = structure::SPLIT;
+            $pagebreakclass = 'break';
         }
 
         if (!$structure->is_last_slot_in_quiz($question->slot)) {
@@ -546,25 +546,21 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::start_div('activityinstance');
         $output .= $questionname;
 
+        // Action icons.
         $questionicons = '';
         $questionicons .= $this->question_preview_icon($structure->get_quiz(), $question);
-
         if ($structure->can_be_edited()) {
             $questionicons .= $this->question_remove_icon($question, $pageurl);
         }
-
         $questionicons .= $this->marked_out_of_field($structure->get_quiz(), $question);
-
         $output .= html_writer::span($questionicons, 'actions'); // Required to add js spinner icon.
 
         // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
         $output .= html_writer::end_tag('div'); // .activityinstance.
-
         $output .= html_writer::end_tag('div'); // ...$indentclasses.
 
         // End of indentation div.
         $output .= html_writer::end_tag('div');
-
         $output .= html_writer::end_tag('div');
 
         return $output;
@@ -577,20 +573,8 @@ class edit_renderer extends \plugin_renderer_base {
      * @return The markup for the move action, or an empty string if not available.
      */
     public function question_move_icon($question) {
-        static $str;
-        static $baseurl;
-
-        if (!isset($str)) {
-            $str = get_strings(array('move'));
-        }
-
-        if (!isset($baseurl)) {
-            $baseurl = new \moodle_url('/course/mod.php', array('sesskey' => sesskey()));
-        }
-
-        return html_writer::link(
-            new \moodle_url($baseurl, array('copy' => $question->id)),
-            $this->pix_icon('i/dragdrop', $str->move, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+        return html_writer::link(new \moodle_url('#'),
+            $this->pix_icon('i/dragdrop', get_string('move'), 'moodle', array('class' => 'iconsmall', 'title' => '')),
             array('class' => 'editing_move', 'data-action' => 'move')
         );
     }
@@ -631,9 +615,8 @@ class edit_renderer extends \plugin_renderer_base {
      */
     public function question_remove_icon($question, $pageurl) {
         $url = new \moodle_url($pageurl, array('sesskey' => sesskey(), 'remove' => $question->slot));
-
         $strdelete = get_string('delete');
-        // Build the icon.
+
         $image = $this->pix_icon('t/delete', $strdelete);
 
         return $this->action_link($url, $image, null, array('title' => $strdelete,
@@ -653,13 +636,13 @@ class edit_renderer extends \plugin_renderer_base {
                     'slot' => $question->slot, 'repag' => $splitorjoin, 'sesskey' => sesskey()));
 
         if ($splitorjoin == structure::SPLIT) {
-            $title = get_string('linkpage', 'quiz');
-            $image = $this->pix_icon('e/insert_page_break', $title); // Remove_link.
-            $action = 'linkpage';
-        } else {
-            $title = get_string('unlinkpage', 'quiz');
-            $image = $this->pix_icon('e/remove_page_break', $title);
+            $title = get_string('splitpages', 'quiz');
+            $image = $this->pix_icon('e/insert_page_break', $title);
             $action = 'unlinkpage';
+        } else {
+            $title = get_string('joinpages', 'quiz');
+            $image = $this->pix_icon('e/remove_page_break', $title);
+            $action = 'linkpage';
         }
 
         // Disable the link if quiz has attempts.

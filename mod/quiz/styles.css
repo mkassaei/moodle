@@ -1058,12 +1058,6 @@ table#categoryquestions td,
     margin: -15px -25px;
 }
 
-.path-mod-quiz ul.slots li.section li.activity.page_join.break {
-    position: relative;
-    top: 10px;
-    margin-right: 50em;
-}
-
 .path-mod-quiz ul.slots li.section li.activity .instancemaxmarkcontainer {
     background: white;
     padding: .2em;
