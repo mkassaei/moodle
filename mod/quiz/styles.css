@@ -1110,6 +1110,7 @@ table#categoryquestions td,
 
 #page-mod-quiz-edit ul.slots .activityinstance img.activityicon {
     float: left;
+    margin-top: .2em;
 }
 
 #page-mod-quiz-edit .statusbar {
