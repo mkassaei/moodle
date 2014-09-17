@@ -60,6 +60,9 @@ var manager = {
     init: function() {
         // Find the header checkbox, and set the initial values.
         this._header = Y.one('#qbheadercheckbox');
+        if (!this._header) {
+            return;
+        }
         this._header.setAttrs({
             disabled: false,
             title: M.util.get_string('selectall', 'moodle')
