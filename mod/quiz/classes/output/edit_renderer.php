@@ -373,55 +373,30 @@ class edit_renderer extends \plugin_renderer_base {
      */
     public function question_row(structure $structure, $question, $contexts, $pagevars, $pageurl) {
         $output = '';
-        $slotid = $this->get_question_info($structure, $question->id, 'slotid');
-        $slotnumber = $this->get_question_info($structure, $question->id, 'slot');
-        $pagenumber = $this->get_question_info($structure, $question->id, 'page');
-        $page = $pagenumber ? get_string('pageshort', 'quiz') . ' ' . $pagenumber : null;
-        $pagealt = $pagenumber ? get_string('page') . ' ' . $pagenumber : null;
-        // Put page in a span for easier styling.
-        $page = html_writer::tag('span', $page, array('class' => 'text'));
 
-        $pagenumberclass = 'pagenumber';
-        $dragdropclass = 'activity yui3-dd-drop';
-        $prevpage = $this->get_previous_page($structure, $slotnumber - 1);
-        $nextpage = $this->get_previous_page($structure, $slotnumber + 1);
-        if ($prevpage != $pagenumber) {
+        // Put page in a span for easier styling.
+        $page = html_writer::tag('span', get_string('page') . ' ' . $question->page,
+                array('class' => 'text'));
+
+        if ($structure->is_first_slot_on_page($question->slot)) {
             // Add the add-menu at the page level.
             $addmenu = html_writer::tag('span', $this->add_menu_actions($structure,
-                    $pagenumber, $pageurl, $contexts, $pagevars),
+                    $question->page, $pageurl, $contexts, $pagevars),
                     array('class' => 'add-menu-outer'));
 
-            // Add the form for the add new question chooser dialogue.
-            $addquestionurl = new \moodle_url('/question/addquestion.php');
-            $questioncategoryid = question_get_category_id_from_pagevars($pagevars);
+            $addquestionform = $this->add_question_form($structure,
+                    $question->page, $pageurl, $pagevars);
 
-            // Form fields.
-            $addquestionformhtml = html_writer::tag('input', null,
-                    array('type' => 'hidden', 'name' => 'returnurl',
-                            'value' => '/mod/quiz/edit.php?cmid='.$structure->get_cmid().'&amp;addonpage=' . $pagenumber));
-            $addquestionformhtml .= html_writer::tag('input', null,
-                    array('type' => 'hidden', 'name' => 'cmid', 'value' => $structure->get_cmid()));
-            $addquestionformhtml .= html_writer::tag('input', null,
-                    array('type' => 'hidden', 'name' => 'appendqnumstring', 'value' => 'addquestion'));
-            $addquestionformhtml .= html_writer::tag('input', null,
-                    array('type' => 'hidden', 'name' => 'category', 'value' => $questioncategoryid));
-            $addquestionformhtml .= html_writer::tag('div', $addquestionformhtml);
-
-            // Form.
-            $addquestionformhtml .= html_writer::tag('form', $addquestionformhtml,
-                    array('class' => 'addnewquestion', 'method' => 'post', 'action' => $addquestionurl));
-
-            $output .= html_writer::tag('li', $page.$addmenu.$addquestionformhtml,
-                    array('class' => $pagenumberclass . ' ' . $dragdropclass.' page', 'id' => 'page-' . $pagenumber,
-                            'title' => $pagealt));
+            $output .= html_writer::tag('li', $page . $addmenu . $addquestionform,
+                    array('class' => 'pagenumber activity yui3-dd-drop page', 'id' => 'page-' . $question->page));
         }
 
         if ($questionhtml = $this->question($structure, $question, $pageurl)) {
             $questionclasses = 'activity ' . $question->qtype . ' qtype_' . $question->qtype . ' slot';
-            $output .= html_writer::tag('li', $questionhtml, array('class' => $questionclasses, 'id' => 'slot-' . $slotid));
+            $output .= html_writer::tag('li', $questionhtml, array('class' => $questionclasses, 'id' => 'slot-' . $question->slotid));
         }
 
-        if ($nextpage != $pagenumber) {
+        if ($structure->is_last_slot_on_page($question->slot)) {
             $splitorjoin = structure::SPLIT;
             $pagebreakclass = 'break';
         } else {
@@ -429,10 +404,9 @@ class edit_renderer extends \plugin_renderer_base {
             $pagebreakclass = '';
         }
 
-        $lastslot = $structure->get_last_slot();
-        if ($lastslot->id != $slotid) {
+        if (!$structure->is_last_slot_in_quiz($question->slot)) {
             $joinhtml = $this->page_split_join_button($structure->get_quiz(), $question, $splitorjoin);
-            $output .= html_writer::tag('li', $joinhtml, array('class' => $dragdropclass.' page_join '.$pagebreakclass));
+            $output .= html_writer::tag('li', $joinhtml, array('class' => 'activity yui3-dd-drop page_join ' . $pagebreakclass));
         }
 
         return $output;
@@ -532,6 +506,32 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * @param structure $structure object containing the structure of the quiz.
+     * @param int $page the page number that this menu will add to.
+     * @param \moodle_url $pageurl the canonical URL of this page.
+     * @param array $pagevars the variables from {@link question_edit_setup()}.
+     * @return string HTML to output.
+     */
+    protected function add_question_form(structure $structure, $page, \moodle_url $pageurl, array $pagevars) {
+
+        $questioncategoryid = question_get_category_id_from_pagevars($pagevars);
+
+        $output = html_writer::tag('input', null,
+                array('type' => 'hidden', 'name' => 'returnurl',
+                        'value' => $pageurl->out_as_local_url(false, array('addonpage' => $page))));
+        $output .= html_writer::tag('input', null,
+                array('type' => 'hidden', 'name' => 'cmid', 'value' => $structure->get_cmid()));
+        $output .= html_writer::tag('input', null,
+                array('type' => 'hidden', 'name' => 'appendqnumstring', 'value' => 'addquestion'));
+        $output .= html_writer::tag('input', null,
+                array('type' => 'hidden', 'name' => 'category', 'value' => $questioncategoryid));
+
+        return html_writer::tag('form', html_writer::div($output),
+                array('class' => 'addnewquestion', 'method' => 'post',
+                        'action' => new \moodle_url('/question/addquestion.php')));
+    }
+
+    /**
      * Display a question.
      *
      * @param structure $structure object containing the structure of the quiz.
@@ -543,9 +543,6 @@ class edit_renderer extends \plugin_renderer_base {
         $output = '';
 
         $output .= html_writer::start_tag('div');
-
-        // Print slot number.
-        $slotnumber = $this->get_question_info($structure, $question->id, 'slot');
 
         if ($structure->can_be_edited()) {
             $output .= $this->question_move_icon($question);
@@ -926,52 +923,5 @@ class edit_renderer extends \plugin_renderer_base {
             }
         }
         return null;
-    }
-
-    /**
-     *
-     * @param object $quiz
-     * @param int $questionid
-     * @param string, 'all' for returning list (sectionid, page-number, slot-number, maxmark),
-     * 'section' for returning section heding, 'page' for returning page number,
-     * 'slot' for returning slot-number and 'mark' for returning maxmark.
-     * @return array, a list (sectionid, page-number, slot-number, maxmark), or the value for the given string
-     */
-    protected function get_question_info($structure, $questionid, $info = 'all') {
-        foreach ($structure->get_quiz_slots() as $slotid => $slot) {
-            if ((int)$slot->questionid === (int)$questionid) {
-                if ($info === 'all') {
-                    return array($slot->sectionid, $slot->page, $slot->id, $slot->maxmark);
-                }
-                if ($info === 'section') {
-                    return $this->get_section($structure, $slot->sectionid);
-                }
-                if ($info === 'page') {
-                    return $slot->page;
-                }
-                if ($info === 'slot') {
-                    return $slot->slot;
-                }
-                if ($info === 'mark') {
-                    return $slot->maxmark;
-                }
-                if ($info === 'slotid') {
-                    return $slot->id;
-                }
-            }
-        }
-        return null;
-    }
-
-    protected function get_previous_page($structure, $prevslotnumber) {
-        if ($prevslotnumber < 1) {
-            return 0;
-        }
-        foreach ($structure->get_quiz_slots() as $slotid => $slot) {
-            if ($slot->slot == $prevslotnumber) {
-                return $slot->page;
-            }
-        }
-        return 0;
     }
 }

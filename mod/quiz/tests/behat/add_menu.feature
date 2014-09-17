@@ -13,11 +13,10 @@ Feature: Edit quiz page
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
-     And the following "activities" exist:
+    And the following "activities" exist:
       | activity   | name   | intro                           | course | idnumber |
       | quiz       | Quiz 1 | Quiz 1 for testing the Add menu | C1     | quiz1    |
- 
-    When I log in as "teacher1"
+    And I log in as "teacher1"
     And I follow "Course 1"
     And I follow "Quiz 1"
     And I navigate to "Edit quiz" node in "Quiz administration"
@@ -34,7 +33,7 @@ Feature: Edit quiz page
     And I set the field "Question text" to "Please write 200 words about Essay 01"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "P 1"
+    And I should see "Page 1"
     And I should see "Essay 01 new"
 
     And I follow "Add"
@@ -77,14 +76,14 @@ Feature: Edit quiz page
     And I should see "Essay 04 new"
 
     # Repaginate as two questions per page.
-    When I should see "P 1"
-    And I should not see "P 2"
+    When I should see "Page 1"
+    And I should not see "Page 2"
     And I press "Repaginate"
     Then I should see "Repaginate with"
     And I set the field "menuquestionsperpage" to "2"
     When I press "Go"
-    Then I should see "P 1"
-    And I should see "P 2"
+    Then I should see "Page 1"
+    And I should see "Page 2"
 
     # Add a question to page 2.
     And I click on "//a[@id=\"action-menu-toggle-1\"]" "xpath_element"
@@ -219,15 +218,15 @@ Feature: Edit quiz page
     And I should see "Random"
 
     # Repaginate as one question per page.
-    And I should see "P 1"
-    And I should not see "P 2"
+    And I should see "Page 1"
+    And I should not see "Page 2"
     When I press "Repaginate"
     Then I should see "Repaginate with"
     And I set the field "menuquestionsperpage" to "1"
     When I press "Go"
-    Then I should see "P 2"
-    And I should see "P 3"
-    And I should see "P 4"
+    Then I should see "Page 2"
+    And I should see "Page 3"
+    And I should see "Page 4"
 
     # Add a random question to page 4.
     And I click on "//a[@id=\"action-menu-toggle-3\"]" "xpath_element"

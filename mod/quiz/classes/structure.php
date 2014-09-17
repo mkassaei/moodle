@@ -150,6 +150,40 @@ class structure {
     }
 
     /**
+     * Is this slot the first one on its page?
+     * @param int $slotnumber the index of the slot in question.
+     * @return boolean whether this slot the first one on its page.
+     */
+    public function is_first_slot_on_page($slotnumber) {
+        if ($slotnumber == 1) {
+            return true;
+        }
+        return $this->slotsinorder[$slotnumber]->page != $this->slotsinorder[$slotnumber - 1]->page;
+    }
+
+    /**
+     * Is this slot the last one on its page?
+     * @param int $slotnumber the index of the slot in question.
+     * @return boolean whether this slot the last one on its page.
+     */
+    public function is_last_slot_on_page($slotnumber) {
+        if (!isset($this->slotsinorder[$slotnumber + 1])) {
+            return true;
+        }
+        return $this->slotsinorder[$slotnumber]->page != $this->slotsinorder[$slotnumber + 1]->page;
+    }
+
+    /**
+     * Is this slot the last one in the quiz?
+     * @param int $slotnumber the index of the slot in question.
+     * @return boolean whether this slot the last one in the quiz.
+     */
+    public function is_last_slot_in_quiz($slotnumber) {
+        end($this->slotsinorder);
+        return $slotnumber == key($this->slotsinorder);
+    }
+
+    /**
      * Get a slot by it's id. Throws an exception if it is missing.
      * @return stdClass the requested slot.
      */
@@ -225,7 +259,7 @@ class structure {
         global $DB;
 
         $this->questions = $DB->get_records_sql(
-                "SELECT q.*, qc.contextid, slot.maxmark, slot.slot, slot.page
+                "SELECT q.*, qc.contextid, slot.id AS slotid, slot.maxmark, slot.slot, slot.page
                    FROM {question} q
                    JOIN {question_categories} qc ON qc.id = q.category
                    JOIN {quiz_slots} slot ON slot.questionid = q.id
@@ -233,6 +267,10 @@ class structure {
 
         $this->slots = $DB->get_records('quiz_slots',
                 array('quizid' => $quiz->id), 'slot');
+        $this->slotsinorder = array();
+        foreach ($this->slots as $slot) {
+            $this->slotsinorder[$slot->slot] = $slot;
+        }
 
         $this->sections = array(
             1 => (object) array('id' => 1, 'quizid' => $quiz->id,
