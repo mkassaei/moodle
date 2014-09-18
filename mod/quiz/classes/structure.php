@@ -221,6 +221,13 @@ class structure {
     }
 
     /**
+     * @return stdClass get the last slot in the quiz.
+     */
+    public function get_last_slot() {
+        return end($this->slotsinorder);
+    }
+
+    /**
      * Get a slot by it's id. Throws an exception if it is missing.
      * @param int $slotid the slot id.
      * @return stdClass the requested quiz_slots row.
@@ -646,20 +653,5 @@ class structure {
         $slots = $this->refresh_page_numbers_and_update_db($quiz);
 
         return $slots;
-    }
-
-    /**
-     * @return stdClass get the last slot in the quiz.
-     */
-    public function get_last_slot() {
-        return end($this->slotsinorder);
-    }
-
-    public function set_quiz_slots(array $slots) {
-        $this->slots = $slots;
-    }
-
-    public function set_quiz_sections(array $sections) {
-        $this->sections = $sections;
     }
 }
