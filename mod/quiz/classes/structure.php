@@ -182,7 +182,7 @@ class structure {
     /**
      * @return stdClass[] the slots in this quiz.
      */
-    public function get_quiz_slots() {
+    public function get_slots() {
         return $this->slots;
     }
 
@@ -324,8 +324,8 @@ class structure {
     }
 
     /**
-     * Populate this class with the structure for a given quiz.
-     * @param unknown_type $quiz
+     * Set up this class with the structure for a given quiz.
+     * @param \stdClass $quiz the quiz settings.
      */
     public function populate_structure($quiz) {
         global $DB;
@@ -367,10 +367,15 @@ class structure {
         $section->shuffle = false;
         $this->sections = array(1 => $section);
 
-        $this->populate_slots_with_sectionids($quiz);
+        $this->populate_slots_with_sectionids();
         $this->populate_question_numbers();
     }
 
+    /**
+     * Used by populate. Make up fake data for any missing questions.
+     * @param array $slots the data about the slots and questions in the quiz.
+     * @return array updated $slots array.
+     */
     protected function populate_missing_questions($slots) {
         // Address missing question types.
         foreach ($slots as $slot) {
@@ -394,6 +399,9 @@ class structure {
         return $slots;
     }
 
+    /**
+     * Fill in the section ids for each slot.
+     */
     public function populate_slots_with_sectionids() {
         $nextsection = reset($this->sections);
         foreach ($this->slotsinorder as $slot) {
@@ -410,6 +418,9 @@ class structure {
         }
     }
 
+    /**
+     * Number the questions.
+     */
     protected function populate_question_numbers() {
         $number = 1;
         foreach ($this->slots as $slot) {
@@ -425,17 +436,23 @@ class structure {
 
     /**
      * Move a slot from its current location to a new location.
-     * Reorder the slot table accordingly.
+     *
+     * After callig this method, this class will be in an invalid state, and
+     * should be discarded if you want to manipulate the structure further.
+     *
      * @param stdClass $quiz
      * @param int $id id of slot to be moved
      * @param int $idbefore id of slot to come before slot being moved
      * @param int $page new page number of slot being moved
      * @return array
      */
-    public function move_slot($quiz, $idmove, $idbefore, $page) {
+    public function move_slot($idmove, $idbefore, $page) {
         global $DB, $CFG;
 
         $movingslot = $this->slots[$idmove];
+        if (empty($movingslot)) {
+            throw new moodle_exception('Bad slot ID ' . $idmove);
+        }
 
         // Empty target slot means move slot to first.
         if (empty($idbefore)) {
@@ -443,68 +460,63 @@ class structure {
         } else {
             $targetslot = $this->slots[$idbefore];
         }
-        $hasslotmoved = false;
-        $pagehaschanged = false;
-
-        if (empty($movingslot)) {
-            throw new moodle_exception('Bad slot ID ' . $idmove);
-        }
 
         // Unit tests convert slot values to strings. Need as int.
-        $movingslotnumber = intval($movingslot->slot);
-        $targetslotnumber = intval($targetslot->slot);
+        $movingslotnumber = (int) $movingslot->slot;
+        $targetslotnumber = (int) $targetslot->slot;
+
+        // Work out how things are being moved.
+        $slotreorder = array();
+        if ($targetslotnumber == $movingslotnumber - 1) {
+            // Nothing to do.
+        } else if ($targetslotnumber > $movingslotnumber) {
+            $slotreorder[$movingslotnumber] = $targetslotnumber;
+            for ($i = $movingslotnumber; $i < $targetslotnumber; $i++) {
+                $slotreorder[$i + 1] = $i;
+            }
+        } else if ($targetslotnumber < $movingslotnumber) {
+            $slotreorder[$movingslotnumber] = $targetslotnumber + 1;
+            for ($i = $targetslotnumber + 1; $i < $movingslotnumber; $i++) {
+                $slotreorder[$i] = $i + 1;
+            }
+        }
 
         $trans = $DB->start_delegated_transaction();
-        // Move slots if slots haven't already been moved ignore.
-        if ($targetslotnumber - $movingslotnumber !== -1  ) {
 
-            $slotreorder = array();
-            if ($movingslotnumber < $targetslotnumber) {
-                $hasslotmoved = true;
-                $slotreorder[$movingslotnumber] = $targetslotnumber;
-                for ($i = $movingslotnumber; $i < $targetslotnumber; $i += 1) {
-                    $slotreorder[$i + 1] = $i;
-                }
-            } else if ($movingslotnumber > $targetslotnumber) {
-                $hasslotmoved = true;
-                $previousslotnumber = $targetslotnumber + 1;
-                $slotreorder[$movingslotnumber] = $previousslotnumber;
-                for ($i = $previousslotnumber; $i < $movingslotnumber; $i += 1) {
-                    $slotreorder[$i] = $i + 1;
-                }
-            }
-
-            // Slot has moved record new order.
-            if ($hasslotmoved) {
-                update_field_with_unique_index('quiz_slots',
-                        'slot', $slotreorder, array('quizid' => $quiz->id));
-            }
+        // Slot has moved record new order.
+        if ($slotreorder) {
+            update_field_with_unique_index('quiz_slots', 'slot', $slotreorder,
+                    array('quizid' => $this->get_quizid()));
         }
 
         // Page has changed. Record it.
         if (!$page) {
             $page = 1;
         }
-
-        if (intval($movingslot->page) !== intval($page)) {
+        if ($movingslot->page != $page) {
             $DB->set_field('quiz_slots', 'page', $page,
                     array('id' => $movingslot->id));
-            $pagehaschanged = true;
         }
 
-        // Slot dropped back where it came from.
-        if (!$hasslotmoved && !$pagehaschanged) {
-            $trans->allow_commit();
-            return;
-        }
+        $emptypages = $DB->get_fieldset_sql("
+                SELECT DISTINCT page - 1
+                  FROM {quiz_slots} slot
+                 WHERE quizid = ?
+                   AND page > 1
+                   AND NOT EXISTS (SELECT 1 FROM {quiz_slots} WHERE quizid = ? AND page = slot.page - 1)
+              ORDER BY page - 1 DESC
+                ", array($this->get_quizid(), $this->get_quizid()));
 
-        // Refresh page numbering.
-        $slots = $this->refresh_page_numbers_and_update_db($quiz);
+        foreach ($emptypages as $page) {
+            $DB->execute("
+                    UPDATE {quiz_slots}
+                       SET page = page - 1
+                     WHERE quizid = ?
+                       AND page > ?
+                    ", array($this->get_quizid(), $page));
+        }
 
         $trans->allow_commit();
-
-        $this->set_quiz_slots($slots);
-        $this->populate_slots_with_sectionids($quiz);
     }
 
     /**

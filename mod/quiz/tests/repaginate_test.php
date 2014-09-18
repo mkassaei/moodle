@@ -66,8 +66,8 @@ class quiz_repaginate_test extends advanced_testcase {
     private $repaginate = null;
 
     public function setUp() {
-        $this->set_quiz_slots($this->get_quiz_object()->get_quiz_slots());
-        $this->repaginate = new mod_quiz_repaginate_testable(0, $this->get_quiz_slots());
+        $this->set_quiz_slots($this->get_quiz_object()->get_slots());
+        $this->repaginate = new mod_quiz_repaginate_testable(0, $this->get_slots());
     }
 
     public function tearDown() {
@@ -135,7 +135,7 @@ class quiz_repaginate_test extends advanced_testcase {
      */
     private function set_quiz_slots($slots = null) {
         if (!$slots) {
-            $this->quizslots = $this->get_quiz_object()->get_quiz_slots();
+            $this->quizslots = $this->get_quiz_object()->get_slots();
         } else {
             $this->quizslots = $slots;
         }
@@ -144,7 +144,7 @@ class quiz_repaginate_test extends advanced_testcase {
     /**
      * Return an array of slots
      */
-    private function get_quiz_slots() {
+    private function get_slots() {
         return $this->quizslots;
     }
 
@@ -153,7 +153,7 @@ class quiz_repaginate_test extends advanced_testcase {
      */
     public function test_get_last_slot() {
         $this->set_quiz_slots();
-        $slots = $this->get_quiz_slots();
+        $slots = $this->get_slots();
         $expected = end($slots);
         $actual = $this->repaginate->get_last_slot($slots);
         $this->assertEquals($expected, $actual);
@@ -164,7 +164,7 @@ class quiz_repaginate_test extends advanced_testcase {
      */
     public function test_get_this_slot() {
         $this->set_quiz_slots();
-        $slots = $this->get_quiz_slots();
+        $slots = $this->get_slots();
         $actual = array();
         $expected = $this->repaginate->get_slots_by_slot_number();
         $this->assertEquals($expected, $actual);
@@ -177,7 +177,7 @@ class quiz_repaginate_test extends advanced_testcase {
 
     public function test_get_slots_by_slotnumber() {
         $this->set_quiz_slots();
-        $slots = $this->get_quiz_slots();
+        $slots = $this->get_slots();
         $expected = array();
         $actual = $this->repaginate->get_slots_by_slot_number();
         $this->assertEquals($expected, $actual);
@@ -191,7 +191,7 @@ class quiz_repaginate_test extends advanced_testcase {
 
     public function test_get_slots_by_slotid() {
         $this->set_quiz_slots();
-        $slots = $this->get_quiz_slots();
+        $slots = $this->get_slots();
         $expected = array();
         $actual = $this->repaginate->get_slots_by_slotid();
         $this->assertEquals($expected, $actual);
@@ -204,7 +204,7 @@ class quiz_repaginate_test extends advanced_testcase {
 
     public function test_repaginate_n_questions_per_page() {
         $this->set_quiz_slots();
-        $slots = $this->get_quiz_slots();
+        $slots = $this->get_slots();
 
         // Expect 2 questions per page.
         $expected = array();
@@ -287,7 +287,7 @@ class quiz_repaginate_test extends advanced_testcase {
 
     public function test_repaginate_this_slot() {
         $this->set_quiz_slots();
-        $slots = $this->get_quiz_slots();
+        $slots = $this->get_slots();
         $slotsbyslotno = $this->repaginate->get_slots_by_slot_number($slots);
         $slotnumber = 3;
         $newpagenumber = 2;
@@ -300,7 +300,7 @@ class quiz_repaginate_test extends advanced_testcase {
 
     public function test_repaginate_the_rest() {
         $this->set_quiz_slots();
-        $slots = $this->get_quiz_slots();
+        $slots = $this->get_slots();
         $slotfrom = 1;
         $type = \mod_quiz\repaginate::LINK;
         $expected = array();

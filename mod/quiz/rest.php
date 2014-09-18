@@ -80,7 +80,7 @@ switch($requestmethod) {
                 switch ($field) {
                     case 'move':
                         require_capability('mod/quiz:manage', $modcontext);
-                        $structure->move_slot($quiz, $id, $previousid, $page);
+                        $structure->move_slot($id, $previousid, $page);
                         quiz_delete_previews($quiz);
                         echo json_encode(array('visible' => true));
                         break;
