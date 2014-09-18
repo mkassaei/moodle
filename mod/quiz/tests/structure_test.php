@@ -227,6 +227,7 @@ class mod_quiz_structure_testcase extends advanced_testcase {
      */
     public function test_quiz_remove_slot() {
         global $SITE, $DB;
+
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
@@ -244,106 +245,34 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         // Get the random question.
         $randomq = $DB->get_record('question', array('qtype' => 'random'));
 
-        $slotssql = "SELECT qs.*, q.qtype AS qtype
-                       FROM {quiz_slots} qs
-                       JOIN {question} q ON qs.questionid = q.id
-                      WHERE qs.quizid = ?
-                   ORDER BY qs.slot";
-        $slots = $DB->get_records_sql($slotssql, array($quiz->id));
-
-        // Check that the setup looks right.
-        $this->assertEquals(2, count($slots));
-        $slot = array_shift($slots);
-        $this->assertEquals($standardq->id, $slot->questionid);
-        $slot = array_shift($slots);
-        $this->assertEquals($randomq->id, $slot->questionid);
-        $this->assertEquals(2, $slot->slot);
-
-        // Remove the standard question.
-        $structure = \mod_quiz\structure::create();
-        $structure->remove_slot($quiz, 1);
-
-        $slots = $DB->get_records_sql($slotssql, array($quiz->id));
-
-        // Check the new ordering, and that the slot number was updated.
-        $this->assertEquals(1, count($slots));
-        $slot = array_shift($slots);
-        $this->assertEquals($randomq->id, $slot->questionid);
-        $this->assertEquals(1, $slot->slot);
-
-        // Check the the standard question was not deleted.
-        $count = $DB->count_records('question', array('id' => $standardq->id));
-        $this->assertEquals(1, $count);
-
-        // Remove the random question.
-        $structure = \mod_quiz\structure::create();
-        $structure->remove_slot($quiz, 1);
-
-        $slots = $DB->get_records_sql($slotssql, array($quiz->id));
-
-        // Check that new ordering.
-        $this->assertEquals(0, count($slots));
-
-        // Check that the random question was deleted.
-        $count = $DB->count_records('question', array('id' => $randomq->id));
-        $this->assertEquals(0, $count);
-
-        // Test a longer quiz. Are page and slot numbers updated correctly?
-
-        // Append slots to the quiz.
-        $testslots = $this->reset_slots($quiz, $structure);
-
-        $structure->remove_slot($quiz, 7);
-
-        // Get updated slots from db.
-        $this->get_saved_quiz_slots($quiz, $structure);
-        $slotsremoved = $structure->get_quiz_slots();
-
-        $idremove = $this->get_slot_id_by_slot_number('7', $testslots);
-
-        // Update test data. Remove slot and refresh slots and pages.
-        unset($testslots[$idremove]);
-        $this->refresh_slots_and_pages($quiz, $structure, $testslots);
-
-        // Do the arrays of slots match?
-        $this->assertEquals($testslots, $slotsremoved);
-    }
-
-    public function test_refresh_slot_numbers() {
-        list($quiz, $cm, $course) = $this->prepare_quiz_data();
         $structure = \mod_quiz\structure::create_for($quiz);
 
-        // Append slots to the quiz.
-        $testslots = $this->reset_slots($quiz, $structure);
+        // Check that the setup looks right.
+        $this->assertEquals(2, $structure->get_question_count());
+        $this->assertEquals($standardq->id, $structure->get_question_in_slot(1)->questionid);
+        $this->assertEquals($randomq->id, $structure->get_question_in_slot(2)->questionid);
 
-        $this->assertInstanceOf('\mod_quiz\structure', $structure);
-        $slots = $structure->get_quiz_slots();
+        // Remove the standard question.
+        $structure->remove_slot($quiz, 1);
 
-        // Test: Nothing changed.
-        $structure->refresh_slot_numbers($quiz, $slots);
+        $alteredstructure = \mod_quiz\structure::create_for($quiz);
 
-        $this->assertEquals($testslots, $slots);
+        // Check the new ordering, and that the slot number was updated.
+        $this->assertEquals(1, $alteredstructure->get_question_count());
+        $this->assertEquals($randomq->id, $alteredstructure->get_question_in_slot(1)->questionid);
 
-        // Test: Page break added at slot 3. Pages reordered.
-        $testslots = $this->reset_slots($quiz, $structure);
-        $slots = $structure->get_quiz_slots();
+        // Check that the ordinary question was not deleted.
+        $this->assertTrue($DB->record_exists('question', array('id' => $standardq->id)));
 
-        $idmove = $this->get_slot_id_by_slot_number('3');
-        unset($slots[$idmove]);
+        // Remove the random question.
+        $structure->remove_slot($quiz, 1);
+        $alteredstructure = \mod_quiz\structure::create_for($quiz);
 
-        $structure->refresh_slot_numbers($quiz, $slots);
+        // Check that new ordering.
+        $this->assertEquals(0, $alteredstructure->get_question_count());
 
-        unset($testslots[$idmove]);
-
-        // Now reorder the slotnumbers in test slots.
-        $slottoslotids = $structure->create_slot_to_slotids($testslots);
-        $slotnumber = 1;
-        foreach ($slottoslotids as $slottoslotid) {
-            $testslots[$slottoslotid]->slot = $slotnumber;
-            $slotnumber++;
-        }
-
-        $this->assertEquals($testslots, $slots);
+        // Check that the random question was deleted.
+        $this->assertFalse($DB->record_exists('question', array('id' => $randomq->id)));
     }
 
     public function test_refresh_page_numbers() {
@@ -404,54 +333,6 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         $testslots[$this->get_slot_id_by_slot_number(++$slotnumber)]->page = ++$pagenumber;
 
         $this->assertEquals($testslots, $slots);
-    }
-
-    public function test_create_slot_to_slotids() {
-        list($quiz, $cm, $course) = $this->prepare_quiz_data();
-        $structure = \mod_quiz\structure::create_for($quiz);
-
-        // Append slots to the quiz.
-        $testslots = $this->reset_slots($quiz, $structure);
-
-        $this->assertInstanceOf('\mod_quiz\structure', $structure);
-        $slots = $structure->get_quiz_slots();
-
-        // Test: Nothing changed.
-        $slottoslotids = $structure->create_slot_to_slotids($slots);
-
-        // Create test data.
-        $testslottoslotids = array();
-        foreach ($testslots as $slot) {
-            $testslottoslotids[$slot->slot] = $slot->id;
-        }
-
-        $this->assertEquals($testslottoslotids, $slottoslotids);
-
-        // Test: remove slot.
-        $testslots = $this->reset_slots($quiz, $structure);
-        $slots = $structure->get_quiz_slots();
-
-        $idmove = $this->get_slot_id_by_slot_number('3');
-        unset($slots[$idmove]);
-
-        $slottoslotids = $structure->create_slot_to_slotids($slots);
-
-        // Create test data.
-        unset($testslots[$idmove]);
-        $testslottoslotids = array();
-        foreach ($testslots as $slot) {
-            $testslottoslotids[$slot->slot] = $slot->id;
-        }
-
-        $this->assertEquals($testslottoslotids, $slottoslotids);
-    }
-
-    /*
-     * Refresh the slot and page numbers of a given array of slots.
-     */
-    private function refresh_slots_and_pages($quiz, $structure, $slots) {
-        $structure->refresh_slot_numbers($quiz, $slots);
-        $structure->refresh_page_numbers($quiz, $slots);
     }
 
     private function update_slot_page_and_slot($slots, $slotnumber, $pagenumber, $slot) {
@@ -538,7 +419,6 @@ class mod_quiz_structure_testcase extends advanced_testcase {
 
         // Get updated slot ids.
         $structure->set_quiz_slots($slots);
-        $structure->set_quiz_slottoslotids($structure->create_slot_to_slotids($slots));
     }
 
     /**

@@ -31,7 +31,6 @@ require_once($CFG->dirroot.'/course/lib.php');
 require_once($CFG->dirroot . '/mod/quiz/editlib.php');
 
 // Initialise ALL the incoming parameters here, up front.
-$courseid   = required_param('courseid', PARAM_INT);
 $quizid     = required_param('quizid', PARAM_INT);
 $class      = required_param('class', PARAM_ALPHA);
 $field      = optional_param('field', '', PARAM_ALPHA);
@@ -48,7 +47,7 @@ $pageaction = optional_param('action', '', PARAM_ALPHA); // Used to simulate a D
 $maxmark    = optional_param('maxmark', '', PARAM_FLOAT);
 $page       = optional_param('page', '', PARAM_INT);
 $PAGE->set_url('/mod/quiz/rest.php',
-        array('courseid' => $courseid, 'quizid' => $quizid, 'class' => $class));
+        array('quizid' => $quizid, 'class' => $class));
 
 require_sesskey();
 $quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);

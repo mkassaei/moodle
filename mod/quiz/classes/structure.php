@@ -56,9 +56,6 @@ class structure {
      */
     protected $sections = array();
 
-    /** @var int[] slot number => slot id. */
-    protected $slottoslotids = array();
-
     /** @var bool caches the results of can_be_edited. */
     protected $canbeedited = null;
 
@@ -113,6 +110,16 @@ class structure {
      */
     public function get_question_by_id($questionid) {
         return $this->questions[$questionid];
+    }
+
+    /**
+     * Get the information about the question in a given slot.
+     * @param int $slotnumber the index of the slot in question.
+     * @return \stdClass the data from the questions table, augmented with
+     * question_category.contextid, and the quiz_slots data for the question in this quiz.
+     */
+    public function get_question_in_slot($slotnumber) {
+        return $this->questions[$this->slotsinorder[$slotnumber]->questionid];
     }
 
     /**
@@ -323,24 +330,30 @@ class structure {
     public function populate_structure($quiz) {
         global $DB;
 
-        $this->questions = $DB->get_records_sql(
-                "SELECT q.*, qc.contextid, slot.id AS slotid, slot.slot, slot.page, slot.maxmark
-                   FROM {question} q
-                   JOIN {question_categories} qc ON qc.id = q.category
-                   JOIN {quiz_slots} slot ON slot.questionid = q.id
-                  WHERE slot.quizid = ?
-               ORDER BY slot.slot", array($quiz->id));
+        $slots = $DB->get_records_sql("
+                SELECT slot.id AS slotid, slot.slot, slot.questionid, slot.page, slot.maxmark,
+                       q.*, qc.contextid
+                  FROM {quiz_slots} slot
+                  LEFT JOIN {question} q ON q.id = slot.questionid
+                  LEFT JOIN {question_categories} qc ON qc.id = q.category
+                 WHERE slot.quizid = ?
+              ORDER BY slot.slot", array($quiz->id));
 
+        $slots = $this->populate_missing_questions($slots);
+
+        $this->questions = array();
         $this->slots = array();
         $this->slotsinorder = array();
-        foreach ($this->questions as $question) {
+        foreach ($slots as $slotdata) {
+            $this->questions[$slotdata->questionid] = $slotdata;
+
             $slot = new \stdClass();
-            $slot->id = $question->slotid;
-            $slot->slot = $question->slot;
+            $slot->id = $slotdata->slotid;
+            $slot->slot = $slotdata->slot;
             $slot->quizid = $quiz->id;
-            $slot->page = $question->page;
-            $slot->questionid = $question->id;
-            $slot->maxmark = $question->maxmark;
+            $slot->page = $slotdata->page;
+            $slot->questionid = $slotdata->questionid;
+            $slot->maxmark = $slotdata->maxmark;
 
             $this->slots[$slot->id] = $slot;
             $this->slotsinorder[$slot->slot] = $slot;
@@ -355,8 +368,30 @@ class structure {
         $this->sections = array(1 => $section);
 
         $this->populate_slots_with_sectionids($quiz);
-        $this->populate_missing_questions();
         $this->populate_question_numbers();
+    }
+
+    protected function populate_missing_questions($slots) {
+        // Address missing question types.
+        foreach ($slots as $slot) {
+            if ($slot->qtype === null) {
+                // If the questiontype is missing change the question type.
+                $slot->id = $slot->questionid;
+                $slot->category = 0;
+                $slot->qtype = 'missingtype';
+                $slot->name = get_string('missingquestion', 'quiz');
+                $slot->slot = $slot->slot;
+                $slot->maxmark = 0;
+                $slot->questiontext = ' ';
+                $slot->questiontextformat = FORMAT_HTML;
+                $slot->length = 1;
+
+            } else if (!\question_bank::qtype_exists($slot->qtype)) {
+                $slot->qtype = 'missingtype';
+            }
+        }
+
+        return $slots;
     }
 
     public function populate_slots_with_sectionids() {
@@ -372,39 +407,6 @@ class structure {
             }
 
             $slot->sectionid = $currentsectionid;
-        }
-    }
-
-    public function create_slot_to_slotids($slots) {
-        $slottoslotids = array();
-        foreach ($slots as $slot) {
-            $slottoslotids[$slot->slot] = $slot->id;
-        }
-        return $slottoslotids;
-    }
-
-    protected function populate_missing_questions() {
-        // Address missing question types.
-        foreach ($this->slots as $slot) {
-            $questionid = $slot->questionid;
-
-            // If the questiontype is missing change the question type.
-            if (!array_key_exists($questionid, $this->questions)) {
-                $fakequestion = new \stdClass();
-                $fakequestion->id = $questionid;
-                $fakequestion->category = 0;
-                $fakequestion->qtype = 'missingtype';
-                $fakequestion->name = get_string('missingquestion', 'quiz');
-                $fakequestion->slot = $slot->slot;
-                $fakequestion->maxmark = 0;
-                $fakequestion->questiontext = ' ';
-                $fakequestion->questiontextformat = FORMAT_HTML;
-                $fakequestion->length = 1;
-                $this->questions[$questionid] = $fakequestion;
-
-            } else if (!\question_bank::qtype_exists($this->questions[$questionid]->qtype)) {
-                $this->questions[$questionid]->qtype = 'missingtype';
-            }
         }
     }
 
@@ -433,12 +435,11 @@ class structure {
     public function move_slot($quiz, $idmove, $idbefore, $page) {
         global $DB, $CFG;
 
-        $slottoslotids = $this->create_slot_to_slotids($this->slots);
         $movingslot = $this->slots[$idmove];
 
         // Empty target slot means move slot to first.
         if (empty($idbefore)) {
-            $targetslot = $this->slots[$slottoslotids[1]];
+            $targetslot = $this->slotsinorder[1];
         } else {
             $targetslot = $this->slots[$idbefore];
         }
@@ -504,22 +505,6 @@ class structure {
 
         $this->set_quiz_slots($slots);
         $this->populate_slots_with_sectionids($quiz);
-    }
-
-    /**
-     * Refresh slot numbering of quiz slots
-     * Required after deleting slots.
-     * @param object $quiz the quiz object.
-     */
-    public function refresh_slot_numbers($quiz, $slots=array()) {
-        $slottoslotids = $this->create_slot_to_slotids($slots);
-        $slotnumber = 1;
-        foreach ($slottoslotids as $slottoslotid) {
-            $slots[$slottoslotid]->slot = $slotnumber;
-            $slotnumber++;
-        }
-
-        return $slots;
     }
 
     /**
@@ -664,18 +649,5 @@ class structure {
 
     public function set_quiz_sections(array $sections) {
         $this->sections = $sections;
-    }
-
-    public function set_quiz_slottoslotids(array $slottoslotids) {
-        $this->slottoslotids = $slottoslotids;
-    }
-
-    public function find_slot_by_slotnumber($slots, $slotnumber) {
-        foreach ($slots as $slot) {
-            if ($slot->slot !== $slotnumber) {
-                continue;
-            }
-            return $slot;
-        }
     }
 }
