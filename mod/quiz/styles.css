@@ -1064,6 +1064,42 @@ table#categoryquestions td,
     margin: .4em;
 }
 
+.path-mod-quiz ul.slots li.section li.activity .instancemaxmark {
+    display: inline-block;
+    text-align: right;
+}
+
+.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_0 {
+    min-width: 1.3em;
+}
+.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_1 {
+    min-width: 2em;
+}
+
+.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_2 {
+    min-width: 2.6em;
+}
+
+.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_3 {
+    min-width: 3.2em;
+}
+
+.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_4 {
+    min-width: 3.7em;
+}
+
+.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_5 {
+    min-width: 4.3em;
+}
+
+.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_6 {
+    min-width: 4.8em;
+}
+
+.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_7 {
+    min-width: 5.45em;
+}
+
 .path-mod-quiz ul.slots li.section li.activity .edit_icon,
 .path-mod-quiz ul.slots li.section li.activity a.preview,
 .path-mod-quiz ul.slots li.section li.activity .editing_delete,

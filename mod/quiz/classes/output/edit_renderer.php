@@ -695,7 +695,8 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function marked_out_of_field($quiz, $question) {
-        $output = html_writer::span(quiz_format_question_grade($quiz, $question->maxmark), 'instancemaxmark',
+        $output = html_writer::span(quiz_format_question_grade($quiz, $question->maxmark),
+                'instancemaxmark decimalplaces_'.quiz_get_grade_format($quiz),
                 array('title'=>get_string('maxmark', 'quiz')));
 
         $output .= html_writer::span(

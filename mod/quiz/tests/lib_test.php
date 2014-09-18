@@ -58,6 +58,20 @@ class mod_quiz_lib_testcase extends advanced_testcase {
         $this->assertEquals(quiz_format_grade($quiz, 0.12345678), '0');
     }
 
+    public function test_quiz_get_grade_format() {
+        $quiz = new stdClass();
+        $quiz->decimalpoints = 2;
+        $this->assertEquals(quiz_get_grade_format($quiz), 2);
+        $this->assertEquals($quiz->questiondecimalpoints, -1);
+        $quiz->questiondecimalpoints = 2;
+        $this->assertEquals(quiz_get_grade_format($quiz), 2);
+        $quiz->decimalpoints = 3;
+        $quiz->questiondecimalpoints = -1;
+        $this->assertEquals(quiz_get_grade_format($quiz), 3);
+        $quiz->questiondecimalpoints = 4;
+        $this->assertEquals(quiz_get_grade_format($quiz), 4);
+    }
+
     public function test_quiz_format_question_grade() {
         $quiz = new stdClass();
         $quiz->decimalpoints = 2;
