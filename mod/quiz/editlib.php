@@ -224,13 +224,7 @@ class question_bank_add_to_quiz_action_column extends question_bank_action_colum
         if (!question_has_capability_on($question, 'use')) {
             return;
         }
-        // For RTL languages: switch right and left arrows.
-        if (right_to_left()) {
-            $movearrow = 't/removeright';
-        } else {
-            $movearrow = 't/moveleft';
-        }
-        $this->print_icon($movearrow, $this->stradd, $this->qbank->add_to_quiz_url($question->id));
+        $this->print_icon('t/add', $this->stradd, $this->qbank->add_to_quiz_url($question->id));
     }
 
     public function get_required_fields() {
