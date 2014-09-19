@@ -690,10 +690,13 @@ class edit_renderer extends \plugin_renderer_base {
 
         $icon = $this->pix_icon('icon', $namestr, $qtype->plugin_name(), array('title' => $namestr,
                 'class' => 'icon activityicon', 'alt' => ' ', 'role' => 'presentation'));
+
+        $editicon = $this->pix_icon('t/edit', '', 'moodle', array('title' => ''));
+
         // Need plain question name without html tags for link title.
         $title = shorten_text(format_string($question->name), 100);
         // Display the link itself.
-        $activitylink = $icon . html_writer::tag('span', $instancename, array('class' => 'instancename'));
+        $activitylink = $icon . html_writer::tag('span', $editicon . $instancename, array('class' => 'instancename'));
         $output .= html_writer::link($editurl, $activitylink,
                 array('title' => get_string('editquestion', 'quiz').' '.$title));
         return $output;

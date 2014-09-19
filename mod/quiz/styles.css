@@ -1147,9 +1147,14 @@ table#categoryquestions td,
     padding: 0;
 }
 
+#page-mod-quiz-edit ul.slots .activityinstance span.instancename img {
+    margin-right: .2em;
+}
+
 #page-mod-quiz-edit ul.slots .activityinstance img.activityicon {
     float: left;
     margin-top: .2em;
+    margin-right: 0;
 }
 
 #page-mod-quiz-edit .statusbar {
