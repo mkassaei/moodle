@@ -30,11 +30,6 @@ namespace mod_quiz;
 
 use core\plugininfo\theme;
 class structure {
-    /** Constant to represent splitting two pages. */
-    const SPLIT = 'split';
-    /** Constant to represent joining two pages. */
-    const JOIN  = 'join';
-
     /** @var \quiz the quiz this is the structure of. */
     protected $quizobj = null;
 

@@ -370,23 +370,19 @@ class edit_renderer extends \plugin_renderer_base {
                     array('class' => 'pagenumber activity yui3-dd-drop page', 'id' => 'page-' . $question->page));
         }
 
-        if ($questionhtml = $this->question($structure, $question, $pageurl)) {
-            $questionclasses = 'activity ' . $question->qtype . ' qtype_' . $question->qtype . ' slot';
-            $output .= html_writer::tag('li', $questionhtml, array('class' => $questionclasses, 'id' => 'slot-' . $question->slotid));
-        }
-
-        if ($structure->is_last_slot_on_page($question->slot)) {
-            $splitorjoin = structure::JOIN;
-            $pagebreakclass = '';
-        } else {
-            $splitorjoin = structure::SPLIT;
-            $pagebreakclass = 'break';
-        }
-
+        // Page split/join icon.
+        $joinhtml = '';
         if (!$structure->is_last_slot_in_quiz($question->slot)) {
-            $joinhtml = $this->page_split_join_button($structure->get_quiz(), $question, $splitorjoin);
-            $output .= html_writer::tag('li', $joinhtml, array('class' => 'activity yui3-dd-drop page_join ' . $pagebreakclass));
+            $joinhtml = $this->page_split_join_button($structure->get_quiz(),
+                    $question, !$structure->is_last_slot_on_page($question->slot));
         }
+
+        // Question HTML.
+        $questionhtml = $this->question($structure, $question, $pageurl);
+        $questionclasses = 'activity ' . $question->qtype . ' qtype_' . $question->qtype . ' slot';
+
+        $output .= html_writer::tag('li', $questionhtml . $joinhtml,
+                array('class' => $questionclasses, 'id' => 'slot-' . $question->slotid));
 
         return $output;
     }
@@ -625,14 +621,15 @@ class edit_renderer extends \plugin_renderer_base {
      *
      * @param stdClass $quiz the quiz settings from the database.
      * @param stdClass $question data from the question and quiz_slots tables.
-     * @param string $splitorjoin structure::SPLIT or structure::JOIN.
+     * @param string $insertpagebreak if true, show an insert page break icon.
+     *      Else show a join pages icon.
      * @return string HTML to output.
      */
-    public function page_split_join_button($quiz, $question, $splitorjoin) {
+    public function page_split_join_button($quiz, $question, $insertpagebreak) {
         $url = new \moodle_url('repaginate.php', array('cmid' => $quiz->cmid, 'quizid' => $quiz->id,
-                    'slot' => $question->slot, 'repag' => $splitorjoin, 'sesskey' => sesskey()));
+                    'slot' => $question->slot, 'repag' => $insertpagebreak ? 2 : 1, 'sesskey' => sesskey()));
 
-        if ($splitorjoin == structure::SPLIT) {
+        if ($insertpagebreak) {
             $title = get_string('splitpages', 'quiz');
             $image = $this->pix_icon('e/insert_page_break', $title);
             $action = 'unlinkpage';
@@ -647,8 +644,9 @@ class edit_renderer extends \plugin_renderer_base {
         if (quiz_has_attempts($quiz->id)) {
             $disabled = "disabled";
         }
-        return $this->action_link($url, $image, null, array('title' => $title,
-                    'class' => 'cm-edit-action editing_page_join', 'disabled' => $disabled, 'data-action' => $action));
+        return html_writer::span($this->action_link($url, $image, null, array('title' => $title,
+                    'class' => 'page_split_join', 'disabled' => $disabled, 'data-action' => $action)),
+                'page_split_join_wrapper');
     }
 
     /**

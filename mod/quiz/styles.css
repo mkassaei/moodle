@@ -1049,13 +1049,8 @@ table#categoryquestions td,
     background: #E6E6E6;
     margin: 3px 0 3px 0
 }
-.path-mod-quiz ul.slots li.section li.activity.page,
-.path-mod-quiz ul.slots li.section li.activity.page_join {
+.path-mod-quiz ul.slots li.section li.activity.page {
     background: transparent;
-}
-
-.path-mod-quiz ul.slots li.section li.activity.page_join {
-    margin: -15px -25px;
 }
 
 .path-mod-quiz ul.slots li.section li.activity .instancemaxmarkcontainer {
@@ -1067,6 +1062,14 @@ table#categoryquestions td,
 .path-mod-quiz ul.slots li.section li.activity .instancemaxmark {
     display: inline-block;
     text-align: right;
+}
+.path-mod-quiz ul.slots li.section li.activity .page_split_join_wrapper {
+    position: absolute;
+}
+.path-mod-quiz ul.slots li.section li.activity .page_split_join {
+    position: relative;
+    left: -20px;
+    top: -7px;
 }
 
 .path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_0 {
