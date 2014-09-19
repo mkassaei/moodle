@@ -96,7 +96,10 @@ Y.extend(POPUP, Y.Base, {
     load_content : function(queryString) {
         this.dialogue.bodyNode.append(this.loadingDiv);
 
-        window.history.replaceState(null, '', M.cfg.wwwroot + '/mod/quiz/edit.php' + queryString);
+        // If to support old IE.
+        if (window.history.replaceState) {
+            window.history.replaceState(null, '', M.cfg.wwwroot + '/mod/quiz/edit.php' + queryString);
+        }
 
         Y.io(M.cfg.wwwroot + '/mod/quiz/questionbank.ajax.php' + queryString, {
             method: 'GET',
