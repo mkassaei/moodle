@@ -1113,7 +1113,7 @@ table#categoryquestions td,
 }
 
 #page-mod-quiz-edit span.editinstructions {
-    margin-left: 250px;
+    right: 0;
 }
 
 #page-mod-quiz-edit ul.slots .activityinstance span.instancename {
