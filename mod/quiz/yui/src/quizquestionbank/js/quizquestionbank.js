@@ -93,10 +93,7 @@ Y.extend(POPUP, Y.Base, {
 
     load_content : function(queryString) {
         Y.log('Starting load.');
-        this.dialogue.bodyNode.setHTML(this.loadingDiv);
-        if (this.dialogue.visible) {
-            Y.later(0, this.dialogue, this.dialogue.centerDialogue);
-        }
+        this.dialogue.bodyNode.append(this.loadingDiv);
 
         window.history.replaceState(null, '', M.cfg.wwwroot + '/mod/quiz/edit.php' + queryString);
 

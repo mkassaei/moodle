@@ -769,31 +769,22 @@ table#categoryquestions td,
 }
 .mod_quiz_qbank_dialogue {
     width: 80%;
-
+    min-height: 200px;
 }
 .mod_quiz_qbank_dialogue.moodle-dialogue-fullscreen {
     width: 100%;
 
 }
-.questionbankwindow.block {
-    float: right;
-    right: 0.3em;
-    padding-bottom: 0.5em;
-    display: block;
-    border-width: 0;
-}
-.questionbankwindow.block .content {
-    padding: 0;
-}
-.questionbankwindow .choosecategory,
-.questionbankwindow .createnewquestion {
-    padding: 0.3em;
-}
-.questionbankwindow .createnewquestion .singlebutton {
-    display: inline;
-}
-.questionbankwindow #catmenu_jump {
-    display: block;
+.mod_quiz_qbank_dialogue .questionbankloading {
+    position: absolute;
+    top: 30px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    text-align: center;
+    opacity: 0.5;
+    padding-top: 50px;
 }
 
 .modulespecificbuttonscontainer {
