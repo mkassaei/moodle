@@ -1899,7 +1899,7 @@ function quiz_question_tostring($question, $showicon = false,
         $questiontext = question_utils::to_plain_text($question->questiontext,
                 $question->questiontextformat, array('noclean' => true, 'para' => false));
         $questiontext = shorten_text($questiontext, 200);
-        $result .= '<span class="questiontext">';
+        $result .= ' <span class="questiontext">';
         if (!empty($questiontext)) {
             $result .= s($questiontext);
         } else {

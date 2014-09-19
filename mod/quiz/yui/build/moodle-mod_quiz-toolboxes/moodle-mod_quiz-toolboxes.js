@@ -37,7 +37,7 @@ YUI.add('moodle-mod_quiz-toolboxes', function (Y, NAME) {
         ACTIONAREA: '.actions',
         ACTIONLINKTEXT : '.actionlinktext',
         ACTIVITYACTION : 'a.cm-edit-action[data-action], a.editing_maxmark',
-        ACTIVITYFORM : '.' + CSS.ACTIVITYINSTANCE + ' form',
+        ACTIVITYFORM : 'span.instancemaxmarkcontainer form',
         ACTIVITYICON : 'img.activityicon',
         ACTIVITYINSTANCE : '.' + CSS.ACTIVITYINSTANCE,
         ACTIVITYLINK: '.' + CSS.ACTIVITYINSTANCE + ' > a',

@@ -539,6 +539,10 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::start_div('activityinstance');
         $output .= $questionname;
 
+        // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
+        $output .= html_writer::end_tag('div'); // .activityinstance.
+        $output .= html_writer::end_tag('div'); // ...$indentclasses.
+
         // Action icons.
         $questionicons = '';
         $questionicons .= $this->question_preview_icon($structure->get_quiz(), $question);
@@ -547,10 +551,6 @@ class edit_renderer extends \plugin_renderer_base {
         }
         $questionicons .= $this->marked_out_of_field($structure->get_quiz(), $question);
         $output .= html_writer::span($questionicons, 'actions'); // Required to add js spinner icon.
-
-        // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
-        $output .= html_writer::end_tag('div'); // .activityinstance.
-        $output .= html_writer::end_tag('div'); // ...$indentclasses.
 
         // End of indentation div.
         $output .= html_writer::end_tag('div');
