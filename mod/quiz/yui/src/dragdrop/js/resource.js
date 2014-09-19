@@ -18,11 +18,11 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
         this.resourcedraghandle = this.get_drag_handle(M.str.moodle.move, CSS.EDITINGMOVE, CSS.ICONCLASS, true);
 
         this.samenodelabel = {
-            identifier: 'dragtoafterquestion',
+            identifier: 'dragtoafter',
             component: 'quiz'
         };
         this.parentnodelabel = {
-            identifier: 'dragtostartofpage',
+            identifier: 'dragtostart',
             component: 'quiz'
         };
 

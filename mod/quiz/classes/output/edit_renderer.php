@@ -524,7 +524,7 @@ class edit_renderer extends \plugin_renderer_base {
         }
 
         $output .= html_writer::start_div('mod-indent-outer');
-        $output .= html_writer::tag('span', $question->displayednumber, array('class' => 'slotnumber'));
+        $output .= $this->question_number($question->displayednumber);
 
         // This div is used to indent the content.
         $output .= html_writer::div('', 'mod-indent');
@@ -570,6 +570,20 @@ class edit_renderer extends \plugin_renderer_base {
             $this->pix_icon('i/dragdrop', get_string('move'), 'moodle', array('class' => 'iconsmall', 'title' => '')),
             array('class' => 'editing_move', 'data-action' => 'move')
         );
+    }
+
+    /**
+     * Output the question number.
+     * @param string $number The number, or 'i'.
+     * @return string HTML to output.
+     */
+    public function question_number($number) {
+        $numbertext = '';
+        if (is_numeric($number)) {
+            $number = html_writer::span(get_string('question'), 'accesshide') .
+                    ' ' . $number;
+        }
+        return html_writer::tag('span', $number, array('class' => 'slotnumber'));
     }
 
     /**
@@ -822,14 +836,15 @@ class edit_renderer extends \plugin_renderer_base {
                 'move',
                 'movesection',
                 'movecontent',
+                'selectall',
                 'tocontent',
                 'emptydragdropregion'
         ), 'moodle');
 
         $this->page->requires->strings_for_js(array(
                 'confirmremovequestion',
-                'dragtoafterquestion',
-                'dragtostartofpage',
+                'dragtoafter',
+                'dragtostart',
         ), 'quiz');
 
         foreach (\question_bank::get_all_qtypes() as $qtype => $notused) {
