@@ -563,7 +563,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         activity = activity.next('li.activity.slot');
         var spinner = this.add_spinner(activity),
             slotid = 0;
-        var value = action == 'linkpage' ? 1:2;
+        var value = action === 'linkpage' ? 1:2;
 
         var data = {
             'class': 'resource',
