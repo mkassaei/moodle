@@ -18,7 +18,7 @@
  * Unit tests for (some of) mod/quiz/locallib.php.
  *
  * @package    mod_quiz
- * @category   phpunit
+ * @category   test
  * @copyright  2008 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */

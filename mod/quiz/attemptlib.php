@@ -155,6 +155,10 @@ class quiz {
         get_question_options($questionstoprocess);
     }
 
+    /**
+     * Get an instance of the {@link \mod_quiz\structure} class for this quiz.
+     * @return \mod_quiz\structure describes the questions in the quiz.
+     */
     public function get_structure() {
         return \mod_quiz\structure::create_for_quiz($this);
     }

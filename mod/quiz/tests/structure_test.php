@@ -17,10 +17,10 @@
 /**
  * Quiz events tests.
  *
- * @package    mod_quiz
- * @category   phpunit
- * @copyright  2013 Adrian Greeve
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_quiz
+ * @category  test
+ * @copyright 2013 Adrian Greeve
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,8 +32,6 @@ require_once($CFG->dirroot . '/mod/quiz/editlib.php');
 /**
  * Unit tests for quiz events.
  *
- * @package    mod_quiz
- * @category   phpunit
  * @copyright  2013 Adrian Greeve
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

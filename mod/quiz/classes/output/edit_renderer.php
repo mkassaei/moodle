@@ -482,6 +482,8 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * Render the form that contains the data for adding a new question to the quiz.
+     *
      * @param structure $structure object containing the structure of the quiz.
      * @param int $page the page number that this menu will add to.
      * @param \moodle_url $pageurl the canonical URL of this page.
@@ -752,7 +754,7 @@ class edit_renderer extends \plugin_renderer_base {
 
     /**
      * Return random question form.
-     * @param \moodle_url $pageurl the canonical URL of this page.
+     * @param \moodle_url $thispageurl the canonical URL of this page.
      * @param \question_edit_contexts $contexts the relevant question bank contexts.
      * @param array $pagevars the variables from {@link question_edit_setup()}.
      * @return string HTML to output.

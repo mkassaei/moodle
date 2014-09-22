@@ -15,11 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The structure of the quiz. That is, which questions it is built up
- * from. This is used on the Edit quiz page (edit.php) and also when
- * starting an attempt at the quiz (startattempt.php). Once an attempt
- * has been started, then the attempt holds the specific set of questions
- * that that student should answer, and we no longer use this class.
+ * Defines the \mod_quiz\structure class.
  *
  * @package   mod_quiz
  * @copyright 2013 The Open University
@@ -28,7 +24,17 @@
 
 namespace mod_quiz;
 
-use core\plugininfo\theme;
+
+/**
+ * The structure of the quiz. That is, which questions it is built up
+ * from. This is used on the Edit quiz page (edit.php) and also when
+ * starting an attempt at the quiz (startattempt.php). Once an attempt
+ * has been started, then the attempt holds the specific set of questions
+ * that that student should answer, and we no longer use this class.
+ *
+ * @copyright 2014 The Open University
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class structure {
     /** @var \quiz the quiz this is the structure of. */
     protected $quizobj = null;
@@ -84,13 +90,15 @@ class structure {
     }
 
     /**
-     * @return boolean whether there are any questions in the quiz.
+     * Whether there are any questions in the quiz.
+     * @return boolean true if there is at least one question in the quiz.
      */
     public function has_questions() {
         return !empty($this->questions);
     }
 
     /**
+     * Get the number of questions in the quiz.
      * @return int the number of questions in the quiz.
      */
     public function get_question_count() {
@@ -139,7 +147,8 @@ class structure {
     }
 
     /**
-     * @return bool whether the question in the quiz are shuffled for each attempt.
+     * Whether the question in the quiz are shuffled for each attempt.
+     * @return bool true if the questions are shuffled.
      */
     public function is_shuffled() {
         return $this->quizobj->get_quiz()->shufflequestions;
@@ -167,6 +176,8 @@ class structure {
     }
 
     /**
+     * This setting controls how frequently extra page-breaks should be inserted
+     * automatically when questions are added to the quiz.
      * @return int the number of questions that should be on each page of the
      * quiz by default.
      */
@@ -216,7 +227,8 @@ class structure {
     }
 
     /**
-     * @return stdClass get the last slot in the quiz.
+     * Get the final slot in the quiz.
+     * @return stdClass the quiz_slots for for the final slot in the quiz.
      */
     public function get_last_slot() {
         return end($this->slotsinorder);
@@ -257,7 +269,8 @@ class structure {
     }
 
     /**
-     * @return array of strings. Warnings to show at the top of the edit page.
+     * Get any warnings to show at the top of the edit page.
+     * @return array of strings.
      */
     public function get_edit_page_warnings() {
         $warnings = array();

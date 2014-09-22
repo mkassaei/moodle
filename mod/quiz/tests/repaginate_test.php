@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
+ * Unit tests for the {@link \mod_quiz\repaginate} class.
  * @package   mod_quiz
+ * @category  test
  * @copyright 2014 The Open Univsersity
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @group quiz
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -29,6 +29,12 @@ require_once($CFG->dirroot . '/mod/quiz/editlib.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/classes/repaginate.php');
 
+
+/**
+ * Testable subclass, giving access to the protected methods of {@link \mod_quiz\repaginate}
+ * @copyright 2014 The Open Univsersity
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_quiz_repaginate_testable extends \mod_quiz\repaginate {
 
     public function __construct($quizid = 0, $slots = null) {
@@ -54,10 +60,10 @@ class mod_quiz_repaginate_testable extends \mod_quiz\repaginate {
     }
 }
 
-/** Test for some parts of the repaginate class.
+/**
+ * Test for some parts of the repaginate class.
  * @copyright 2014 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @group quiz_editing
  */
 class quiz_repaginate_test extends advanced_testcase {
 

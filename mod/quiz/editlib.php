@@ -367,32 +367,6 @@ class quiz_question_bank_view extends core_question\bank\view {
         return $out;
     }
 
-    public function xxxxdisplay($tabname, $page, $perpage, $cat,
-            $recurse, $showhidden, $showquestiontext) {
-        global $OUTPUT;
-        if ($this->process_actions_needing_ui()) {
-            return;
-        }
-
-        $editcontexts = $this->contexts->having_one_edit_tab_cap($tabname);
-        array_unshift($this->searchconditions,
-                new \core_question\bank\search\hidden_condition(!$showhidden));
-        array_unshift($this->searchconditions,
-                new \core_question\bank\search\category_condition($cat, $recurse,
-                        $editcontexts, $this->baseurl, $this->course, self::MAX_TEXT_LENGTH));
-
-        echo $OUTPUT->box_start('generalbox questionbank');
-        $this->display_options_form($showquestiontext);
-
-        // Continues with list of questions.
-        $this->display_question_list($this->contexts->having_one_edit_tab_cap($tabname),
-                $this->baseurl, $cat, $this->cm, $recurse, $page,
-                $perpage, $showhidden, $showquestiontext,
-                $this->contexts->having_cap('moodle/question:add'));
-
-        echo $OUTPUT->box_end();
-    }
-
     /**
      * Display the controls at the bottom of the list of questions.
      * @param int      $totalnumber Total number of questions that might be shown (if it was not for paging).
