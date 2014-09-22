@@ -516,24 +516,16 @@ table.quizreviewsummary td.cell {
 
 /** Mod quiz edit **/
 #page-mod-quiz-edit li.activity > div {
-    position:relative;
+    position: relative;
 }
 
 #page-mod-quiz-edit .add-menu-outer {
     float: right;
-    --margin-bottom: -1.5em;'
     margin-left: 55em;
 }
 #page-mod-quiz-edit .add-menu {
     max-height: 20px;
     width:10em;
-}
-#page-mod-quiz-edit .add-menu-left {
-    position:relative;
-    right:10em;
-}
-#page-mod-quiz-edit .tablerow {
-    display: table;
 }
 #page-mod-quiz-edit .slotnumber{
     background-color: #D3D3D3;
@@ -827,7 +819,7 @@ table#categoryquestions {
 #page-mod-quiz-edit .statusdisplay p {
     margin: 0.4em;
 }
-table#categoryquestions td,
+#page-mod-quiz-edit table#categoryquestions td,
 #page-mod-quiz-edit table#categoryquestions th {
     overflow: hidden;
     white-space: nowrap;
@@ -918,10 +910,6 @@ table#categoryquestions td,
 .questionbank .categorypagingbarcontainer,
 .questionbank .categoryselectallcontainer {
     background-color: #FFF;
-}
-
-.qnum label {
-    padding-right: 0.25em;
 }
 
 /* RTL Mode */
