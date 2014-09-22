@@ -239,8 +239,9 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function total_marks($quiz) {
+        $totalmark = html_writer::span(quiz_format_grade($quiz, $quiz->sumgrades), 'mod_quiz_summarks');
         return html_writer::tag('span',
-                get_string('totalmarksx', 'quiz', quiz_format_grade($quiz, $quiz->sumgrades)),
+                get_string('totalmarksx', 'quiz', $totalmark),
                 array('class' => 'totalpoints'));
     }
 

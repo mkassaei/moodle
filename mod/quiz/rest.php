@@ -103,7 +103,8 @@ switch($requestmethod) {
                             quiz_update_all_final_grades($quiz);
                             quiz_update_grades($quiz, 0, true);
                         }
-                        echo json_encode(array('instancemaxmark' => quiz_format_question_grade($quiz, $maxmark)));
+                        echo json_encode(array('instancemaxmark' => quiz_format_question_grade($quiz, $maxmark),
+                                'newsummarks' => quiz_format_grade($quiz, $quiz->sumgrades)));
                         break;
                     case 'linkslottopage':
                         require_capability('mod/quiz:manage', $modcontext);
@@ -133,6 +134,7 @@ switch($requestmethod) {
                 $structure->remove_slot($quiz, $slot->slot);
                 quiz_delete_previews($quiz);
                 quiz_update_sumgrades($quiz);
+                echo json_encode(array('newsummarks' => quiz_format_grade($quiz, $quiz->sumgrades)));
                 break;
         }
         break;

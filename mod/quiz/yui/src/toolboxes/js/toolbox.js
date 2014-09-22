@@ -56,7 +56,8 @@
         SECTIONUL : 'ul.section',
         SHOW : 'a.' + CSS.SHOW,
         SHOWHIDE : 'a.editing_showhide',
-        SLOTLI : 'li.slot'
+        SLOTLI : 'li.slot',
+        SUMMARKS : '.mod_quiz_summarks'
     },
     BODY = Y.one(document.body);
 
@@ -120,6 +121,9 @@ Y.extend(TOOLBOX, Y.Base, {
                     } catch (e) {}
 
                     // Run the callback if we have one.
+                    if (responsetext.newsummarks) {
+                        Y.one(SELECTOR.SUMMARKS).setHTML(responsetext.newsummarks);
+                    }
                     if (success_callback) {
                         Y.bind(success_callback, this, responsetext)();
                     }
