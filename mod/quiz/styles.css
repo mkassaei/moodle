@@ -355,6 +355,7 @@ body.path-mod-quiz table tbody tr.gradedattempt > td {
     margin-left: 0;
     margin-right: 0;
 }
+
 /** Mod quiz summary **/
 #page-mod-quiz-summary #content {
     text-align: center;
@@ -514,6 +515,211 @@ table.quizreviewsummary td.cell {
 }
 
 /** Mod quiz edit **/
+#page-mod-quiz-edit li.activity > div {
+    position:relative;
+}
+
+#page-mod-quiz-edit .add-menu-outer {
+    float: right;
+    --margin-bottom: -1.5em;'
+    margin-left: 55em;
+}
+#page-mod-quiz-edit .add-menu {
+    max-height: 20px;
+    width:10em;
+}
+#page-mod-quiz-edit .add-menu-left {
+    position:relative;
+    right:10em;
+}
+#page-mod-quiz-edit .tablerow {
+    display: table;
+}
+#page-mod-quiz-edit .slotnumber{
+    background-color: #D3D3D3;
+    text-align: center;
+    margin-right: 0.5em;
+    margin-top: 0.2em;
+    min-width: 2em;
+    display: inline-block;
+}
+
+#page-mod-quiz-edit ul.slots li.section {
+    border: 0;
+}
+#page-mod-quiz-edit ul.slots li.section .content {
+    background-color:#FAFAFA;
+    padding:5px 10px;
+}
+#page-mod-quiz-edit ul.slots li.section .content h3 {
+    margin:0;
+    color:#777;
+    font-weight: normal;
+}
+#page-mod-quiz-edit ul.slots li.section .left {
+    padding:4px 0;
+}
+#page-mod-quiz-edit ul.slots li.section .right {
+    padding:4px 0;
+}
+#page-mod-quiz-edit ul.slots {
+    margin:0;
+}
+#page-mod-quiz-edit ul.slots li.section {
+    list-style: none;
+    margin:0 0 5px 0;
+    padding:0;
+}
+#page-mod-quiz-edit ul.slots li.section .left {
+    float:left;
+}
+#page-mod-quiz-edit ul.slots li.section .right {
+    float:right;
+}
+#page-mod-quiz-edit ul.slots li.section .left,
+#page-mod-quiz-edit ul.slots li.section .right {
+    width:40px;
+    text-align:center;
+    padding: 6px 0;
+}
+#page-mod-quiz-edit ul.slots li.section .right img.icon {
+    padding: 0 0 4px 0;
+}
+#page-mod-quiz-edit ul.slots li.section .left .section-handle img.icon {
+    padding:0;
+    vertical-align: baseline;
+}
+#page-mod-quiz-edit ul.slots li.section li.activity {
+    background: #E6E6E6;
+    margin: 3px 0 3px 0;
+    padding: 0.2em 0 0.2em 0.2em;
+}
+#page-mod-quiz-edit ul.slots li.section li.activity.page {
+    background: transparent;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer {
+    background: white;
+    padding: .2em;
+    margin: .4em;
+}
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer form {
+    display: inline;
+}
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer form input {
+    margin: 0;
+    padding: 0.2em;
+    height: 1em;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark {
+    display: inline-block;
+    text-align: right;
+}
+#page-mod-quiz-edit ul.slots li.section li.activity .page_split_join_wrapper {
+    position: absolute;
+}
+#page-mod-quiz-edit ul.slots li.section li.activity .page_split_join {
+    position: relative;
+    left: -20px;
+    top: -7px;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_0 {
+    min-width: 1.3em;
+}
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_1 {
+    min-width: 2em;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_2 {
+    min-width: 2.6em;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_3 {
+    min-width: 3.2em;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_4 {
+    min-width: 3.7em;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_5 {
+    min-width: 4.3em;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_6 {
+    min-width: 4.8em;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_7 {
+    min-width: 5.45em;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .edit_icon,
+#page-mod-quiz-edit ul.slots li.section li.activity a.preview,
+#page-mod-quiz-edit ul.slots li.section li.activity .editing_delete,
+#page-mod-quiz-edit ul.slots li.section li.activity .editing_maxmark {
+    margin-left: 5px
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .activityinstance {
+    display: block;
+    min-height: 1.7em;
+}
+
+.quizsavegradesform label[for=inputmaxgrade],
+#page-mod-quiz-edit ul.slots .activityinstance form {
+    display: inline;
+}
+#page-mod-quiz-edit .maxgrade,
+#page-mod-quiz-edit .totalpoints {
+    display: block;
+    float: right;
+    margin: -2.5em 1em 0em 1em;
+    padding: .2em;
+}
+
+#page-mod-quiz-edit span.editinstructions {
+    right: 0;
+}
+
+#page-mod-quiz-edit ul.slots .activityinstance span.instancename {
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#page-mod-quiz-edit ul.slots .activityinstance span.instancename img {
+    margin-right: .2em;
+}
+#page-mod-quiz-edit ul.slots li.activity div.activityinstance .questionname {
+    font-weight: bold;
+    color: #555;
+}
+#page-mod-quiz-edit ul.slots li.activity div.activityinstance .questiontext {
+    color: #555;
+}
+#page-mod-quiz-edit ul.slots li.activity div.activityinstance .mod_quiz_random_qbank_link {
+    font-size: 0.8em;
+}
+
+#page-mod-quiz-edit ul.slots .activityinstance img.activityicon {
+    float: left;
+    margin-top: .2em;
+    margin-right: 0;
+}
+
+#page-mod-quiz-edit .statusbar {
+    margin: 0.6em 0.4em;
+}
+
+#page-mod-quiz-edit .section .activity .actions {
+    white-space: nowrap;
+    background: #e6e6e6;
+    padding: .2em 0 .2em .5em;
+}
+
 #page-mod-quiz-edit h2.main {
     display: inline;
     padding-right: 1em;
@@ -748,211 +954,4 @@ table#categoryquestions td,
 #page-mod-quiz-edit.dir-rtl div.points input {
     direction: ltr;
     text-align: left;
-}
-#page-mod-quiz-edit li.activity > div {
-	position:relative;
-}
-
-#page-mod-quiz-edit .add-menu-outer {
-    float: right;
-    --margin-bottom: -1.5em;'
-    margin-left: 55em;
-}
-#page-mod-quiz-edit .add-menu {
-    max-height: 20px;
-    width:10em;
-}
-#page-mod-quiz-edit .add-menu-left {
-    position:relative;
-    right:10em;
-}
-#page-mod-quiz-edit .tablerow {
-    display:table;
-}
-#page-mod-quiz-edit .slotnumber{
-    background-color: #D3D3D3;
-    text-align: center;
-    margin-right: 0.5em;
-    margin-top: 0.2em;
-    min-width: 2em;
-    display: inline-block;
-}
-
-/**
- * Edit Quiz
- */
-#page-mod-quiz-edit ul.slots li.section {
-    border: 0;
-}
-#page-mod-quiz-edit ul.slots li.section .content {
-    background-color:#FAFAFA;
-    padding:5px 10px;
-}
-#page-mod-quiz-edit ul.slots li.section .content h3 {
-    margin:0;
-    color:#777;
-    font-weight: normal;
-}
-#page-mod-quiz-edit ul.slots li.section .left {
-    padding:4px 0;
-}
-#page-mod-quiz-edit ul.slots li.section .right {
-    padding:4px 0;
-}
-#page-mod-quiz-edit ul.slots {
-    margin:0;
-}
-#page-mod-quiz-edit ul.slots li.section {
-    list-style: none;
-    margin:0 0 5px 0;
-    padding:0;
-}
-#page-mod-quiz-edit ul.slots li.section .left {
-    float:left;
-}
-#page-mod-quiz-edit ul.slots li.section .right {
-    float:right;
-}
-#page-mod-quiz-edit ul.slots li.section .left,
-#page-mod-quiz-edit ul.slots li.section .right {
-    width:40px;
-    text-align:center;
-    padding: 6px 0;
-}
-#page-mod-quiz-edit ul.slots li.section .right img.icon {
-    padding: 0 0 4px 0;
-}
-#page-mod-quiz-edit ul.slots li.section .left .section-handle img.icon {
-    padding:0;
-    vertical-align: baseline;
-}
-#page-mod-quiz-edit ul.slots li.section li.activity {
-    background: #E6E6E6;
-    margin: 3px 0 3px 0;
-    padding: 0.2em 0 0.2em 0.2em;
-}
-#page-mod-quiz-edit ul.slots li.section li.activity.page {
-    background: transparent;
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer {
-    background: white;
-    padding: .2em;
-    margin: .4em;
-}
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer form {
-    display: inline;
-}
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer form input {
-    margin: 0;
-    padding: 0.2em;
-    height: 1em;
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark {
-    display: inline-block;
-    text-align: right;
-}
-#page-mod-quiz-edit ul.slots li.section li.activity .page_split_join_wrapper {
-    position: absolute;
-}
-#page-mod-quiz-edit ul.slots li.section li.activity .page_split_join {
-    position: relative;
-    left: -20px;
-    top: -7px;
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_0 {
-    min-width: 1.3em;
-}
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_1 {
-    min-width: 2em;
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_2 {
-    min-width: 2.6em;
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_3 {
-    min-width: 3.2em;
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_4 {
-    min-width: 3.7em;
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_5 {
-    min-width: 4.3em;
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_6 {
-    min-width: 4.8em;
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_7 {
-    min-width: 5.45em;
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .edit_icon,
-#page-mod-quiz-edit ul.slots li.section li.activity a.preview,
-#page-mod-quiz-edit ul.slots li.section li.activity .editing_delete,
-#page-mod-quiz-edit ul.slots li.section li.activity .editing_maxmark {
-    margin-left: 5px
-}
-
-#page-mod-quiz-edit ul.slots li.section li.activity .activityinstance {
-    display: block;
-    min-height: 1.7em;
-}
-
-.quizsavegradesform label[for=inputmaxgrade],
-#page-mod-quiz-edit ul.slots .activityinstance form {
-    display: inline;
-}
-#page-mod-quiz-edit .maxgrade,
-#page-mod-quiz-edit .totalpoints {
-    display: block;
-    float: right;
-    margin: -2.5em 1em 0em 1em;
-    padding: .2em;
-}
-
-#page-mod-quiz-edit span.editinstructions {
-    right: 0;
-}
-
-#page-mod-quiz-edit ul.slots .activityinstance span.instancename {
-    overflow-x: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-#page-mod-quiz-edit ul.slots .activityinstance span.instancename img {
-    margin-right: .2em;
-}
-#page-mod-quiz-edit ul.slots li.activity div.activityinstance .questionname {
-    font-weight: bold;
-    color: #555;
-}
-#page-mod-quiz-edit ul.slots li.activity div.activityinstance .questiontext {
-    color: #555;
-}
-#page-mod-quiz-edit ul.slots li.activity div.activityinstance .mod_quiz_random_qbank_link {
-    font-size: 0.8em;
-}
-
-#page-mod-quiz-edit ul.slots .activityinstance img.activityicon {
-    float: left;
-    margin-top: .2em;
-    margin-right: 0;
-}
-
-#page-mod-quiz-edit .statusbar {
-    margin: 0.6em 0.4em;
-}
-
-#page-mod-quiz-edit .section .activity .actions {
-    white-space: nowrap;
-    background: #e6e6e6;
-    padding: .2em 0 .2em .5em;
 }
