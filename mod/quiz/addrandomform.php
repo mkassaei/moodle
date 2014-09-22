@@ -53,11 +53,10 @@ class quiz_add_random_form extends moodleform {
         $mform->addElement('checkbox', 'includesubcategories', '', get_string('recurse', 'quiz'));
 
         list($categoryid) = explode(',', $this->_customdata['cat']);
-        //$randomnumber = $this->get_number_of_questions_in_category($categoryid, false);
-        $randomnumber = $this->get_random_numbers();
-        $mform->addElement('select', 'randomnumber', get_string('randomnumber', 'quiz'), $randomnumber);
+        $mform->addElement('select', 'numbertoadd', get_string('randomnumber', 'quiz'),
+                $this->get_number_of_questions_to_add_choices());
 
-       $mform->addElement('submit', 'existingcategory', get_string('addrandomquestion', 'quiz'));
+        $mform->addElement('submit', 'existingcategory', get_string('addrandomquestion', 'quiz'));
 
         // Random from a new category section.
         $mform->addElement('header', 'categoryheader',
@@ -73,7 +72,7 @@ class quiz_add_random_form extends moodleform {
         $mform->addElement('submit', 'newcategory',
                 get_string('createcategoryandaddrandomquestion', 'quiz'));
 
-        // Submit button
+        // Cancel button.
         $mform->addElement('cancel');
         $mform->closeHeaderBefore('cancel');
 
@@ -95,31 +94,11 @@ class quiz_add_random_form extends moodleform {
         return $errors;
     }
 
-    private function get_random_number($maxrand = 100) {
-        $randomcount = array();
-        if ($maxrand <= 0) {
-            return 0;
-        }
-        if ($maxrand <= 20) {
-            for ($i = 1; $i <= $maxrand; $i++) {
-                $randomcount[$i] = $i;
-            }
-            return $randomcount;
-        }
-        for ($i = 1; $i <= min(10, $maxrand); $i++) {
-            $randomcount[$i] = $i;
-        }
-        for ($i = 20; $i <= min(100, $maxrand); $i += 10) {
-           $randomcount[$i] = $i;
-        }
-        return $randomcount;
-    }
-
     /**
      * Return an arbitrary array for the dropdown menu
      * @return array of integers array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
      */
-    private function get_random_numbers() {
+    private function get_number_of_questions_to_add_choices() {
         $maxrand = 100;
         $randomcount = array();
         for ($i = 1; $i <= min(10, $maxrand); $i++) {
@@ -130,35 +109,4 @@ class quiz_add_random_form extends moodleform {
         }
         return $randomcount;
     }
-
-    /**
-     * Get the number of questions in a given category and creates an array
-     * of integers for a dropdown menu
-     *
-     * @param int $categoryid
-     * @oaram bool $recurse
-     * @return array of integers
-     */
-    private function get_number_of_questions_in_category($categoryid, $recurse) {
-        $randomusablequestions =
-        question_bank::get_qtype('random')->get_available_questions_from_category(
-                $categoryid, $recurse);
-        $maxrand = count($randomusablequestions);
-        $randomcount = array();
-        $disabled = null;
-        if ($maxrand > 0) {
-            for ($i = 1; $i <= min(10, $maxrand); $i++) {
-                $randomcount[$i] = $i;
-            }
-            for ($i = 20; $i <= min(100, $maxrand); $i += 10) {
-                $randomcount[$i] = $i;
-            }
-        } else {
-            $randomcount[0] = 0;
-            $disabled = ' disabled="disabled"';
-        }
-        return $randomcount;
-    }
-
 }
-

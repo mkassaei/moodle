@@ -97,7 +97,7 @@ if ($data = $mform->get_data()) {
                 'It seems a form was submitted without any button being pressed???');
     }
 
-    quiz_add_random_questions($quiz, $addonpage, $categoryid, $data->randomnumber, $includesubcategories);
+    quiz_add_random_questions($quiz, $addonpage, $categoryid, $data->numbertoadd, $includesubcategories);
     quiz_delete_previews($quiz);
     quiz_update_sumgrades($quiz);
     redirect($returnurl);
@@ -108,7 +108,6 @@ $mform->set_data(array(
     'returnurl' => $returnurl,
     'cmid' => $cm->id,
     'category' => $category,
-    'randomnumber' => $randomnumber
 ));
 
 // Setup $PAGE.
