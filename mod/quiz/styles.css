@@ -749,7 +749,7 @@ table#categoryquestions td,
     direction: ltr;
     text-align: left;
 }
-.path-mod-quiz li.activity > div {
+#page-mod-quiz-edit li.activity > div {
 	position:relative;
 }
 
@@ -781,133 +781,132 @@ table#categoryquestions td,
 /**
  * Edit Quiz
  */
-.path-mod-quiz ul.slots li.section {
+#page-mod-quiz-edit ul.slots li.section {
     border: 0;
 }
-.path-mod-quiz ul.slots li.section .content {
+#page-mod-quiz-edit ul.slots li.section .content {
     background-color:#FAFAFA;
     padding:5px 10px;
 }
-.path-mod-quiz ul.slots li.section .content h3 {
+#page-mod-quiz-edit ul.slots li.section .content h3 {
     margin:0;
     color:#777;
     font-weight: normal;
 }
-.path-mod-quiz ul.slots li.section .left {
+#page-mod-quiz-edit ul.slots li.section .left {
     padding:4px 0;
 }
-.path-mod-quiz ul.slots li.section .right {
+#page-mod-quiz-edit ul.slots li.section .right {
     padding:4px 0;
 }
-.path-mod-quiz ul.slots {
+#page-mod-quiz-edit ul.slots {
     margin:0;
 }
-.path-mod-quiz ul.slots li.section {
+#page-mod-quiz-edit ul.slots li.section {
     list-style: none;
     margin:0 0 5px 0;
     padding:0;
 }
-.path-mod-quiz ul.slots li.section .left {
+#page-mod-quiz-edit ul.slots li.section .left {
     float:left;
 }
-.path-mod-quiz ul.slots li.section .right {
+#page-mod-quiz-edit ul.slots li.section .right {
     float:right;
 }
-.path-mod-quiz ul.slots li.section .left,
-.path-mod-quiz ul.slots li.section .right {
+#page-mod-quiz-edit ul.slots li.section .left,
+#page-mod-quiz-edit ul.slots li.section .right {
     width:40px;
     text-align:center;
     padding: 6px 0;
 }
-.path-mod-quiz ul.slots li.section .right img.icon {
+#page-mod-quiz-edit ul.slots li.section .right img.icon {
     padding: 0 0 4px 0;
 }
-.path-mod-quiz ul.slots li.section .left .section-handle img.icon {
+#page-mod-quiz-edit ul.slots li.section .left .section-handle img.icon {
     padding:0;
     vertical-align: baseline;
 }
-.path-mod-quiz ul.slots li.section li.activity {
+#page-mod-quiz-edit ul.slots li.section li.activity {
     background: #E6E6E6;
     margin: 3px 0 3px 0;
     padding: 0.2em 0 0.2em 0.2em;
 }
-.path-mod-quiz ul.slots li.section li.activity.page {
+#page-mod-quiz-edit ul.slots li.section li.activity.page {
     background: transparent;
 }
 
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmarkcontainer {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer {
     background: white;
     padding: .2em;
     margin: .4em;
 }
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmarkcontainer form {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer form {
     display: inline;
 }
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmarkcontainer form input {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer form input {
     margin: 0;
     padding: 0.2em;
     height: 1em;
 }
 
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmark {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark {
     display: inline-block;
     text-align: right;
 }
-.path-mod-quiz ul.slots li.section li.activity .page_split_join_wrapper {
+#page-mod-quiz-edit ul.slots li.section li.activity .page_split_join_wrapper {
     position: absolute;
 }
-.path-mod-quiz ul.slots li.section li.activity .page_split_join {
+#page-mod-quiz-edit ul.slots li.section li.activity .page_split_join {
     position: relative;
     left: -20px;
     top: -7px;
 }
 
-
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_0 {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_0 {
     min-width: 1.3em;
 }
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_1 {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_1 {
     min-width: 2em;
 }
 
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_2 {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_2 {
     min-width: 2.6em;
 }
 
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_3 {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_3 {
     min-width: 3.2em;
 }
 
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_4 {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_4 {
     min-width: 3.7em;
 }
 
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_5 {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_5 {
     min-width: 4.3em;
 }
 
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_6 {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_6 {
     min-width: 4.8em;
 }
 
-.path-mod-quiz ul.slots li.section li.activity .instancemaxmark.decimalplaces_7 {
+#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark.decimalplaces_7 {
     min-width: 5.45em;
 }
 
-.path-mod-quiz ul.slots li.section li.activity .edit_icon,
-.path-mod-quiz ul.slots li.section li.activity a.preview,
-.path-mod-quiz ul.slots li.section li.activity .editing_delete,
-.path-mod-quiz ul.slots li.section li.activity .editing_maxmark {
+#page-mod-quiz-edit ul.slots li.section li.activity .edit_icon,
+#page-mod-quiz-edit ul.slots li.section li.activity a.preview,
+#page-mod-quiz-edit ul.slots li.section li.activity .editing_delete,
+#page-mod-quiz-edit ul.slots li.section li.activity .editing_maxmark {
     margin-left: 5px
 }
 
-.path-mod-quiz ul.slots li.section li.activity .activityinstance {
+#page-mod-quiz-edit ul.slots li.section li.activity .activityinstance {
     display: block;
     min-height: 1.7em;
 }
 
 .quizsavegradesform label[for=inputmaxgrade],
-.path-mod-quiz ul.slots .activityinstance form {
+#page-mod-quiz-edit ul.slots .activityinstance form {
     display: inline;
 }
 #page-mod-quiz-edit .maxgrade,
@@ -952,7 +951,7 @@ table#categoryquestions td,
     margin: 0.6em 0.4em;
 }
 
-.section .activity .actions {
+#page-mod-quiz-edit .section .activity .actions {
     white-space: nowrap;
     background: #e6e6e6;
     padding: .2em 0 .2em .5em;
