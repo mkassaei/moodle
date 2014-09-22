@@ -1,5 +1,4 @@
 <?php
-use calendartype_gregorian\structure;
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -105,8 +104,8 @@ class quiz_repaginate_test extends advanced_testcase {
         // Make a quiz.
         $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
 
-        $quiz = $quizgenerator->create_instance(array('course'=>$SITE->id, 'questionsperpage' => 0, 'grade' => 100.0,
-                'sumgrades' => 2));
+        $quiz = $quizgenerator->create_instance(array(
+                'course' => $SITE->id, 'questionsperpage' => 0, 'grade' => 100.0, 'sumgrades' => 2));
 
         // Create five questions.
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');

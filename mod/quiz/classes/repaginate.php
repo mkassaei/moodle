@@ -113,6 +113,7 @@ class repaginate {
         }
         return $newslots;
     }
+
     /**
      * Repaginate, update DB and slots object
      * @param int $nextslotnumber

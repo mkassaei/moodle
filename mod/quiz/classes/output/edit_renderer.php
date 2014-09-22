@@ -167,7 +167,8 @@ class edit_renderer extends \plugin_renderer_base {
                 'value' => quiz_format_grade($quiz, $quiz->grade)));
         $output .= html_writer::tag('label', get_string('maximumgradex', '', $a),
                 array('for' => 'inputmaxgrade'));
-        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'savechanges', 'value' => get_string('save', 'quiz')));
+        $output .= html_writer::empty_tag('input', array('type' => 'submit',
+                'name' => 'savechanges', 'value' => get_string('save', 'quiz')));
         $output .= html_writer::end_tag('fieldset');
         $output .= html_writer::end_tag('form');
         $output .= html_writer::end_tag('div');
@@ -711,8 +712,8 @@ class edit_renderer extends \plugin_renderer_base {
      */
     public function marked_out_of_field($quiz, $question) {
         $output = html_writer::span(quiz_format_question_grade($quiz, $question->maxmark),
-                'instancemaxmark decimalplaces_'.quiz_get_grade_format($quiz),
-                array('title'=>get_string('maxmark', 'quiz')));
+                'instancemaxmark decimalplaces_' . quiz_get_grade_format($quiz),
+                array('title' => get_string('maxmark', 'quiz')));
 
         $output .= html_writer::span(
             html_writer::link(
