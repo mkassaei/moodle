@@ -683,6 +683,7 @@ $string['random'] = 'Random question';
 $string['randomcreate'] = 'Create random questions';
 $string['randomfromcategory'] = 'Random question from category:';
 $string['randomfromexistingcategory'] = 'Random question from an existing category';
+$string['randomnumber'] = 'Number of random questions';
 $string['randomnosubcat'] = 'Questions from this category only, not its subcategories.';
 $string['randomquestionusinganewcategory'] = 'Random question using a new category';
 $string['randomwithsubcat'] = 'Questions from this category and its subcategories.';

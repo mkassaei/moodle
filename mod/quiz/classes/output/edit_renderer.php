@@ -764,11 +764,12 @@ class edit_renderer extends \plugin_renderer_base {
         if (!$contexts->have_cap('moodle/question:useall')) {
             return '';
         }
-
-        $randomform = new \quiz_add_random_form(new \moodle_url('/mod/quiz/addrandom.php'), $contexts);
+        $randomform = new \quiz_add_random_form(new \moodle_url('/mod/quiz/addrandom.php'),
+                                 array('contexts' => $contexts, 'cat' => $pagevars['cat']));
         $randomform->set_data(array(
                 'category' => $pagevars['cat'],
                 'returnurl' => $thispageurl->out_as_local_url(true),
+                'randomnumber' => 1,
                 'cmid' => $thispageurl->param('cmid'),
         ));
         return html_writer::div($randomform->render(), 'randomquestionformforpopup');
