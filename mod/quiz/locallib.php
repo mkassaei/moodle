@@ -1883,35 +1883,25 @@ class qubaids_for_quiz extends qubaid_join {
  * @param bool $showicon If true, show the question's icon with the question. False by default.
  * @param bool $showquestiontext If true (default), show question text after question name.
  *       If false, show only question name.
- * @param bool $return If true (default), return the output. If false, print it.
+ * @return string
  */
-function quiz_question_tostring($question, $showicon = false,
-        $showquestiontext = true, $return = true) {
-    global $COURSE;
+function quiz_question_tostring($question, $showicon = false, $showquestiontext = true) {
     $result = '';
-    $result .= '<span class="questionname">';
+
+    $name = shorten_text(format_string($question->name), 200);
     if ($showicon) {
-        $result .= print_question_icon($question, true);
-        echo ' ';
+        $name .= print_question_icon($question) . ' ' . $name;
     }
-    $result .= shorten_text(format_string($question->name), 200) . '</span>';
+    $result .= html_writer::span($name, 'questionname');
+
     if ($showquestiontext) {
         $questiontext = question_utils::to_plain_text($question->questiontext,
                 $question->questiontextformat, array('noclean' => true, 'para' => false));
         $questiontext = shorten_text($questiontext, 200);
-        $result .= ' <span class="questiontext">';
-        if (!empty($questiontext)) {
-            $result .= s($questiontext);
-        } else {
-            $result .= '<span class="error">';
-            $result .= get_string('questiontextisempty', 'quiz');
-            $result .= '</span>';
+        if ($questiontext) {
+            $result .= ' ' . html_writer::span(s($questiontext), 'questiontext');
         }
-        $result .= '</span>';
     }
-    if ($return) {
-        return $result;
-    } else {
-        echo $result;
-    }
+
+    return $result;
 }

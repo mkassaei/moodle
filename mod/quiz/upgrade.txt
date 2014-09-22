@@ -1,5 +1,15 @@
 This files describes API changes in the quiz code.
 
+=== 2.8 ===
+
+* Major changes to the Edit quiz page.
+  TODO explain the details.
+  
+  Functions that have changed:
+      quiz_question_tostring - now always returns a string (the only option used).
+                               The $return argument has gone.
+
+
 === 2.7.1 ===
 
 * The function quiz_fire_attempt_started_event has been removed. This function

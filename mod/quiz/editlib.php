@@ -249,7 +249,7 @@ class question_bank_question_name_text_column extends question_bank_question_nam
         if ($labelfor) {
             echo '<label for="' . $labelfor . '">';
         }
-        echo quiz_question_tostring($question, false, true, true);
+        echo quiz_question_tostring($question);
         if ($labelfor) {
             echo '</label>';
         }
