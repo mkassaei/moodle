@@ -926,8 +926,6 @@ table#categoryquestions td,
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    display: block;
-    height: 20px;
 }
 
 #page-mod-quiz-edit ul.slots .activityinstance span.instancename img {
@@ -935,8 +933,13 @@ table#categoryquestions td,
 }
 #page-mod-quiz-edit ul.slots li.activity div.activityinstance .questionname {
     font-weight: bold;
+    color: #555;
 }
 #page-mod-quiz-edit ul.slots li.activity div.activityinstance .questiontext {
+    color: #555;
+}
+#page-mod-quiz-edit ul.slots li.activity div.activityinstance .mod_quiz_random_qbank_link {
+    font-size: 0.8em;
 }
 
 #page-mod-quiz-edit ul.slots .activityinstance img.activityicon {

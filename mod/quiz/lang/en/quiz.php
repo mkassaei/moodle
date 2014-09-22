@@ -791,6 +791,7 @@ $string['savingnewgradeforquestion'] = 'Saving new grade for question id {$a}.';
 $string['savingnewmaximumgrade'] = 'Saving new maximum grade.';
 $string['score'] = 'Raw score';
 $string['scores'] = 'Scores';
+$string['seequestions'] = '(See questions)';
 $string['select'] = 'Select';
 $string['selectall'] = 'Select all';
 $string['selectcategory'] = 'Select category';

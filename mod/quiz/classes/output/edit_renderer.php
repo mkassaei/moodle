@@ -537,7 +537,11 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::start_tag('div');
 
         // Display the link to the question (or do nothing if question has no url).
-        $questionname = $this->question_name($structure, $question, $pageurl);
+        if ($question->qtype == 'random') {
+            $questionname = $this->random_question($structure, $question, $pageurl);
+        } else {
+            $questionname = $this->question_name($structure, $question, $pageurl);
+        }
 
         // Start the div for the activity title, excluding the edit icons.
         $output .= html_writer::start_div('activityinstance');
@@ -670,8 +674,8 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Renders html to display a name with the link to the question on a quiz edit page
      *
-     * If question is unavailable for the user but still needs to be displayed
-     * in the list, just the name is returned without a link
+     * If the user does not have permission to edi the question, it is rendered
+     * without a link
      *
      * @param structure $structure object containing the structure of the quiz.
      * @param stdClass $question data from the question and quiz_slots tables.
@@ -685,9 +689,7 @@ class edit_renderer extends \plugin_renderer_base {
                 'returnurl' => $pageurl->out_as_local_url(),
                 'cmid' => $structure->get_cmid(), 'id' => $question->id));
 
-        // Accessibility: for files get description via icon, this is very ugly hack!
         $instancename = quiz_question_tostring($question);
-        $altname = $question->name;
 
         $qtype = \question_bank::get_qtype($question->qtype, false);
         $namestr = $qtype->local_name();
@@ -699,11 +701,56 @@ class edit_renderer extends \plugin_renderer_base {
 
         // Need plain question name without html tags for link title.
         $title = shorten_text(format_string($question->name), 100);
+
         // Display the link itself.
         $activitylink = $icon . html_writer::tag('span', $editicon . $instancename, array('class' => 'instancename'));
         $output .= html_writer::link($editurl, $activitylink,
                 array('title' => get_string('editquestion', 'quiz').' '.$title));
+
         return $output;
+    }
+
+    /**
+     * Renders html to display a random question the link to edit the configuration
+     * and also to see that category in the question bank.
+     *
+     * @param structure $structure object containing the structure of the quiz.
+     * @param stdClass $question data from the question and quiz_slots tables.
+     * @param \moodle_url $pageurl the canonical URL of this page.
+     * @return string HTML to output.
+     */
+    public function random_question(structure $structure, $question, $pageurl) {
+
+        $editurl = new \moodle_url('/question/question.php', array(
+                'returnurl' => $pageurl->out_as_local_url(),
+                'cmid' => $structure->get_cmid(), 'id' => $question->id));
+
+        $temp = clone($question);
+        $temp->questiontext = '';
+        $instancename = quiz_question_tostring($temp);
+
+        $configuretitle = get_string('configurerandomquestion', 'quiz');
+        $qtype = \question_bank::get_qtype($question->qtype, false);
+        $namestr = $qtype->local_name();
+        $icon = $this->pix_icon('icon', $namestr, $qtype->plugin_name(), array('title' => $namestr,
+                'class' => 'icon activityicon', 'alt' => ' ', 'role' => 'presentation'));
+
+        $editicon = $this->pix_icon('t/edit', $configuretitle, 'moodle', array('title' => ''));
+
+        // Display the link itself.
+        $activitylink = html_writer::tag('span', $editicon . $instancename, array('class' => 'instancename'));
+
+        // If this is a random question, display a link to show the questions
+        // selected from in the question bank.
+        $qbankurl = new \moodle_url('/question/edit.php', array(
+                'cmid' => $structure->get_cmid(),
+                'cat' => $question->category . ',' . $question->contextid,
+                'recurse' => !empty($question->questiontext)));
+        $qbanklink = ' ' . \html_writer::link($qbankurl,
+                get_string('seequestions', 'quiz'), array('class' => 'mod_quiz_random_qbank_link'));
+
+        return html_writer::link($editurl, $icon . $editicon, array('title' => $configuretitle)) .
+                ' ' . $instancename . ' ' . $qbanklink;
     }
 
     /**
