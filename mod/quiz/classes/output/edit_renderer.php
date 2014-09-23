@@ -533,9 +533,6 @@ class edit_renderer extends \plugin_renderer_base {
         // This div is used to indent the content.
         $output .= html_writer::div('', 'mod-indent');
 
-        // Start a wrapper for the actual content to keep the indentation consistent.
-        $output .= html_writer::start_tag('div');
-
         // Display the link to the question (or do nothing if question has no url).
         if ($question->qtype == 'random') {
             $questionname = $this->random_question($structure, $question, $pageurl);
@@ -549,7 +546,6 @@ class edit_renderer extends \plugin_renderer_base {
 
         // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
         $output .= html_writer::end_tag('div'); // .activityinstance.
-        $output .= html_writer::end_tag('div'); // ...$indentclasses.
 
         // Action icons.
         $questionicons = '';

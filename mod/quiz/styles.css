@@ -527,13 +527,15 @@ table.quizreviewsummary td.cell {
     max-height: 20px;
     width:10em;
 }
-#page-mod-quiz-edit .slotnumber{
+#page-mod-quiz-edit .slotnumber {
     background-color: #D3D3D3;
     text-align: center;
     margin-right: 0.5em;
-    margin-top: 0.2em;
+    margin-top: 0.1em;
+    margin-bottom: .1em;
     min-width: 2em;
     display: inline-block;
+    float: left;
 }
 
 #page-mod-quiz-edit ul.slots li.section {
@@ -658,6 +660,10 @@ table.quizreviewsummary td.cell {
 #page-mod-quiz-edit ul.slots li.section li.activity .activityinstance {
     display: block;
     min-height: 1.7em;
+    position: absolute;
+    top: 0;
+    left: 5em;
+    width: 100%;
 }
 
 .quizsavegradesform label[for=inputmaxgrade],
@@ -680,6 +686,11 @@ table.quizreviewsummary td.cell {
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    overflow: hidden;
+    word-break: break-word;
+    width: 70%;
+    display: inline-block;
+    height: 20px;
 }
 
 #page-mod-quiz-edit ul.slots .activityinstance span.instancename img {
