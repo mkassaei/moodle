@@ -515,13 +515,15 @@ table.quizreviewsummary td.cell {
 }
 
 /** Mod quiz edit **/
-#page-mod-quiz-edit li.activity > div {
+#page-mod-quiz-edit li.activity > div,
+#page-mod-quiz-edit li.pagenumber {
     position: relative;
 }
 
 #page-mod-quiz-edit .add-menu-outer {
-    float: right;
-    margin-left: 55em;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 #page-mod-quiz-edit .add-menu {
     max-height: 20px;
