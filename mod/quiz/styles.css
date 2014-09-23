@@ -1145,6 +1145,7 @@ table#categoryquestions td,
     height: 20px;
     margin: 0;
     padding: 0;
+    text-overflow: ellipsis;
 }
 
 #page-mod-quiz-edit ul.slots .activityinstance span.instancename img {
