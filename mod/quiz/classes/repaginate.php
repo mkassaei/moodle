@@ -15,8 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Quiz repaginate class
+ *
  * The repaginate class will rearrange questions in pages.
- * The quiz setting allows users to write quizzes with one auestion pe rpage
+ * The quiz setting allows users to write quizzes with one question per page,
  * n questions per page, or all questions on one page.
  * @package   mod_quiz
  * @copyright 2013 The Open University

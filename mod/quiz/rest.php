@@ -108,7 +108,7 @@ switch($requestmethod) {
                         break;
                     case 'linkslottopage':
                         require_capability('mod/quiz:manage', $modcontext);
-                        $slots = $structure->link_slot_to_page($quiz, $id, $value);
+                        $slots = $structure->update_page_break($quiz, $id, $value);
                         $json = array();
                         foreach ($slots as $slot) {
                             $json[$slot->slot] = array('id' => $slot->id, 'slot' => $slot->slot,

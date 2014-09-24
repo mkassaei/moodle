@@ -26,6 +26,8 @@ namespace mod_quiz;
 
 
 /**
+ * Quiz structure class.
+ *
  * The structure of the quiz. That is, which questions it is built up
  * from. This is used on the Edit quiz page (edit.php) and also when
  * starting an attempt at the quiz (startattempt.php). Once an attempt
@@ -70,6 +72,7 @@ class structure {
 
     /**
      * Create an instance of this class representing the structure of a given quiz.
+     * @param \stdClass $quiz the quiz settings.
      * @return structure
      */
     public static function create_for($quiz) {
@@ -126,6 +129,7 @@ class structure {
     }
 
     /**
+     * Get the course module id of the quiz.
      * @return int the course_modules.id for the quiz.
      */
     public function get_cmid() {
@@ -133,6 +137,7 @@ class structure {
     }
 
     /**
+     * Get id of the quiz.
      * @return int the quiz.id for the quiz.
      */
     public function get_quizid() {
@@ -140,6 +145,7 @@ class structure {
     }
 
     /**
+     * Get the quiz object.
      * @return \stdClass the quiz settings row from the database.
      */
     public function get_quiz() {
@@ -176,6 +182,7 @@ class structure {
     }
 
     /**
+     * How many questions are allowed per page in the quiz.
      * This setting controls how frequently extra page-breaks should be inserted
      * automatically when questions are added to the quiz.
      * @return int the number of questions that should be on each page of the
@@ -186,6 +193,7 @@ class structure {
     }
 
     /**
+     * Get quiz slots.
      * @return stdClass[] the slots in this quiz.
      */
     public function get_slots() {
@@ -262,6 +270,7 @@ class structure {
     }
 
     /**
+     * Get all the sections of the quiz.
      * @return stdClass[] the sections in this quiz.
      */
     public function get_quiz_sections() {
@@ -455,11 +464,10 @@ class structure {
      * After callig this method, this class will be in an invalid state, and
      * should be discarded if you want to manipulate the structure further.
      *
-     * @param stdClass $quiz
-     * @param int $id id of slot to be moved
+     * @param int $idmove id of slot to be moved
      * @param int $idbefore id of slot to come before slot being moved
      * @param int $page new page number of slot being moved
-     * @return array
+     * @return void
      */
     public function move_slot($idmove, $idbefore, $page) {
         global $DB, $CFG;
@@ -535,8 +543,10 @@ class structure {
     }
 
     /**
-     * Refresh page numbering of quiz slots
+     * Refresh page numbering of quiz slots.
      * @param object $quiz the quiz object.
+     * @param array  $slots (optional) array of slot objects.
+     * @return array of slot objects.
      */
     public function refresh_page_numbers($quiz, $slots=array()) {
         global $DB;
@@ -563,6 +573,11 @@ class structure {
         return $slots;
     }
 
+    /**
+     * Refresh page numbering of quiz slots and save to the database.
+     * @param object $quiz the quiz object.
+     * @return array of slot objects.
+     */
     public function refresh_page_numbers_and_update_db($quiz) {
         global $DB;
         $slots = $this->refresh_page_numbers($quiz);
@@ -577,9 +592,9 @@ class structure {
     }
 
     /**
-     * Remove a question from a quiz
+     * Remove a slot from a quiz
      * @param object $quiz the quiz object.
-     * @param int $questionid The id of the question to be deleted.
+     * @param int $slotnumber The number of the slot to be deleted.
      */
     public function remove_slot($quiz, $slotnumber) {
         global $DB;
@@ -638,19 +653,19 @@ class structure {
     }
 
     /**
-     * link/unlink a slot to a page.
+     * Add/Remove a pagebreak.
      *
      * Saves changes to the slot page relationship in the quiz_slots table and reorders the paging
      * for subsequent slots.
      *
-     * @param stdClass $slot    row from the quiz_slots table.
-     * @param float    $maxmark the new maxmark.
-     * @return bool true if the new grade is different from the old one.
+     * @param object $quiz the quiz object.
+     * @param int    $slotid id of slot.
+     * @return array of slot objects.
      */
-    public function link_slot_to_page($quiz, $slotid, $type) {
-        global $DB;
-        require_once("locallib.php");
-        require_once('classes/repaginate.php');
+    public function update_page_break($quiz, $slotid, $type) {
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+        require_once($CFG->dirroot . '/mod/quiz/classes/repaginate.php');
         $quizid = $quiz->id;
 
         $repagtype = $type;

@@ -37,9 +37,9 @@ require_once($CFG->dirroot . '/mod/quiz/editlib.php');
  */
 class mod_quiz_structure_testcase extends advanced_testcase {
 
-    public $sections = array();
-    public $defaultslots = array();
-
+    /**
+     * Prepare the quiz object with standard data. Ready for testing.
+     */
     protected function prepare_quiz_data() {
 
         $this->resetAfterTest(true);
@@ -58,6 +58,9 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         return array($quiz, $cm, $course);
     }
 
+    /**
+     * Test getting the quiz slots.
+     */
     public function test_get_quiz_slots() {
         // Get basic quiz.
         list($quiz, $cm, $course) = $this->prepare_quiz_data();
@@ -78,6 +81,9 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         $this->assertCount(8, $slots);
     }
 
+    /**
+     * Test getting the quiz sections.
+     */
     public function test_get_quiz_sections() {
         // Get basic quiz.
         list($quiz, $cm, $course) = $this->prepare_quiz_data();
@@ -90,8 +96,8 @@ class mod_quiz_structure_testcase extends advanced_testcase {
     }
 
     /**
-     * Verify that the 
-     * @param array $expectedlayout 
+     * Verify that the given layout matches that expected.
+     * @param array $expectedlayout
      * @param \mod_quiz\structure $structure
      */
     protected function assert_quiz_layout($expectedlayout, \mod_quiz\structure $structure) {
@@ -105,9 +111,10 @@ class mod_quiz_structure_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Test moving slots in the quiz.
+     */
     public function test_move_slot() {
-        global $DB;
-
         // Create a test quiz with 8 questions.
         list($quiz, $cm, $course) = $this->prepare_quiz_data();
         $this->add_eight_questions_to_the_quiz($quiz);
@@ -120,7 +127,7 @@ class mod_quiz_structure_testcase extends advanced_testcase {
             $originalslotids[$slot->slot] = $slot->id;
         }
 
-        // Don't acutally move anything. Check the layout is unchanged.
+        // Don't actually move anything. Check the layout is unchanged.
         $idmove = $structure->get_question_in_slot(2)->slotid;
         $idbefore = $structure->get_question_in_slot(1)->slotid;
         $structure->move_slot($idmove, $idbefore, 2);
@@ -301,12 +308,63 @@ class mod_quiz_structure_testcase extends advanced_testcase {
     }
 
     /**
+     * Test updating pagebreaks in the quiz.
+     */
+    public function test_update_page_break() {
+        // Create a test quiz with 8 questions.
+        list($quiz, $cm, $course) = $this->prepare_quiz_data();
+        $this->add_eight_questions_to_the_quiz($quiz);
+        $quizobj = new quiz($quiz, $cm, $course);
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+
+        // Store the original order of slots, so we can assert what has changed.
+        $originalslotids = array();
+        foreach ($structure->get_slots() as $slot) {
+            $originalslotids[$slot->slot] = $slot->id;
+        }
+
+        // Test removing a page break.
+        $slotid = $structure->get_question_in_slot(2)->slotid;
+        $type = \mod_quiz\repaginate::LINK;
+        $slots = $structure->update_page_break($quiz, $slotid, $type);
+
+        // Having called update page break, we need to reload $structure.
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $this->assert_quiz_layout(array(
+                    $originalslotids[1] => 1,
+                    $originalslotids[2] => 1,
+                    $originalslotids[3] => 1,
+                    $originalslotids[4] => 1,
+                    $originalslotids[5] => 1,
+                    $originalslotids[6] => 1,
+                    $originalslotids[7] => 2,
+                    $originalslotids[8] => 3,
+                ), $structure);
+
+        // Test adding a page break.
+        $slotid = $structure->get_question_in_slot(2)->slotid;
+        $type = \mod_quiz\repaginate::UNLINK;
+        $slots = $structure->update_page_break($quiz, $slotid, $type);
+
+        // Having called update page break, we need to reload $structure.
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $this->assert_quiz_layout(array(
+                    $originalslotids[1] => 1,
+                    $originalslotids[2] => 2,
+                    $originalslotids[3] => 2,
+                    $originalslotids[4] => 2,
+                    $originalslotids[5] => 2,
+                    $originalslotids[6] => 2,
+                    $originalslotids[7] => 3,
+                    $originalslotids[8] => 4,
+                ), $structure);
+    }
+
+    /**
      * Populate quiz with eight questions.
      * @param stdClass $quiz the quiz to add to.
      */
     public function add_eight_questions_to_the_quiz($quiz) {
-        global $DB;
-
         /*
          * Rows are in the format array(id, quizid, slot, page, questionid, maxmark).
          *

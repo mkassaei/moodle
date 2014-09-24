@@ -65,7 +65,7 @@ class mod_quiz_repaginate_testable extends \mod_quiz\repaginate {
  * @copyright 2014 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class quiz_repaginate_test extends advanced_testcase {
+class mod_quiz_repaginate_test extends advanced_testcase {
 
     private $quizslots;
     private $repaginate = null;
