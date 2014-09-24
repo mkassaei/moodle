@@ -663,16 +663,11 @@ class structure {
      * @return array of slot objects.
      */
     public function update_page_break($quiz, $slotid, $type) {
-        global $DB, $CFG;
-        require_once($CFG->dirroot . '/mod/quiz/locallib.php');
-        require_once($CFG->dirroot . '/mod/quiz/classes/repaginate.php');
-        $quizid = $quiz->id;
+        global $DB;
 
-        $repagtype = $type;
-        $quizslots = $DB->get_records('quiz_slots', array('quizid' => $quizid), 'slot');
-        $slot = $quizslots[$slotid];
-        $repaginate = new \mod_quiz\repaginate($quizid, $quizslots);
-        $repaginate->repaginate($slot->slot, $repagtype);
+        $quizslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id), 'slot');
+        $repaginate = new \mod_quiz\repaginate($quiz->id, $quizslots);
+        $repaginate->repaginate($quizslots[$slotid]->slot, $type);
         $slots = $this->refresh_page_numbers_and_update_db($quiz);
 
         return $slots;
