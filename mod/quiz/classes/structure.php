@@ -291,7 +291,7 @@ class structure {
         }
 
         if ($this->is_shuffled()) {
-            $updateurl = new moodle_url('/course/mod.php',
+            $updateurl = new \moodle_url('/course/mod.php',
                     array('return' => 'true', 'update' => $this->quizobj->get_cmid(), 'sesskey' => sesskey()));
             $updatelink = '<a href="'.$updateurl->out().'">' . get_string('updatethis', '',
                     get_string('modulename', 'quiz')) . '</a>';
