@@ -115,8 +115,8 @@ Feature: Edit quiz page
     And I should see "Page 3"
 
     # Add the forth Essay question in a new page (Page 4).
-    And I click on "//a[@id=\"action-menu-toggle-2\"]" "xpath_element"
-    And I click on "//li[@id='page-3']//a[contains(., 'a new question')]" "xpath_element"
+    And I open the "last" add to quiz menu
+    And I follow "a new question" in the open menu
     And I set the field "qtype_qtype_essay" to "1"
     And I press "submitbutton"
     Then I should see "Adding an Essay question"

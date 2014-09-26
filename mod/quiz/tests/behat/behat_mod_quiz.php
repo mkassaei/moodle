@@ -79,4 +79,37 @@ class behat_mod_quiz extends behat_question_base {
             new Given('I set the field "maxmark" to "' . $this->escape($newmark) . chr(10) . '"'),
         );
     }
+
+    /**
+     * Open the add menu on a given page, or at the end.
+     * @Given /^I open the "(?P<page_n_or_last_string>(?:[^"]|\\")*)" add to quiz menu$/
+     * @param string $pageorlast either "Page n" or "last".
+     */
+    public function i_open_the_add_to_quiz_menu_for($pageorlast) {
+
+        if (!$this->running_javascript()) {
+            throw new DriverException('Activities actions menu not available when Javascript is disabled');
+        }
+
+        if ($pageorlast == 'last') {
+            $xpath = "//div[@class = 'last-add-menu']//a[contains(@class, 'textmenu') and contains(., 'Add')]";
+        } else if (preg_match('~Page (\d+)~', $pageorlast, $matches)) {
+            $xpath = "//li[@id = 'page-{$matches[1]}']//a[contains(@class, 'textmenu') and contains(., 'Add')]";
+        } else {
+            throw new ExpectationException("The I open the add to quiz menu step must specify either 'Page N' or 'last'.");
+        }
+        $menu = $this->find('xpath', $xpath)->click();
+    }
+
+    /**
+     * Click on a given link in the moodle-actionmenu that is currently open.
+     * @Given /^I follow "(?P<link_string>(?:[^"]|\\")*)" in the open menu$/
+     * @param $text the text (or id, etc.) of the link to click.
+     */
+    public function i_follow_in_the_open_menu($linkstring) {
+        $openmenuxpath = "//div[contains(@class, 'moodle-actionmenu') and contains(@class, 'show')]";
+        return array(
+            new Given('I click on "' . $linkstring . '" "link" in the "' . $openmenuxpath . '" "xpath_element"'),
+        );
+    }
 }

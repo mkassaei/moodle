@@ -24,7 +24,7 @@ Feature: Edit quiz page
 
   @javascript @addmenu_s1
   Scenario: Add some new question to the quiz using '+ a new question' options of the 'Add' menu.
-    And I follow "Add"
+    And I open the "last" add to quiz menu
     And I follow "a new question"
     And I set the field "qtype_qtype_essay" to "1"
     And I press "submitbutton"
@@ -36,7 +36,7 @@ Feature: Edit quiz page
     And I should see "Page 1"
     And I should see "Essay 01 new"
 
-    And I follow "Add"
+    And I open the "Page 1" add to quiz menu
     And I follow "a new question"
     And I set the field "qtype_qtype_essay" to "1"
     And I press "submitbutton"
@@ -48,7 +48,7 @@ Feature: Edit quiz page
     And I should see "Essay 01 new"
     And I should see "Essay 02 new"
 
-    And I follow "Add"
+    And I open the "Page 1" add to quiz menu
     And I follow "a new question"
     And I set the field "qtype_qtype_essay" to "1"
     And I press "submitbutton"
@@ -61,7 +61,7 @@ Feature: Edit quiz page
     And I should see "Essay 02 new"
     And I should see "Essay 03 new"
 
-    And I follow "Add"
+    And I open the "Page 1" add to quiz menu
     And I follow "a new question"
     And I set the field "qtype_qtype_essay" to "1"
     And I press "submitbutton"
@@ -86,8 +86,8 @@ Feature: Edit quiz page
     And I should see "Page 2"
 
     # Add a question to page 2.
-    And I click on "//a[@id=\"action-menu-toggle-1\"]" "xpath_element"
-    And I click on "//li[@id='page-2']//a[contains(., 'a new question')]" "xpath_element"
+    And I open the "Page 2" add to quiz menu
+    And I follow "a new question" in the open menu
     And I set the field "qtype_qtype_essay" to "1"
     And I press "submitbutton"
     Then I should see "Adding an Essay question"
@@ -95,7 +95,7 @@ Feature: Edit quiz page
     And I set the field "Question text" to "Please write 200 words about Essay for page 2"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay for page 2"
+    Then "//li[contains(., 'Essay for page 2')][./preceding-sibling::li[contains(., 'Page 2')]]" "xpath_element" should exist
 
   @javascript @addmenu_s2
   Scenario: Add questions from question bank to the quiz. In order to be able to
@@ -187,22 +187,21 @@ Feature: Edit quiz page
     And I follow "Course 1"
     And I follow "Quiz 1"
     And I follow "Edit quiz"
-    And I follow "Add"
+    And I open the "last" add to quiz menu
     And I follow "from question bank"
-    #And I click on "Add to quiz" "link" in the "Essay 03" "table_row"
-    And I click on "//a[@title=\"Add to quiz\"]" "xpath_element" in the "Essay 03" "table_row"
+    And I click on "Add to quiz" "link" in the "Essay 03" "table_row"
     Then I should see "Editing quiz: Quiz 1"
     And I should see "Essay 03"
 
     # Add Essay 01 from question bank.
-    And I follow "Add"
+    And I open the "Page 1" add to quiz menu
     And I follow "from question bank"
     And I click on "Add to quiz" "link" in the "Essay 01" "table_row"
     Then I should see "Editing quiz: Quiz 1"
     And I should see "Essay 01"
 
     # Add Esay 02 from question bank.
-    And I follow "Add"
+    And I open the "Page 1" add to quiz menu
     And I follow "from question bank"
     And I should see "Select a category"
     And I set the field "Select a category" to "Subcat 1"
@@ -211,7 +210,7 @@ Feature: Edit quiz page
     And I should see "Essay 02"
 
     # Add a random question.
-    And I follow "Add"
+    And I open the "Page 1" add to quiz menu
     And I follow "a random question"
     And I press "Add random question"
     Then I should see "Editing quiz: Quiz 1"
@@ -229,8 +228,8 @@ Feature: Edit quiz page
     And I should see "Page 4"
 
     # Add a random question to page 4.
-    And I click on "//a[@id=\"action-menu-toggle-3\"]" "xpath_element"
-    And I click on "//li[@id='page-4']//a[contains(., 'a new question')]" "xpath_element"
+    And I open the "Page 4" add to quiz menu
+    And I follow "a new question" in the open menu
     And I set the field "qtype_qtype_essay" to "1"
     And I press "submitbutton"
     Then I should see "Adding an Essay question"
