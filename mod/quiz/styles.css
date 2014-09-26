@@ -520,6 +520,10 @@ table.quizreviewsummary td.cell {
     position: relative;
 }
 
+#page-mod-quiz-edit .last-add-menu {
+    position: relative;
+    height: 1.5em;
+}
 #page-mod-quiz-edit .add-menu-outer {
     position: absolute;
     top: 0;

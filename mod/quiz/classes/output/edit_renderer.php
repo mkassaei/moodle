@@ -73,8 +73,10 @@ class edit_renderer extends \plugin_renderer_base {
             $output .= $this->start_section($section);
             $output .= $this->questions_in_section($structure, $section, $contexts, $pagevars, $pageurl);
             if ($section === $lastsection) {
+                $output .= \html_writer::start_div('last-add-menu');
                 $output .= html_writer::tag('span', $this->add_menu_actions($structure, 0,
                         $pageurl, $contexts, $pagevars), array('class' => 'add-menu-outer'));
+                $output .= \html_writer::end_div();
             }
             $output .= $this->end_section();
         }
