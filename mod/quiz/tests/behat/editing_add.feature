@@ -6,7 +6,7 @@ Feature: Edit quiz page
   Background:
     Given the following "users" exist:
       | username | firstname | lastname | email               |
-      | teacher1 | T1    | Teacher1 | teacher1@moodle.com |
+      | teacher1 | T1        | Teacher1 | teacher1@moodle.com |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
@@ -111,7 +111,7 @@ Feature: Edit quiz page
     And I set the field "Category info" to "This is sub category 1"
     Then I press "id_submitbutton"
     And I should see "Subcat 1"
-    
+
     Then I set the field "Parent category" to "Default for C1"
     And I set the field "Name" to "Subcat 2"
     And I set the field "Category info" to "This is sub category 2"

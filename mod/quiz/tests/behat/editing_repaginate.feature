@@ -6,7 +6,7 @@ Feature: Edit quiz page
   Background:
     Given the following "users" exist:
       | username | firstname | lastname | email               |
-      | teacher1 | T1    | Teacher1 | teacher1@moodle.com |
+      | teacher1 | T1        | Teacher1 | teacher1@moodle.com |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
@@ -80,13 +80,13 @@ Feature: Edit quiz page
     And I should see "Page 1"
     And I should not see "Page 2"
     And I should not see "Page 3"
- 
+
     # We have 2 questions in page 1 and one question in page 2.
     # click on 'Add page break' icon between slot 2 and slot 3.
     And I click on "//a[contains(@href, 'slot=2')]//img[@title=\"Add page break\"]" "xpath_element"
     And I should see "Page 1"
     And I should see "Page 2"
- 
+
     # We have 3 questions on each page.
     # click on 'Add page break' icon between slot 1 and slot 2.
     And I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Add page break\"]" "xpath_element"
@@ -151,4 +151,3 @@ Feature: Edit quiz page
     And I should not see "Page 2"
     And I should not see "Page 3"
     And I should not see "Page 4"
-    
