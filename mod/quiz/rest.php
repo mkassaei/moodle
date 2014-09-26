@@ -46,7 +46,7 @@ $visible    = optional_param('visible', 0, PARAM_INT);
 $pageaction = optional_param('action', '', PARAM_ALPHA); // Used to simulate a DELETE command.
 $maxmark    = optional_param('maxmark', '', PARAM_FLOAT);
 $page       = optional_param('page', '', PARAM_INT);
-$PAGE->set_url('/mod/quiz/rest.php',
+$PAGE->set_url('/mod/quiz/edit-rest.php',
         array('quizid' => $quizid, 'class' => $class));
 
 require_sesskey();

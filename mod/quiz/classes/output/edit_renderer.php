@@ -837,8 +837,8 @@ class edit_renderer extends \plugin_renderer_base {
     protected function initialise_editing_javascript($course, $quiz) {
 
         $config = new \stdClass();
-        $config->resourceurl = '/mod/quiz/rest.php';
-        $config->sectionurl = '/mod/quiz/rest.php';
+        $config->resourceurl = '/mod/quiz/edit-rest.php';
+        $config->sectionurl = '/mod/quiz/edit-rest.php';
         $config->pageparams = array();
         $config->questiondecimalpoints = $quiz->questiondecimalpoints;
 
