@@ -15,11 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Quiz repaginate class
+ * Defines the quiz repaginate class.
  *
- * The repaginate class will rearrange questions in pages.
- * The quiz setting allows users to write quizzes with one question per page,
- * n questions per page, or all questions on one page.
  * @package   mod_quiz
  * @copyright 2013 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,18 +24,30 @@
 
 namespace mod_quiz;
 
+/**
+ * The repaginate class will rearrange questions in pages.
+ * The quiz setting allows users to write quizzes with one question per page,
+ * n questions per page, or all questions on one page.
+ *
+ * @copyright 2013 The Open University
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class repaginate {
 
-    const LINK = 1; // This is used to join pages.
-    const UNLINK = 2; // This is used to separate pages.
+    /** @var int means join pages. */
+    const LINK = 1;
+    /** @var int means split pages. */
+    const UNLINK = 2;
 
+    /** @var int the id of the quiz being manipulated. */
     private $quizid;
+    /** @var array the quiz_slots for that quiz. */
     private $slots;
 
     /**
-     * Set current slots object
-     * @param int $quizid
-     * @param object $slots
+     * Constuctor.
+     * @param int $quizid the id of the quiz being manipulated.
+     * @param object $slots the quiz_slots for that quiz.
      */
     public function __construct($quizid = 0, $slots = null) {
         global $DB;
@@ -54,7 +63,7 @@ class repaginate {
     }
 
     /**
-     * Repaginate a given slot with the given pagenumber
+     * Repaginate a given slot with the given pagenumber.
      * @param object $slot
      * @param int $newpagenumber
      */
@@ -65,8 +74,8 @@ class repaginate {
     }
 
     /**
-     * Return current slot object
-     * @param object$slots
+     * Return current slot object.
+     * @param array $slots
      * @param int $slotnumber
      */
     protected function get_this_slot($slots, $slotnumber) {
@@ -79,16 +88,8 @@ class repaginate {
     }
 
     /**
-     * Return the last slot object
-     * @param object$slots
-     */
-    protected function get_last_slot($slots) {
-        return end($slots);
-    }
-
-    /**
      * Return array of slots with slot number as key
-     * @param object$slots
+     * @param array $slots
      */
     protected function get_slots_by_slot_number($slots) {
         if (!$slots) {
@@ -103,7 +104,7 @@ class repaginate {
 
     /**
      * Return array of slots with slot id as key
-     * @param object$slots
+     * @param array $slots
      */
     protected function get_slots_by_slotid($slots) {
         if (!$slots) {
@@ -119,9 +120,9 @@ class repaginate {
     /**
      * Repaginate, update DB and slots object
      * @param int $nextslotnumber
-     * @param int $type
+     * @param int $type repaginate::LINK or repaginate::UNLINK.
      */
-    public function repaginate($nextslotnumber, $type) {
+    public function repaginate_slots($nextslotnumber, $type) {
         global $DB;
         $this->slots = $DB->get_records('quiz_slots', array('quizid' => $this->quizid), 'slot');
         $nextslot = null;
@@ -148,7 +149,7 @@ class repaginate {
     /**
      * Repaginate next slot and return the modified slot object
      * @param int $nextslotnumber
-     * @param int $type
+     * @param int $type repaginate::LINK or repaginate::UNLINK.
      */
     public function repaginate_next_slot($nextslotnumber, $type) {
         global $DB;
@@ -169,8 +170,9 @@ class repaginate {
 
     /**
      * Return the slots with the new pagination, regardless of current pagination.
-     * @param object $slots
-     * @param int $number, number of question per page
+     * @param array $slots the slots to repaginate.
+     * @param int $number number of question per page
+     * @return array the updated slots.
      */
     public function repaginate_n_question_per_page($slots, $number) {
         $slots = $this->get_slots_by_slot_number($slots);
@@ -221,9 +223,5 @@ class repaginate {
             $newslots[$slot->id] = $slot;
         }
         return $newslots;
-    }
-
-    public function get_slots() {
-        return $this->slots;
     }
 }

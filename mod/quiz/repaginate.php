@@ -36,7 +36,7 @@ $quizobj = quiz::create($quizid);
 
 $slotnumber++;
 $repage = new \mod_quiz\repaginate($quizid);
-$repage->repaginate($slotnumber, $repagtype);
+$repage->repaginate_slots($slotnumber, $repagtype);
 
 $structure = $quizobj->get_structure();
 $slots = $structure->refresh_page_numbers_and_update_db($structure->get_quiz());

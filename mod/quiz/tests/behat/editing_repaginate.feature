@@ -115,7 +115,7 @@ Feature: Edit quiz page
     And I should see "Page 3"
 
     # Add the forth Essay question in a new page (Page 4).
-    And I open the "last" add to quiz menu
+    And I open the "Page 3" add to quiz menu
     And I follow "a new question" in the open menu
     And I set the field "qtype_qtype_essay" to "1"
     And I press "submitbutton"

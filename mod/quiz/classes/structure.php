@@ -490,14 +490,12 @@ class structure {
 
         // Work out how things are being moved.
         $slotreorder = array();
-        if ($targetslotnumber == $movingslotnumber - 1) {
-            // Nothing to do.
-        } else if ($targetslotnumber > $movingslotnumber) {
+        if ($targetslotnumber > $movingslotnumber) {
             $slotreorder[$movingslotnumber] = $targetslotnumber;
             for ($i = $movingslotnumber; $i < $targetslotnumber; $i++) {
                 $slotreorder[$i + 1] = $i;
             }
-        } else if ($targetslotnumber < $movingslotnumber) {
+        } else if ($targetslotnumber < $movingslotnumber - 1) {
             $slotreorder[$movingslotnumber] = $targetslotnumber + 1;
             for ($i = $targetslotnumber + 1; $i < $movingslotnumber; $i++) {
                 $slotreorder[$i] = $i + 1;
@@ -660,6 +658,7 @@ class structure {
      *
      * @param object $quiz the quiz object.
      * @param int    $slotid id of slot.
+     * @param int    $type repaginate::LINK or repaginate::UNLINK.
      * @return array of slot objects.
      */
     public function update_page_break($quiz, $slotid, $type) {
@@ -667,7 +666,7 @@ class structure {
 
         $quizslots = $DB->get_records('quiz_slots', array('quizid' => $quiz->id), 'slot');
         $repaginate = new \mod_quiz\repaginate($quiz->id, $quizslots);
-        $repaginate->repaginate($quizslots[$slotid]->slot, $type);
+        $repaginate->repaginate_slots($quizslots[$slotid]->slot, $type);
         $slots = $this->refresh_page_numbers_and_update_db($quiz);
 
         return $slots;
