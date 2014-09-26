@@ -17,10 +17,10 @@
 /**
  * Steps definitions related to mod_quiz.
  *
- * @package    mod_quiz
- * @category   test
- * @copyright  2014 Marina Glancy
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_quiz
+ * @category  test
+ * @copyright 2014 Marina Glancy
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
@@ -34,10 +34,8 @@ use Behat\Behat\Context\Step\Given as Given,
 /**
  * Steps definitions related to mod_quiz.
  *
- * @package    mod_quiz
- * @category   test
- * @copyright  2014 Marina Glancy
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2014 Marina Glancy
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_mod_quiz extends behat_question_base {
     /**
@@ -105,6 +103,7 @@ class behat_mod_quiz extends behat_question_base {
      * Click on a given link in the moodle-actionmenu that is currently open.
      * @Given /^I follow "(?P<link_string>(?:[^"]|\\")*)" in the open menu$/
      * @param $text the text (or id, etc.) of the link to click.
+     * @return array of steps.
      */
     public function i_follow_in_the_open_menu($linkstring) {
         $openmenuxpath = "//div[contains(@class, 'moodle-actionmenu') and contains(@class, 'show')]";
@@ -116,6 +115,9 @@ class behat_mod_quiz extends behat_question_base {
     /**
      * Check whether a particular question is on a particular page of the quiz on the Edit quiz page.
      * @Given /^I should see "(?P<question_name>(?:[^"]|\\")*)" on quiz page "(?P<page_number>\d+)"$/
+     * @param string $questionname the name of the question we are looking for.
+     * @param number $pagenumber the page it should be found on.
+     * @return array of steps.
      */
     public function i_should_see_on_quiz_page($questionname, $pagenumber) {
         $xpath = "//li[contains(., '" . $this->escape($questionname) .
@@ -123,6 +125,21 @@ class behat_mod_quiz extends behat_question_base {
                 $pagenumber . "')]]";
         return array(
             new Given('"' . $xpath . '" "xpath_element" should exist'),
+        );
+    }
+
+    /**
+     * Click the add or remove page-break icon after a particular question.
+     * @When /^I click on the "(Add|Remove)" page break icon after question "(?P<question_name>(?:[^"]|\\")*)"$/
+     * @param string $addorremoves 'Add' or 'Remove'.
+     * @param string $questionname the name of the question before the icon to click.
+     * @return array of steps.
+     */
+    public function i_click_on_the_page_break_icon_after_question($addorremoves, $questionname) {
+        $xpath = "//li[contains(., '" . $this->escape($questionname) .
+                "')]//a[@class = 'page_split_join' and @title = '" . $addorremoves . " page break']";
+        return array(
+            new Given('I click on "' . $xpath . '" "xpath_element"'),
         );
     }
 }

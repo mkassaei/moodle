@@ -56,13 +56,11 @@ Feature: Edit quiz page
     # Start repaginating.
     And I should not see "Page 2"
 
-    # click on 'Add page break' icon between slot 1 and slot 2.
-    And I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Add page break\"]" "xpath_element"
+    When I click on the "Add" page break icon after question "Essay 01 new"
     And I should see "Essay 01 new" on quiz page "1"
     And I should see "Essay 02 new" on quiz page "2"
 
-    # click on 'Remove page break' icon between slot 1 and slot 2.
-    And I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Remove page break\"]" "xpath_element"
+    When I click on the "Remove" page break icon after question "Essay 01 new"
     And I should see "Essay 01 new" on quiz page "1"
     And I should see "Essay 02 new" on quiz page "1"
     And I should not see "Page 2"
@@ -83,29 +81,24 @@ Feature: Edit quiz page
     And I should not see "Page 2"
     And I should not see "Page 3"
 
-    # We have 2 questions in page 1 and one question in page 2.
-    # click on 'Add page break' icon between slot 2 and slot 3.
-    When I click on "//a[contains(@href, 'slot=2')]//img[@title=\"Add page break\"]" "xpath_element"
+    When I click on the "Add" page break icon after question "Essay 02 new"
     And I should see "Essay 01 new" on quiz page "1"
-    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "2"
     And I should see "Essay 03 new" on quiz page "2"
     And I should not see "Page 3"
 
-    # We have 3 questions on each page.
-    # click on 'Add page break' icon between slot 1 and slot 2.
-    When I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Add page break\"]" "xpath_element"
+    When I click on the "Add" page break icon after question "Essay 01 new"
     And I should see "Essay 01 new" on quiz page "1"
     And I should see "Essay 02 new" on quiz page "2"
     And I should see "Essay 03 new" on quiz page "3"
 
-    # Remove both page breaks.
-    When I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Remove page break\"]" "xpath_element"
+    When I click on the "Remove" page break icon after question "Essay 01 new"
     And I should see "Essay 01 new" on quiz page "1"
     And I should see "Essay 02 new" on quiz page "1"
     And I should see "Essay 03 new" on quiz page "2"
     And I should not see "Page 3"
 
-    When I click on "//a[contains(@href, 'slot=2')]//img[@title=\"Remove page break\"]" "xpath_element"
+    When I click on the "Remove" page break icon after question "Essay 02 new"
     And I should see "Essay 01 new" on quiz page "1"
     And I should see "Essay 02 new" on quiz page "1"
     And I should see "Essay 03 new" on quiz page "1"
@@ -135,7 +128,7 @@ Feature: Edit quiz page
     And I should see "Essay 03 new" on quiz page "3"
     And I should see "Essay 04 new" on quiz page "3"
 
-    And I click on "//a[contains(@href, 'slot=3')]//img[@title=\"Add page break\"]" "xpath_element"
+    When I click on the "Add" page break icon after question "Essay 03 new"
     And I should see "Essay 01 new" on quiz page "1"
     And I should see "Essay 02 new" on quiz page "2"
     And I should see "Essay 03 new" on quiz page "3"
