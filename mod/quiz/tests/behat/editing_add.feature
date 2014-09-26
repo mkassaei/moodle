@@ -33,8 +33,7 @@ Feature: Edit quiz page
     And I set the field "Question text" to "Please write 200 words about Essay 01"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Page 1"
-    And I should see "Essay 01 new"
+    And I should see "Essay 01 new" on quiz page "1"
 
     And I open the "Page 1" add to quiz menu
     And I follow "a new question"
@@ -45,8 +44,8 @@ Feature: Edit quiz page
     And I set the field "Question text" to "Please write 200 words about Essay 02"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay 01 new"
-    And I should see "Essay 02 new"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
 
     And I open the "Page 1" add to quiz menu
     And I follow "a new question"
@@ -57,9 +56,9 @@ Feature: Edit quiz page
     And I set the field "Question text" to "Please write 300 words about Essay 03"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay 01 new"
-    And I should see "Essay 02 new"
-    And I should see "Essay 03 new"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 03 new" on quiz page "1"
 
     And I open the "Page 1" add to quiz menu
     And I follow "a new question"
@@ -70,32 +69,37 @@ Feature: Edit quiz page
     And I set the field "Question text" to "Please write 300 words about Essay 04"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay 01 new"
-    And I should see "Essay 02 new"
-    And I should see "Essay 03 new"
-    And I should see "Essay 04 new"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 03 new" on quiz page "1"
+    And I should see "Essay 04 new" on quiz page "1"
 
     # Repaginate as two questions per page.
-    When I should see "Page 1"
     And I should not see "Page 2"
-    And I press "Repaginate"
+    When I press "Repaginate"
     Then I should see "Repaginate with"
     And I set the field "menuquestionsperpage" to "2"
     When I press "Go"
-    Then I should see "Page 1"
-    And I should see "Page 2"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 03 new" on quiz page "2"
+    And I should see "Essay 04 new" on quiz page "2"
 
     # Add a question to page 2.
-    And I open the "Page 2" add to quiz menu
+    When I open the "Page 2" add to quiz menu
     And I follow "a new question" in the open menu
     And I set the field "qtype_qtype_essay" to "1"
     And I press "submitbutton"
     Then I should see "Adding an Essay question"
-    And I set the field "Question name" to "Essay for page 2"
+    When I set the field "Question name" to "Essay for page 2"
     And I set the field "Question text" to "Please write 200 words about Essay for page 2"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    Then "//li[contains(., 'Essay for page 2')][./preceding-sibling::li[contains(., 'Page 2')]]" "xpath_element" should exist
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 03 new" on quiz page "2"
+    And I should see "Essay 04 new" on quiz page "2"
+    And I should see "Essay for page 2" on quiz page "2"
 
   @javascript @addmenu_s2
   Scenario: Add questions from question bank to the quiz. In order to be able to
@@ -191,14 +195,15 @@ Feature: Edit quiz page
     And I follow "from question bank"
     And I click on "Add to quiz" "link" in the "Essay 03" "table_row"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay 03"
+    And I should see "Essay 03" on quiz page "1"
 
     # Add Essay 01 from question bank.
     And I open the "Page 1" add to quiz menu
     And I follow "from question bank"
     And I click on "Add to quiz" "link" in the "Essay 01" "table_row"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay 01"
+    And I should see "Essay 03" on quiz page "1"
+    And I should see "Essay 01" on quiz page "1"
 
     # Add Esay 02 from question bank.
     And I open the "Page 1" add to quiz menu
@@ -207,25 +212,30 @@ Feature: Edit quiz page
     And I set the field "Select a category" to "Subcat 1"
     And I click on "Add to quiz" "link" in the "Essay 02" "table_row"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay 02"
+    And I should see "Essay 03" on quiz page "1"
+    And I should see "Essay 01" on quiz page "1"
+    And I should see "Essay 02" on quiz page "1"
 
     # Add a random question.
     And I open the "Page 1" add to quiz menu
     And I follow "a random question"
     And I press "Add random question"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Random"
+    And I should see "Essay 03" on quiz page "1"
+    And I should see "Essay 01" on quiz page "1"
+    And I should see "Essay 02" on quiz page "1"
+    And I should see "Random" on quiz page "1"
 
     # Repaginate as one question per page.
-    And I should see "Page 1"
     And I should not see "Page 2"
     When I press "Repaginate"
     Then I should see "Repaginate with"
     And I set the field "menuquestionsperpage" to "1"
     When I press "Go"
-    Then I should see "Page 2"
-    And I should see "Page 3"
-    And I should see "Page 4"
+    And I should see "Essay 03" on quiz page "1"
+    And I should see "Essay 01" on quiz page "2"
+    And I should see "Essay 02" on quiz page "3"
+    And I should see "Random" on quiz page "4"
 
     # Add a random question to page 4.
     And I open the "Page 4" add to quiz menu
@@ -237,5 +247,8 @@ Feature: Edit quiz page
     And I set the field "Question text" to "Please write 200 words about Essay for page 4"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay for page 4"
-    And I wait "10" seconds
+    And I should see "Essay 03" on quiz page "1"
+    And I should see "Essay 01" on quiz page "2"
+    And I should see "Essay 02" on quiz page "3"
+    And I should see "Random" on quiz page "4"
+    And I should see "Essay for page 4" on quiz page "4"

@@ -81,7 +81,7 @@ class behat_mod_quiz extends behat_question_base {
     }
 
     /**
-     * Open the add menu on a given page, or at the end.
+     * Open the add menu on a given page, or at the end of the Edit quiz page.
      * @Given /^I open the "(?P<page_n_or_last_string>(?:[^"]|\\")*)" add to quiz menu$/
      * @param string $pageorlast either "Page n" or "last".
      */
@@ -110,6 +110,19 @@ class behat_mod_quiz extends behat_question_base {
         $openmenuxpath = "//div[contains(@class, 'moodle-actionmenu') and contains(@class, 'show')]";
         return array(
             new Given('I click on "' . $linkstring . '" "link" in the "' . $openmenuxpath . '" "xpath_element"'),
+        );
+    }
+
+    /**
+     * Check whether a particular question is on a particular page of the quiz on the Edit quiz page.
+     * @Given /^I should see "(?P<question_name>(?:[^"]|\\")*)" on quiz page "(?P<page_number>\d+)"$/
+     */
+    public function i_should_see_on_quiz_page($questionname, $pagenumber) {
+        $xpath = "//li[contains(., '" . $this->escape($questionname) .
+                "')][./preceding-sibling::li[contains(@class, 'pagenumber')][1][contains(., 'Page " .
+                $pagenumber . "')]]";
+        return array(
+            new Given('"' . $xpath . '" "xpath_element" should exist'),
         );
     }
 }

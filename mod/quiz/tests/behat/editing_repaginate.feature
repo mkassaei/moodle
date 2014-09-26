@@ -38,7 +38,7 @@ Feature: Edit quiz page
     And I set the field "Question text" to "Please write 100 words about Essay 01"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay 01 new"
+    And I should see "Essay 01 new" on quiz page "1"
 
     # Add the second Essay question.
     And I follow "Add"
@@ -50,18 +50,21 @@ Feature: Edit quiz page
     And I set the field "Question text" to "Please write 200 words about Essay 02"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay 02 new"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
 
     # Start repaginating.
-    And I should see "Page 1"
     And I should not see "Page 2"
 
     # click on 'Add page break' icon between slot 1 and slot 2.
     And I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Add page break\"]" "xpath_element"
-    And I should see "Page 2"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "2"
 
     # click on 'Remove page break' icon between slot 1 and slot 2.
     And I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Remove page break\"]" "xpath_element"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
     And I should not see "Page 2"
 
     # Add the third Essay question.
@@ -74,80 +77,84 @@ Feature: Edit quiz page
     And I set the field "Question text" to "Please write 200 words about Essay 03"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay 03 new"
-
-    # We have 3 question on one page.
-    And I should see "Page 1"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 03 new" on quiz page "1"
     And I should not see "Page 2"
     And I should not see "Page 3"
 
     # We have 2 questions in page 1 and one question in page 2.
     # click on 'Add page break' icon between slot 2 and slot 3.
-    And I click on "//a[contains(@href, 'slot=2')]//img[@title=\"Add page break\"]" "xpath_element"
-    And I should see "Page 1"
-    And I should see "Page 2"
+    When I click on "//a[contains(@href, 'slot=2')]//img[@title=\"Add page break\"]" "xpath_element"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 03 new" on quiz page "2"
+    And I should not see "Page 3"
 
     # We have 3 questions on each page.
     # click on 'Add page break' icon between slot 1 and slot 2.
-    And I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Add page break\"]" "xpath_element"
-    And I should see "Page 1"
-    And I should see "Page 2"
-    And I should see "Page 3"
+    When I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Add page break\"]" "xpath_element"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "2"
+    And I should see "Essay 03 new" on quiz page "3"
 
     # Remove both page breaks.
-    And I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Remove page break\"]" "xpath_element"
-    And I should see "Page 1"
-    And I should see "Page 2"
+    When I click on "//a[contains(@href, 'slot=1')]//img[@title=\"Remove page break\"]" "xpath_element"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 03 new" on quiz page "2"
     And I should not see "Page 3"
 
-    And I click on "//a[contains(@href, 'slot=2')]//img[@title=\"Remove page break\"]" "xpath_element"
-    And I should see "Page 1"
+    When I click on "//a[contains(@href, 'slot=2')]//img[@title=\"Remove page break\"]" "xpath_element"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 03 new" on quiz page "1"
     And I should not see "Page 2"
     And I should not see "Page 3"
 
     # Repaginate one question per page.
     When I press "Repaginate"
-    Then I should see "Repaginate with"
     And I set the field "menuquestionsperpage" to "1"
-    When I press "Go"
-    Then I should see "Page 1"
-    And I should see "Page 2"
-    And I should see "Page 3"
+    And I press "Go"
+    Then I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "2"
+    And I should see "Essay 03 new" on quiz page "3"
 
     # Add the forth Essay question in a new page (Page 4).
-    And I open the "Page 3" add to quiz menu
+    When I open the "Page 3" add to quiz menu
     And I follow "a new question" in the open menu
     And I set the field "qtype_qtype_essay" to "1"
     And I press "submitbutton"
     Then I should see "Adding an Essay question"
-    And I set the field "Question name" to "Essay 04 new"
+    When I set the field "Question name" to "Essay 04 new"
     And I set the field "Question text" to "Please write 300 words about Essay 04"
     And I press "id_submitbutton"
     Then I should see "Editing quiz: Quiz 1"
-    And I should see "Essay 04 new"
-    Then I should see "Page 1"
-    And I should see "Page 2"
-    And I should see "Page 3"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "2"
+    And I should see "Essay 03 new" on quiz page "3"
+    And I should see "Essay 04 new" on quiz page "3"
 
     And I click on "//a[contains(@href, 'slot=3')]//img[@title=\"Add page break\"]" "xpath_element"
-    And I should see "Page 4"
+    And I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "2"
+    And I should see "Essay 03 new" on quiz page "3"
+    And I should see "Essay 04 new" on quiz page "4"
 
     # Repaginate with 2 questions per page.
     When I press "Repaginate"
-    Then I should see "Repaginate with"
     And I set the field "menuquestionsperpage" to "2"
-    When I press "Go"
-    Then I should see "Page 1"
-    And I should see "Page 2"
-    And I should not see "Page 3"
-    And I should not see "Page 4"
+    And I press "Go"
+    Then I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 03 new" on quiz page "2"
+    And I should see "Essay 04 new" on quiz page "2"
 
     # Repaginate with unlimited questions per page (All questions on Page 1).
     When I press "Repaginate"
-    Then I should see "Repaginate with"
     And I set the field "menuquestionsperpage" to "Unlimited"
-    When I press "Go"
-    Then I should see "Page 1"
-    And I should not see "Page 2"
-    And I should not see "Page 3"
-    And I should not see "Page 4"
+    And I press "Go"
+    Then I should see "Essay 01 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 03 new" on quiz page "1"
+    And I should see "Essay 04 new" on quiz page "1"
