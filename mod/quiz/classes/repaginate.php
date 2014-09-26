@@ -26,6 +26,7 @@ namespace mod_quiz;
 
 /**
  * The repaginate class will rearrange questions in pages.
+ *
  * The quiz setting allows users to write quizzes with one question per page,
  * n questions per page, or all questions on one page.
  *
