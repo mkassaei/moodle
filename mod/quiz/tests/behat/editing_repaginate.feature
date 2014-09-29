@@ -1,7 +1,8 @@
-@mod @mod_quiz @repaginate
-Feature: Edit quiz page
-  This feature test the repaginate button where queestions can be repaginate with
-  N question(s) per page on the quiz editing page.
+@mod @mod_quiz
+Feature: Edit quiz page - pagination
+  In order to build a quiz laid out in pages the way I want
+  As a teacher
+  I need to be able to add and remove pages, and repaginate.
 
   Background:
     Given the following "users" exist:
@@ -22,7 +23,7 @@ Feature: Edit quiz page
     And I follow "Quiz 1"
     And I follow "Edit quiz"
 
-  @javascript @repaginate_s1
+  @javascript
   Scenario: Repaginate questions with N question(s) per page as well as clicking
     on "add page break" or "Remove page break" icons to repaginate in any desired format.
 

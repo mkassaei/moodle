@@ -1,7 +1,8 @@
-@mod @mod_quiz @addmenu
-Feature: Edit quiz page
-  This feature test the add menu (adding new questions, adding questions from
-  question bank, adding random questions) of the quiz editing page.
+@mod @mod_quiz
+Feature: Edit quiz page - adding things
+  In order to build the quiz I want my students to attempt
+  As a teacher
+  I need to be able to add questions to the quiz.
 
   Background:
     Given the following "users" exist:
@@ -22,7 +23,7 @@ Feature: Edit quiz page
     And I navigate to "Edit quiz" node in "Quiz administration"
     Then I should see "Editing quiz: Quiz 1"
 
-  @javascript @addmenu_s1
+  @javascript
   Scenario: Add some new question to the quiz using '+ a new question' options of the 'Add' menu.
     And I open the "last" add to quiz menu
     And I follow "a new question"
@@ -101,7 +102,7 @@ Feature: Edit quiz page
     And I should see "Essay 04 new" on quiz page "2"
     And I should see "Essay for page 2" on quiz page "2"
 
-  @javascript @addmenu_s2
+  @javascript
   Scenario: Add questions from question bank to the quiz. In order to be able to
       add questions from question bank to the quiz, first we create some new questions
       in various categories and add them to the question bank.

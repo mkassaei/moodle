@@ -470,23 +470,20 @@ class structure {
      * @return void
      */
     public function move_slot($idmove, $idbefore, $page) {
-        global $DB, $CFG;
+        global $DB;
 
         $movingslot = $this->slots[$idmove];
         if (empty($movingslot)) {
             throw new moodle_exception('Bad slot ID ' . $idmove);
         }
+        $movingslotnumber = (int) $movingslot->slot;
 
         // Empty target slot means move slot to first.
         if (empty($idbefore)) {
-            $targetslot = $this->slotsinorder[1];
+            $targetslotnumber = 0;
         } else {
-            $targetslot = $this->slots[$idbefore];
+            $targetslotnumber = (int) $this->slots[$idbefore]->slot;
         }
-
-        // Unit tests convert slot values to strings. Need as int.
-        $movingslotnumber = (int) $movingslot->slot;
-        $targetslotnumber = (int) $targetslot->slot;
 
         // Work out how things are being moved.
         $slotreorder = array();

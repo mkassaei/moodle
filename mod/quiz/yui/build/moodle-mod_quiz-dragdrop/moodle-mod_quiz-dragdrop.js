@@ -31,7 +31,6 @@ var CSS = {
 },
 // The CSS selectors we use.
 SELECTOR = {
-    STATIC_IDS: {'page-1':1},
     PAGE: 'li.page',
     SLOT: 'li.slot'
 };
@@ -506,11 +505,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
                 where = "after";
             }
 
-            // Add the node contents so that it's moved, otherwise only the drag handle is moved.
-            // Don't insert above the first slot page element.
-            if(!SELECTOR.STATIC_IDS[drop.get('id')]) {
-                drop.insert(drag, where);
-            }
+            drop.insert(drag, where);
         } else if ((drop.hasClass(this.parentnodeclass) || drop.test('[data-droptarget="1"]')) && !drop.contains(drag)) {
             // We are dropping on parent node and it is empty
             if (this.goingup) {

@@ -29,7 +29,6 @@ var CSS = {
 },
 // The CSS selectors we use.
 SELECTOR = {
-    STATIC_IDS: {'page-1':1},
     PAGE: 'li.page',
     SLOT: 'li.slot'
 };

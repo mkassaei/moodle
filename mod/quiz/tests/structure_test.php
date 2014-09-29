@@ -252,6 +252,23 @@ class mod_quiz_structure_testcase extends advanced_testcase {
                 $originalslotids[7] => 1,
                 $originalslotids[8] => 2,
         ), $structure);
+
+        // Slots move 2 > top. No page changes.
+        $idmove = $structure->get_question_in_slot(2)->slotid;
+        $structure->move_slot($idmove, 0, 1);
+
+        // Having called move, we need to reload $structure.
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $this->assert_quiz_layout(array(
+                $originalslotids[1] => 1,
+                $originalslotids[3] => 1,
+                $originalslotids[6] => 1,
+                $originalslotids[2] => 1,
+                $originalslotids[4] => 1,
+                $originalslotids[5] => 1,
+                $originalslotids[7] => 1,
+                $originalslotids[8] => 2,
+        ), $structure);
     }
 
     /**
