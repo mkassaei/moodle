@@ -104,7 +104,6 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             case 'linkpage':
             case 'unlinkpage':
                 // The user is linking or unlinking pages.
-                // TODO MDL-43089 finish link page functionality.
                 this.link_page(ev, node, activity, action);
                 break;
             default:
