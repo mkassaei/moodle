@@ -72,7 +72,7 @@ class behat_mod_quiz extends behat_question_base {
     public function i_set_the_max_mark_for_quiz_question($questionname, $newmark) {
         return array(
             new Given('I follow "' . $this->escape(get_string('editmaxmark', 'quiz')) . '"'),
-            new Given('I wait "2" seconds'),
+            new Given('I wait until "li input[name=maxmark]" "css_element" exists'),
             new Given('I should see "' . $this->escape(get_string('edittitleinstructions')) . '"'),
             new Given('I set the field "maxmark" to "' . $this->escape($newmark) . chr(10) . '"'),
         );

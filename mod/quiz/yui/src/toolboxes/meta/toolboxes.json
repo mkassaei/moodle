@@ -1,10 +1,10 @@
 {
     "moodle-mod_quiz-toolboxes": {
         "requires": [
-            "node",
             "base",
-            "event-key",
             "node",
+            "event",
+            "event-key",
             "io",
             "moodle-mod_quiz-quizbase",
             "moodle-mod_quiz-util-slot"

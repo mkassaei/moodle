@@ -485,10 +485,10 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
     edit_maxmark_submit : function(ev, activity, originalmaxmark) {
         // We don't actually want to submit anything
         ev.preventDefault();
-
         var newmaxmark = Y.Lang.trim(activity.one(SELECTOR.ACTIVITYFORM + ' ' + SELECTOR.ACTIVITYMAXMARK).get('value'));
-        this.edit_maxmark_clear(activity);
         var spinner = this.add_spinner(activity);
+        this.edit_maxmark_clear(activity);
+        activity.one(SELECTOR.INSTANCEMAXMARK).setContent(newmaxmark);
         if (newmaxmark !== null && newmaxmark !== "" && newmaxmark !== originalmaxmark) {
             var data = {
                 'class'   : 'resource',
@@ -547,6 +547,13 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
       Y.later(100, this, function() {
           activity.one(SELECTOR.EDITMAXMARK).focus();
       });
+
+      // This hack is to keep Behat happy until they release a version of
+      // MinkSelenium2Driver that fixes
+      // https://github.com/Behat/MinkSelenium2Driver/issues/80.
+      if (!Y.one('input[name=maxmark')) {
+          Y.one('body').append('<input type="text" name="maxmark" style="display: none">');
+      }
     },
 
     /**
@@ -849,10 +856,10 @@ M.mod_quiz.init_section_toolbox = function(config) {
 
 }, '@VERSION@', {
     "requires": [
-        "node",
         "base",
-        "event-key",
         "node",
+        "event",
+        "event-key",
         "io",
         "moodle-mod_quiz-quizbase",
         "moodle-mod_quiz-util-slot"
