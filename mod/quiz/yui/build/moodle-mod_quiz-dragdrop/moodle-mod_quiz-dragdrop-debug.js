@@ -86,7 +86,7 @@ Y.extend(DRAGSECTION, M.core.dragdrop, {
         }
     },
 
-     /**
+    /**
      * Apply dragdrop features to the specified selector or node that refers to section(s)
      *
      * @method setup_for_section

@@ -105,7 +105,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             case 'unlinkpage':
                 // The user is linking or unlinking pages.
                 // TODO MDL-43089 finish link page functionality.
-                 this.link_page(ev, node, activity, action);
+                this.link_page(ev, node, activity, action);
                 break;
             default:
                 // Nothing to do here!
@@ -318,32 +318,32 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
      * @param {Node} activity  The activity whose maxmark we were altering.
      */
     edit_maxmark_clear : function(activity) {
-      // Detach all listen events to prevent duplicate triggers
-      new Y.EventHandle(this.editmaxmarkevents).detach();
+        // Detach all listen events to prevent duplicate triggers
+        new Y.EventHandle(this.editmaxmarkevents).detach();
 
-      var editform = activity.one(SELECTOR.ACTIVITYFORM),
-          instructions = activity.one('#id_editinstructions');
-      if (editform) {
-          editform.replace(editform.getData('anchor'));
-      }
-      if (instructions) {
-          instructions.remove();
-      }
+        var editform = activity.one(SELECTOR.ACTIVITYFORM),
+            instructions = activity.one('#id_editinstructions');
+        if (editform) {
+            editform.replace(editform.getData('anchor'));
+        }
+        if (instructions) {
+            instructions.remove();
+        }
 
-      // Remove the editing class again to revert the display.
-      activity.removeClass(CSS.EDITINGMAXMARK);
+        // Remove the editing class again to revert the display.
+        activity.removeClass(CSS.EDITINGMAXMARK);
 
-      // Refocus the link which was clicked originally so the user can continue using keyboard nav.
-      Y.later(100, this, function() {
-          activity.one(SELECTOR.EDITMAXMARK).focus();
-      });
+        // Refocus the link which was clicked originally so the user can continue using keyboard nav.
+        Y.later(100, this, function() {
+            activity.one(SELECTOR.EDITMAXMARK).focus();
+        });
 
-      // This hack is to keep Behat happy until they release a version of
-      // MinkSelenium2Driver that fixes
-      // https://github.com/Behat/MinkSelenium2Driver/issues/80.
-      if (!Y.one('input[name=maxmark')) {
-          Y.one('body').append('<input type="text" name="maxmark" style="display: none">');
-      }
+        // This hack is to keep Behat happy until they release a version of
+        // MinkSelenium2Driver that fixes
+        // https://github.com/Behat/MinkSelenium2Driver/issues/80.
+        if (!Y.one('input[name=maxmark')) {
+            Y.one('body').append('<input type="text" name="maxmark" style="display: none">');
+        }
     },
 
     /**
@@ -397,8 +397,8 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             var type;
             var slot;
             if(node.hasClass(CSS.PAGE)){
-               type = this.NODE_PAGE;
-               slot = node.next(SELECTOR.SLOTLI);
+                type = this.NODE_PAGE;
+                slot = node.next(SELECTOR.SLOTLI);
             } else if (node.hasClass(CSS.SLOT)){
                 type = this.NODE_SLOT;
                 slot = node;
