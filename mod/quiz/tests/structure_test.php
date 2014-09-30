@@ -382,18 +382,9 @@ class mod_quiz_structure_testcase extends advanced_testcase {
      * @param stdClass $quiz the quiz to add to.
      */
     public function add_eight_questions_to_the_quiz($quiz) {
-        /*
-         * Rows are in the format array(id, quizid, slot, page, questionid, maxmark).
-         *
-         * $data[] = array($uniqueid++.'', $quiz->id, '1', 1.'', '1', '1.0000000');
-         * $data[] = array($uniqueid++.'', $quiz->id, '2', 2.'', '2', '1.0000000');
-         * $data[] = array($uniqueid++.'', $quiz->id, '3', 2.'', '3', '1.0000000');
-         * $data[] = array($uniqueid++.'', $quiz->id, '4', 2.'', '4', '1.0000000');
-         * $data[] = array($uniqueid++.'', $quiz->id, '5', 2.'', '5', '1.0000000');
-         * $data[] = array($uniqueid++.'', $quiz->id, '6', 2.'', '6', '1.0000000');
-         * $data[] = array($uniqueid++.'', $quiz->id, '7', 3.'', '7', '1.0000000');
-         * $data[] = array($uniqueid++.'', $quiz->id, '8', 4.'', '8', '1.0000000');
-         */
+        // We add 8 numerical questions with this layout:
+        // Slot 1 2 3 4 5 6 7 8
+        // Page 1 2 2 2 2 2 3 4.
 
         // Create slots.
         $pagenumber = 1;

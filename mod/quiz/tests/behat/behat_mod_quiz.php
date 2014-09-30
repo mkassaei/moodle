@@ -102,7 +102,7 @@ class behat_mod_quiz extends behat_question_base {
     /**
      * Click on a given link in the moodle-actionmenu that is currently open.
      * @Given /^I follow "(?P<link_string>(?:[^"]|\\")*)" in the open menu$/
-     * @param $linkstring the text (or id, etc.) of the link to click.
+     * @param string $linkstring the text (or id, etc.) of the link to click.
      * @return array of steps.
      */
     public function i_follow_in_the_open_menu($linkstring) {
@@ -131,7 +131,7 @@ class behat_mod_quiz extends behat_question_base {
     /**
      * Check whether one question comes before another on the Edit quiz page.
      * The two questions must be on the same page.
-     * @Given /^I should see "(?P<first_question_name>(?:[^"]|\\")*)" before "(?P<second_question_name>(?:[^"]|\\")*)" on the edit quiz page$/
+     * @Given /^I should see "(?P<first_q_name>(?:[^"]|\\")*)" before "(?P<second_q_name>(?:[^"]|\\")*)" on the edit quiz page$/
      * @param string $firstquestionname the name of the question that should come first in order.
      * @param string $secondquestionname the name of the question that should come immediately after it in order.
      * @return array of steps.
@@ -152,8 +152,7 @@ class behat_mod_quiz extends behat_question_base {
      * @param number $number the number (or 'i') that should be displayed beside that question.
      * @return array of steps.
      */
-    public function should_have_number_on_the_edit_quiz_page($questionname, $number)
-    {
+    public function should_have_number_on_the_edit_quiz_page($questionname, $number) {
         $xpath = "//li[contains(@class, ' slot ') and contains(., '" . $this->escape($questionname) .
                 "')]//span[@class = 'slotnumber' and normalize-space(text()) = '" . $this->escape($number) . "']";
         return array(
@@ -179,14 +178,13 @@ class behat_mod_quiz extends behat_question_base {
     /**
      * Move a question on the Edit quiz page by first clicking on the Move icon,
      * then clicking one of the "After ..." links.
-     * @When /^I move "(?P<question_name>(?:[^"]|\\")*)" to "(?P<target>(?:[^"]|\\")*)" by clicking on the move icon on the Edit quiz page$/
+     * @When /^I move "(?P<question_name>(?:[^"]|\\")*)" to "(?P<target>(?:[^"]|\\")*)" in the quiz by clicking the move icon$/
      * @param string $questionname the name of the question we are looking for.
      * @param string $target the target place to move to. One of the links in the pop-up like
      *      "After Page 1" or "After Question N".
      * @return array of steps.
      */
-    public function i_move_question_after_item_by_clicking_the_move_icon($questionname, $target)
-    {
+    public function i_move_question_after_item_by_clicking_the_move_icon($questionname, $target) {
         $iconxpath = "//li[contains(@class, ' slot ') and contains(., '" . $this->escape($questionname) .
                 "')]//span[contains(@class, 'editing_move')]";
         return array(
@@ -197,13 +195,12 @@ class behat_mod_quiz extends behat_question_base {
 
     /**
      * Move a question on the Edit quiz page by dragging a given question on top of another item.
-     * @When /^I move "(?P<question_name>(?:[^"]|\\")*)" to "(?P<target>(?:[^"]|\\")*)" by dragging on the Edit quiz page$/
+     * @When /^I move "(?P<question_name>(?:[^"]|\\")*)" to "(?P<target>(?:[^"]|\\")*)" in the quiz by dragging$/
      * @param string $questionname the name of the question we are looking for.
      * @param string $target the target place to move to. Ether a question name, or "Page N"
      * @return array of steps.
      */
-    public function i_move_question_after_item_by_dragging($questionname, $target)
-    {
+    public function i_move_question_after_item_by_dragging($questionname, $target) {
         $iconxpath = "//li[contains(@class, ' slot ') and contains(., '" . $this->escape($questionname) .
                 "')]//span[contains(@class, 'editing_move')]//img";
         $destinationxpath = "//li[contains(@class, ' slot ') or contains(@class, 'pagenumber ')]" .
