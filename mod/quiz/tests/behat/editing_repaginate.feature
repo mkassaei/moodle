@@ -84,7 +84,7 @@ Feature: Edit quiz page - pagination
 
     When I click on the "Add" page break icon after question "Essay 02 new"
     And I should see "Essay 01 new" on quiz page "1"
-    And I should see "Essay 02 new" on quiz page "2"
+    And I should see "Essay 02 new" on quiz page "1"
     And I should see "Essay 03 new" on quiz page "2"
     And I should not see "Page 3"
 
@@ -93,13 +93,13 @@ Feature: Edit quiz page - pagination
     And I should see "Essay 02 new" on quiz page "2"
     And I should see "Essay 03 new" on quiz page "3"
 
-    When I click on the "Remove" page break icon after question "Essay 01 new"
+    When I click on the "Remove" page break icon after question "Essay 02 new"
     And I should see "Essay 01 new" on quiz page "1"
-    And I should see "Essay 02 new" on quiz page "1"
+    And I should see "Essay 02 new" on quiz page "2"
     And I should see "Essay 03 new" on quiz page "2"
     And I should not see "Page 3"
 
-    When I click on the "Remove" page break icon after question "Essay 02 new"
+    When I click on the "Remove" page break icon after question "Essay 01 new"
     And I should see "Essay 01 new" on quiz page "1"
     And I should see "Essay 02 new" on quiz page "1"
     And I should see "Essay 03 new" on quiz page "1"
