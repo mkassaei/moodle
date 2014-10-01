@@ -49,7 +49,7 @@ class structure {
     /** @var \stdClass[] quiz_slots.id => the quiz_slots rows for this quiz, agumented by sectionid. */
     protected $slots = array();
 
-    /** @var \stdClass[] quiz_slots.slot => the quiz_slots rows for this quiz, agumented by sectionid. . */
+    /** @var \stdClass[] quiz_slots.slot => the quiz_slots rows for this quiz, agumented by sectionid. */
     protected $slotsinorder = array();
 
     /**
