@@ -82,4 +82,4 @@ M.mod_quiz.randomquestion.init = function() {
 };
 
 
-}, '@VERSION@', {"requires": ["base", "event", "node", "io"]});
+}, '@VERSION@', {"requires": ["base", "event", "node", "io", "moodle-core-notification-dialogue"]});

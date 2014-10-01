@@ -23,6 +23,7 @@
  */
 
 namespace mod_quiz;
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Quiz structure class.

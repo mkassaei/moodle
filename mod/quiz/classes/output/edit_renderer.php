@@ -23,7 +23,6 @@
  */
 
 namespace mod_quiz\output;
-
 defined('MOODLE_INTERNAL') || die();
 
 use \mod_quiz\structure;
@@ -408,7 +407,7 @@ class edit_renderer extends \plugin_renderer_base {
     public function add_menu_actions(structure $structure, $page, \moodle_url $pageurl,
             \question_edit_contexts $contexts, array $pagevars) {
 
-        $actions = $this->edit_menu_actions($structure, $page, $pageurl, $contexts, $pagevars);
+        $actions = $this->edit_menu_actions($structure, $page, $pageurl, $pagevars);
         if (empty($actions)) {
             return '';
         }
@@ -441,12 +440,11 @@ class edit_renderer extends \plugin_renderer_base {
      * @param structure $structure object containing the structure of the quiz.
      * @param int $page the page number that this menu will add to.
      * @param \moodle_url $pageurl the canonical URL of this page.
-     * @param \question_edit_contexts $contexts the relevant question bank contexts.
      * @param array $pagevars the variables from {@link \question_edit_setup()}.
      * @return array the actions.
      */
-    public function edit_menu_actions(structure $structure, $page, \moodle_url $pageurl,
-            \question_edit_contexts $contexts, array $pagevars) {
+    public function edit_menu_actions(structure $structure, $page,
+            \moodle_url $pageurl, array $pagevars) {
         $questioncategoryid = question_get_category_id_from_pagevars($pagevars);
         static $str;
         if (!isset($str)) {
@@ -589,7 +587,6 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function question_number($number) {
-        $numbertext = '';
         if (is_numeric($number)) {
             $number = html_writer::span(get_string('question'), 'accesshide') .
                     ' ' . $number;
@@ -611,7 +608,7 @@ class edit_renderer extends \plugin_renderer_base {
         // Do we want a label?
         $strpreviewlabel = '';
         if ($label) {
-            $strpreviewlabel = get_string('preview', 'quiz');
+            $strpreviewlabel = ' ' . get_string('preview', 'quiz');
         }
 
         // Build the icon.
@@ -621,7 +618,8 @@ class edit_renderer extends \plugin_renderer_base {
         $action = new \popup_action('click', $url, 'questionpreview',
                                         question_preview_popup_params());
 
-        return $this->action_link($url, $image, $action, array('title' => $strpreviewquestion, 'class' => 'preview'));
+        return $this->action_link($url, $image . $strpreviewlabel, $action,
+                array('title' => $strpreviewquestion, 'class' => 'preview'));
     }
 
     /**
@@ -739,9 +737,6 @@ class edit_renderer extends \plugin_renderer_base {
                 'class' => 'icon activityicon', 'alt' => ' ', 'role' => 'presentation'));
 
         $editicon = $this->pix_icon('t/edit', $configuretitle, 'moodle', array('title' => ''));
-
-        // Display the link itself.
-        $activitylink = html_writer::tag('span', $editicon . $instancename, array('class' => 'instancename'));
 
         // If this is a random question, display a link to show the questions
         // selected from in the question bank.

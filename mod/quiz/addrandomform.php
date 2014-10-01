@@ -49,10 +49,10 @@ class quiz_add_random_form extends moodleform {
 
         $mform->addElement('questioncategory', 'category', get_string('category'),
                 array('contexts' => $usablecontexts, 'top' => false));
+        $mform->setDefault('category', $this->_customdata['cat']);
 
         $mform->addElement('checkbox', 'includesubcategories', '', get_string('recurse', 'quiz'));
 
-        list($categoryid) = explode(',', $this->_customdata['cat']);
         $mform->addElement('select', 'numbertoadd', get_string('randomnumber', 'quiz'),
                 $this->get_number_of_questions_to_add_choices());
 

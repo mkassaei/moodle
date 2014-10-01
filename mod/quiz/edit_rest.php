@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provide interface for topics AJAX course formats
+ * Rest endpoint for ajax editing of quiz structure.
  *
  * @package   mod_quiz
  * @copyright 1999 Martin Dougiamas  http://dougiamas.com
@@ -26,8 +26,8 @@ if (!defined('AJAX_SCRIPT')) {
     define('AJAX_SCRIPT', true);
 }
 
-require_once(dirname(__FILE__) . '/../../config.php');
-require_once($CFG->dirroot.'/course/lib.php');
+require_once(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/mod/quiz/editlib.php');
 
 // Initialise ALL the incoming parameters here, up front.

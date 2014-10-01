@@ -523,6 +523,9 @@ table.quizreviewsummary td.cell {
     margin: -2.5em 1em 0em 1em;
     padding: .2em;
 }
+#page-mod-quiz-edit .maxgrade label {
+    display: inline;
+}
 
 #page-mod-quiz-edit li.activity > div,
 #page-mod-quiz-edit li.pagenumber {

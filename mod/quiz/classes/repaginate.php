@@ -18,11 +18,12 @@
  * Defines the quiz repaginate class.
  *
  * @package   mod_quiz
- * @copyright 2013 The Open University
+ * @copyright 2014 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_quiz;
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * The repaginate class will rearrange questions in pages.
@@ -30,7 +31,7 @@ namespace mod_quiz;
  * The quiz setting allows users to write quizzes with one question per page,
  * n questions per page, or all questions on one page.
  *
- * @copyright 2013 The Open University
+ * @copyright 2014 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class repaginate {

@@ -244,7 +244,8 @@ Y.extend(DRAGSECTION, M.core.dragdrop, {
                             if (Y.Moodle.core_course.util.section.getId(sectionlist.item(index - 1)) >
                                         Y.Moodle.core_course.util.section.getId(sectionlist.item(index))) {
                                 Y.log("Swapping " + Y.Moodle.core_course.util.section.getId(sectionlist.item(index - 1)) +
-                                        " with " + Y.Moodle.core_course.util.section.getId(sectionlist.item(index)));
+                                        " with " + Y.Moodle.core_course.util.section.getId(sectionlist.item(index)),
+                                        "debug", "moodle-mod_quiz-dragdrop");
                                 // Swap section id.
                                 var sectionid = sectionlist.item(index - 1).get('id');
                                 sectionlist.item(index - 1).set('id', sectionlist.item(index).get('id'));
@@ -408,7 +409,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
 
     drag_dropmiss: function(e) {
         // Missed the target, but we assume the user intended to drop it
-        // on the last last ghost node location, e.drag and e.drop should be
+        // on the last ghost node location, e.drag and e.drop should be
         // prepared by global_drag_dropmiss parent so simulate drop_hit(e).
         this.drop_hit(e);
     },

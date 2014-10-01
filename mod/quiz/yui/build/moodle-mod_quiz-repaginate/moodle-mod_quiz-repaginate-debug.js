@@ -40,19 +40,16 @@ var POPUP = function() {
 };
 
 Y.extend(POPUP, Y.Base, {
-    rpbutton: Y.one(CSS.REPAGINATECOMMAND),
-
     header: null,
     body: null,
 
     initializer : function() {
         rpcontainerclass = Y.one(CSS.REPAGINATECONTAINERCLASS);
-        var node = rpcontainerclass._node;
 
         // Set popup header and body.
-        this.header = node.getAttribute(PARAMS.HEADER);
-        this.body = node.getAttribute(PARAMS.FORM);
-        this.rpbutton.on('click', this.display_dialog, this);
+        this.header = rpcontainerclass.getAttribute(PARAMS.HEADER);
+        this.body = rpcontainerclass.getAttribute(PARAMS.FORM);
+        Y.one(CSS.REPAGINATECOMMAND).on('click', this.display_dialog, this);
     },
 
     display_dialog : function (e) {
@@ -76,8 +73,6 @@ Y.extend(POPUP, Y.Base, {
         var popup = { dialog: null };
         popup.dialog = new M.core.dialogue(config);
         popup.dialog.show();
-
-        hide.on('click', function() { popup.dialog.hide(); });
     }
 });
 
@@ -88,4 +83,4 @@ M.mod_quiz.repaginate.init = function() {
 };
 
 
-}, '@VERSION@', {"requires": ["base", "event", "node", "io"]});
+}, '@VERSION@', {"requires": ["base", "event", "node", "io", "moodle-core-notification-dialogue"]});

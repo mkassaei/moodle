@@ -861,6 +861,7 @@ M.mod_quiz.init_section_toolbox = function(config) {
         "event-key",
         "io",
         "moodle-mod_quiz-quizbase",
-        "moodle-mod_quiz-util-slot"
+        "moodle-mod_quiz-util-slot",
+        "moodle-core-notification-ajaxexception"
     ]
 });

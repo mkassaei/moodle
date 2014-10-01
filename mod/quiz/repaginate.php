@@ -15,24 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This script lists all the instances of quiz in a particular course
+ * Rest endpoint for ajax editing for paging operations on the quiz structure.
  *
- * @package    mod_quiz
- * @copyright  2014 The Open University
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_quiz
+ * @copyright 2014 The Open University
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-require_once("../../config.php");
-require_once("locallib.php");
-require_once('classes/repaginate.php');
+require_once(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
 $cmid = required_param('cmid', PARAM_INT);
 $quizid = required_param('quizid', PARAM_INT);
 $slotnumber = required_param('slot', PARAM_INT);
 $repagtype = required_param('repag', PARAM_INT);
 
+require_sesskey();
 $quizobj = quiz::create($quizid);
+require_login($quizobj->get_course(), false, $quizobj->get_cm());
+require_capability('mod/quiz:manage', $quizobj->get_context());
 
 $slotnumber++;
 $repage = new \mod_quiz\repaginate($quizid);
@@ -41,4 +42,4 @@ $repage->repaginate_slots($slotnumber, $repagtype);
 $structure = $quizobj->get_structure();
 $slots = $structure->refresh_page_numbers_and_update_db($structure->get_quiz());
 
-redirect(new moodle_url('edit.php', array('cmid' => $cmid)));
+redirect(new moodle_url('edit.php', array('cmid' => $quizobj->get_cmid())));
