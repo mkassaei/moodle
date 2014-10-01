@@ -24,7 +24,6 @@
 
 namespace mod_quiz;
 
-
 /**
  * Quiz structure class.
  *
@@ -42,19 +41,19 @@ class structure {
     protected $quizobj = null;
 
     /**
-     * @var stdClass[] the questions in this quiz. Contains the row from the questions
+     * @var \stdClass[] the questions in this quiz. Contains the row from the questions
      * table, with the data from the quiz_slots table added, and also question_categories.contextid.
      */
     protected $questions = array();
 
-    /** @var stdClass[] quiz_slots.id => the quiz_slots rows for this quiz, agumented by sectionid. */
+    /** @var \stdClass[] quiz_slots.id => the quiz_slots rows for this quiz, agumented by sectionid. */
     protected $slots = array();
 
-    /** @var stdClass[] quiz_slots.slot => the quiz_slots rows for this quiz, agumented by sectionid. . */
+    /** @var \stdClass[] quiz_slots.slot => the quiz_slots rows for this quiz, agumented by sectionid. . */
     protected $slotsinorder = array();
 
     /**
-     * @var stdClass[] currently a dummy. Holds data that will match the
+     * @var \stdClass[] currently a dummy. Holds data that will match the
      * quiz_sections, once it exists.
      */
     protected $sections = array();
@@ -83,7 +82,7 @@ class structure {
 
     /**
      * Create an instance of this class representing the structure of a given quiz.
-     * @param quiz $quizobj the quiz.
+     * @param \quiz $quizobj the quiz.
      * @return structure
      */
     public static function create_for_quiz($quizobj) {
@@ -94,7 +93,7 @@ class structure {
 
     /**
      * Whether there are any questions in the quiz.
-     * @return boolean true if there is at least one question in the quiz.
+     * @return bool true if there is at least one question in the quiz.
      */
     public function has_questions() {
         return !empty($this->questions);
@@ -194,7 +193,7 @@ class structure {
 
     /**
      * Get quiz slots.
-     * @return stdClass[] the slots in this quiz.
+     * @return \stdClass[] the slots in this quiz.
      */
     public function get_slots() {
         return $this->slots;
@@ -203,7 +202,7 @@ class structure {
     /**
      * Is this slot the first one on its page?
      * @param int $slotnumber the index of the slot in question.
-     * @return boolean whether this slot the first one on its page.
+     * @return bool whether this slot the first one on its page.
      */
     public function is_first_slot_on_page($slotnumber) {
         if ($slotnumber == 1) {
@@ -215,7 +214,7 @@ class structure {
     /**
      * Is this slot the last one on its page?
      * @param int $slotnumber the index of the slot in question.
-     * @return boolean whether this slot the last one on its page.
+     * @return bool whether this slot the last one on its page.
      */
     public function is_last_slot_on_page($slotnumber) {
         if (!isset($this->slotsinorder[$slotnumber + 1])) {
@@ -227,7 +226,7 @@ class structure {
     /**
      * Is this slot the last one in the quiz?
      * @param int $slotnumber the index of the slot in question.
-     * @return boolean whether this slot the last one in the quiz.
+     * @return bool whether this slot the last one in the quiz.
      */
     public function is_last_slot_in_quiz($slotnumber) {
         end($this->slotsinorder);
@@ -236,7 +235,7 @@ class structure {
 
     /**
      * Get the final slot in the quiz.
-     * @return stdClass the quiz_slots for for the final slot in the quiz.
+     * @return \stdClass the quiz_slots for for the final slot in the quiz.
      */
     public function get_last_slot() {
         return end($this->slotsinorder);
@@ -245,7 +244,7 @@ class structure {
     /**
      * Get a slot by it's id. Throws an exception if it is missing.
      * @param int $slotid the slot id.
-     * @return stdClass the requested quiz_slots row.
+     * @return \stdClass the requested quiz_slots row.
      */
     public function get_slot_by_id($slotid) {
         if (!array_key_exists($slotid, $this->slots)) {
@@ -257,7 +256,7 @@ class structure {
     /**
      * Get all the questions in a section of the quiz.
      * @param int $sectionid the section id.
-     * @return array of question/slot objects.
+     * @return \stdClass[] of question/slot objects.
      */
     public function get_questions_in_section($sectionid) {
         $questions = array();
@@ -271,7 +270,7 @@ class structure {
 
     /**
      * Get all the sections of the quiz.
-     * @return stdClass[] the sections in this quiz.
+     * @return \stdClass[] the sections in this quiz.
      */
     public function get_quiz_sections() {
         return $this->sections;
@@ -279,7 +278,7 @@ class structure {
 
     /**
      * Get any warnings to show at the top of the edit page.
-     * @return array of strings.
+     * @return string[] array of strings.
      */
     public function get_edit_page_warnings() {
         $warnings = array();
@@ -303,7 +302,7 @@ class structure {
 
     /**
      * Get the date information about the current state of the quiz.
-     * @return array of two strings. First a short summary, then a longer
+     * @return string[] array of two strings. First a short summary, then a longer
      * explanation of the current state, e.g. for a tool-tip.
      */
     public function get_dates_summary() {
@@ -397,8 +396,8 @@ class structure {
 
     /**
      * Used by populate. Make up fake data for any missing questions.
-     * @param array $slots the data about the slots and questions in the quiz.
-     * @return array updated $slots array.
+     * @param \stdClass[] $slots the data about the slots and questions in the quiz.
+     * @return \stdClass[] updated $slots array.
      */
     protected function populate_missing_questions($slots) {
         // Address missing question types.
@@ -539,9 +538,9 @@ class structure {
 
     /**
      * Refresh page numbering of quiz slots.
-     * @param object $quiz the quiz object.
-     * @param array  $slots (optional) array of slot objects.
-     * @return array of slot objects.
+     * @param \stdClass $quiz the quiz object.
+     * @param \stdClass[] $slots (optional) array of slot objects.
+     * @return \stdClass[] array of slot objects.
      */
     public function refresh_page_numbers($quiz, $slots=array()) {
         global $DB;
@@ -570,8 +569,8 @@ class structure {
 
     /**
      * Refresh page numbering of quiz slots and save to the database.
-     * @param object $quiz the quiz object.
-     * @return array of slot objects.
+     * @param \stdClass $quiz the quiz object.
+     * @return \stdClass[] array of slot objects.
      */
     public function refresh_page_numbers_and_update_db($quiz) {
         global $DB;
@@ -588,7 +587,7 @@ class structure {
 
     /**
      * Remove a slot from a quiz
-     * @param object $quiz the quiz object.
+     * @param \stdClass $quiz the quiz object.
      * @param int $slotnumber The number of the slot to be deleted.
      */
     public function remove_slot($quiz, $slotnumber) {
@@ -625,8 +624,8 @@ class structure {
      * corresponding question_attempts.
      * It does not update 'sumgrades' in the quiz table.
      *
-     * @param stdClass $slot    row from the quiz_slots table.
-     * @param float    $maxmark the new maxmark.
+     * @param \stdClass $slot row from the quiz_slots table.
+     * @param float $maxmark the new maxmark.
      * @return bool true if the new grade is different from the old one.
      */
     public function update_slot_maxmark($slot, $maxmark) {
@@ -653,10 +652,10 @@ class structure {
      * Saves changes to the slot page relationship in the quiz_slots table and reorders the paging
      * for subsequent slots.
      *
-     * @param object $quiz the quiz object.
-     * @param int    $slotid id of slot.
-     * @param int    $type repaginate::LINK or repaginate::UNLINK.
-     * @return array of slot objects.
+     * @param \stdClass $quiz the quiz object.
+     * @param int $slotid id of slot.
+     * @param int $type repaginate::LINK or repaginate::UNLINK.
+     * @return \stdClass[] array of slot objects.
      */
     public function update_page_break($quiz, $slotid, $type) {
         global $DB;

@@ -376,8 +376,6 @@ class quiz_question_bank_view extends core_question\bank\view {
      * @param array    $addcontexts contexts where the user is allowed to add new questions.
      */
     protected function display_bottom_controls($totalnumber, $recurse, $category, \context $catcontext, array $addcontexts) {
-        global $OUTPUT;
-
         $cmoptions = new \stdClass();
         $cmoptions->hasattempts = !empty($this->quizhasattempts);
 

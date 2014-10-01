@@ -46,9 +46,9 @@ class repaginate {
     private $slots;
 
     /**
-     * Constuctor.
+     * Constructor.
      * @param int $quizid the id of the quiz being manipulated.
-     * @param object $slots the quiz_slots for that quiz.
+     * @param stdClass[] $slots the quiz_slots for that quiz.
      */
     public function __construct($quizid = 0, $slots = null) {
         global $DB;
@@ -65,8 +65,9 @@ class repaginate {
 
     /**
      * Repaginate a given slot with the given pagenumber.
-     * @param object $slot
+     * @param stdClass $slot
      * @param int $newpagenumber
+     * @return stdClass
      */
     protected function repaginate_this_slot($slot, $newpagenumber) {
         $newslot = clone($slot);
@@ -78,6 +79,7 @@ class repaginate {
      * Return current slot object.
      * @param array $slots
      * @param int $slotnumber
+     * @return stdClass $slot
      */
     protected function get_this_slot($slots, $slotnumber) {
         foreach ($slots as $key => $slot) {
@@ -90,7 +92,8 @@ class repaginate {
 
     /**
      * Return array of slots with slot number as key
-     * @param array $slots
+     * @param stdClass[] $slots
+     * @return stdClass[]
      */
     protected function get_slots_by_slot_number($slots) {
         if (!$slots) {
@@ -105,7 +108,8 @@ class repaginate {
 
     /**
      * Return array of slots with slot id as key
-     * @param array $slots
+     * @param stdClass[] $slots
+     * @return stdClass[]
      */
     protected function get_slots_by_slotid($slots) {
         if (!$slots) {
@@ -130,7 +134,7 @@ class repaginate {
         $newslots = array();
         foreach ($this->slots as $slot) {
             if ($slot->slot < $nextslotnumber) {
-                 $newslots[$slot->id] = $slot;
+                $newslots[$slot->id] = $slot;
             } else if ($slot->slot == $nextslotnumber) {
                 $nextslot = $this->repaginate_next_slot($nextslotnumber, $type);
 
@@ -138,7 +142,7 @@ class repaginate {
                 $DB->update_record('quiz_slots', $nextslot, true);
 
                 // Update returning object.
-                 $newslots[$slot->id] = $nextslot;
+                $newslots[$slot->id] = $nextslot;
             }
         }
         if ($nextslot) {
@@ -151,9 +155,9 @@ class repaginate {
      * Repaginate next slot and return the modified slot object
      * @param int $nextslotnumber
      * @param int $type repaginate::LINK or repaginate::UNLINK.
+     * @return stdClass|null
      */
     public function repaginate_next_slot($nextslotnumber, $type) {
-        global $DB;
         $currentslotnumber = $nextslotnumber - 1;
         if (!($currentslotnumber && $nextslotnumber)) {
             return null;
@@ -171,9 +175,9 @@ class repaginate {
 
     /**
      * Return the slots with the new pagination, regardless of current pagination.
-     * @param array $slots the slots to repaginate.
+     * @param stdClass[] $slots the slots to repaginate.
      * @param int $number number of question per page
-     * @return array the updated slots.
+     * @return stdClass[] the updated slots.
      */
     public function repaginate_n_question_per_page($slots, $number) {
         $slots = $this->get_slots_by_slot_number($slots);
@@ -193,11 +197,12 @@ class repaginate {
     }
 
     /**
-     * Repaginate the rest
-     * @param object $quizslots
+     * Repaginate the rest.
+     * @param stdClass[] $quizslots
      * @param int $slotfrom
      * @param int $type
      * @param bool $dbupdate
+     * @return stdClass[]
      */
     public function repaginate_the_rest($quizslots, $slotfrom, $type, $dbupdate = true) {
         global $DB;

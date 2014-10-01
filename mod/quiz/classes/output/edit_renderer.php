@@ -152,7 +152,7 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Render the form for setting a quiz' overall grade
      *
-     * @param stdClass $quiz the quiz settings from the database.
+     * @param \stdClass $quiz the quiz settings from the database.
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @return string HTML to output.
      */
@@ -243,7 +243,7 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Render the total marks available for the quiz.
      *
-     * @param stdClass $quiz the quiz settings from the database.
+     * @param \stdClass $quiz the quiz settings from the database.
      * @return string HTML to output.
      */
     public function total_marks($quiz) {
@@ -272,13 +272,12 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Display the start of a section, before the questions.
      *
-     * @param stdClass $section The quiz_section entry from DB
+     * @param \stdClass $section The quiz_section entry from DB
      * @return string HTML to output.
      */
     protected function start_section($section) {
 
         $output = '';
-        $currenttext = '';
         $sectionstyle = '';
 
         $output .= html_writer::start_tag('li', array('id' => 'section-'.$section->id,
@@ -310,7 +309,7 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Generate the content to be displayed on the left part of a section.
      *
-     * @param stdClass $section The quiz_section entry from DB
+     * @param \stdClass $section The quiz_section entry from DB
      * @return string HTML to output.
      */
     protected function section_left_content($section) {
@@ -320,7 +319,7 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Generate the content to displayed on the right part of a section.
      *
-     * @param stdClass $section The quiz_section entry from DB
+     * @param \stdClass $section The quiz_section entry from DB
      * @return string HTML to output.
      */
     protected function section_right_content($section) {
@@ -333,9 +332,9 @@ class edit_renderer extends \plugin_renderer_base {
      * This function calls {@link core_course_renderer::quiz_section_question()}
      *
      * @param structure $structure object containing the structure of the quiz.
-     * @param stdClass $section information about the section.
+     * @param \stdClass $section information about the section.
      * @param \question_edit_contexts $contexts the relevant question bank contexts.
-     * @param array $pagevars the variables from {@link question_edit_setup()}.
+     * @param array $pagevars the variables from {@link \question_edit_setup()}.
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @return string HTML to output.
      */
@@ -354,9 +353,9 @@ class edit_renderer extends \plugin_renderer_base {
      * Displays one question with the surrounding controls.
      *
      * @param structure $structure object containing the structure of the quiz.
-     * @param stdClass $question data from the question and quiz_slots tables.
+     * @param \stdClass $question data from the question and quiz_slots tables.
      * @param \question_edit_contexts $contexts the relevant question bank contexts.
-     * @param array $pagevars the variables from {@link question_edit_setup()}.
+     * @param array $pagevars the variables from {@link \question_edit_setup()}.
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @return string HTML to output.
      */
@@ -403,7 +402,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param int $page the page number that this menu will add to.
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @param \question_edit_contexts $contexts the relevant question bank contexts.
-     * @param array $pagevars the variables from {@link question_edit_setup()}.
+     * @param array $pagevars the variables from {@link \question_edit_setup()}.
      * @return string HTML to output.
      */
     public function add_menu_actions(structure $structure, $page, \moodle_url $pageurl,
@@ -443,7 +442,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param int $page the page number that this menu will add to.
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @param \question_edit_contexts $contexts the relevant question bank contexts.
-     * @param array $pagevars the variables from {@link question_edit_setup()}.
+     * @param array $pagevars the variables from {@link \question_edit_setup()}.
      * @return array the actions.
      */
     public function edit_menu_actions(structure $structure, $page, \moodle_url $pageurl,
@@ -496,7 +495,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param structure $structure object containing the structure of the quiz.
      * @param int $page the page number that this menu will add to.
      * @param \moodle_url $pageurl the canonical URL of this page.
-     * @param array $pagevars the variables from {@link question_edit_setup()}.
+     * @param array $pagevars the variables from {@link \question_edit_setup()}.
      * @return string HTML to output.
      */
     protected function add_question_form(structure $structure, $page, \moodle_url $pageurl, array $pagevars) {
@@ -522,7 +521,7 @@ class edit_renderer extends \plugin_renderer_base {
      * Display a question.
      *
      * @param structure $structure object containing the structure of the quiz.
-     * @param stdClass $question data from the question and quiz_slots tables.
+     * @param \stdClass $question data from the question and quiz_slots tables.
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @return string HTML to output.
      */
@@ -574,8 +573,8 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Render the move icon.
      *
-     * @param stdClass $question data from the question and quiz_slots tables.
-     * @return The markup for the move action, or an empty string if not available.
+     * @param \stdClass $question data from the question and quiz_slots tables.
+     * @return string The markup for the move action, or an empty string if not available.
      */
     public function question_move_icon($question) {
         return html_writer::link(new \moodle_url('#'),
@@ -601,8 +600,8 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Render the preview icon.
      *
-     * @param stdClass $quiz the quiz settings from the database.
-     * @param stdClass $question data from the question and quiz_slots tables.
+     * @param \stdClass $quiz the quiz settings from the database.
+     * @param \stdClass $question data from the question and quiz_slots tables.
      * @param bool $label if true, show the preview question label after the icon
      * @return string HTML to output.
      */
@@ -645,8 +644,8 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Display an icon to split or join two pages of the quiz.
      *
-     * @param stdClass $quiz the quiz settings from the database.
-     * @param stdClass $question data from the question and quiz_slots tables.
+     * @param \stdClass $quiz the quiz settings from the database.
+     * @param \stdClass $question data from the question and quiz_slots tables.
      * @param string $insertpagebreak if true, show an insert page break icon.
      *      Else show a join pages icon.
      * @return string HTML to output.
@@ -682,7 +681,7 @@ class edit_renderer extends \plugin_renderer_base {
      * without a link
      *
      * @param structure $structure object containing the structure of the quiz.
-     * @param stdClass $question data from the question and quiz_slots tables.
+     * @param \stdClass $question data from the question and quiz_slots tables.
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @return string HTML to output.
      */
@@ -719,7 +718,7 @@ class edit_renderer extends \plugin_renderer_base {
      * and also to see that category in the question bank.
      *
      * @param structure $structure object containing the structure of the quiz.
-     * @param stdClass $question data from the question and quiz_slots tables.
+     * @param \stdClass $question data from the question and quiz_slots tables.
      * @param \moodle_url $pageurl the canonical URL of this page.
      * @return string HTML to output.
      */
@@ -760,8 +759,8 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Display the 'marked out of' information for a question.
      * Along with the regrade action.
-     * @param stdClass $quiz the quiz settings from the database.
-     * @param stdClass $question data from the question and quiz_slots tables.
+     * @param \stdClass $quiz the quiz settings from the database.
+     * @param \stdClass $question data from the question and quiz_slots tables.
      * @return string HTML to output.
      */
     public function marked_out_of_field($quiz, $question) {
@@ -795,7 +794,7 @@ class edit_renderer extends \plugin_renderer_base {
 
     /**
      * Render the contents of the question bank pop-up in its initial state,
-     * when it jsut contains a loading progress indicator.
+     * when it just contains a loading progress indicator.
      * @return string HTML to output.
      */
     public function question_bank_loading() {
@@ -808,7 +807,7 @@ class edit_renderer extends \plugin_renderer_base {
      * Return random question form.
      * @param \moodle_url $thispageurl the canonical URL of this page.
      * @param \question_edit_contexts $contexts the relevant question bank contexts.
-     * @param array $pagevars the variables from {@link question_edit_setup()}.
+     * @param array $pagevars the variables from {@link \question_edit_setup()}.
      * @return string HTML to output.
      */
     protected function random_question_form(\moodle_url $thispageurl, \question_edit_contexts $contexts, array $pagevars) {
@@ -831,8 +830,9 @@ class edit_renderer extends \plugin_renderer_base {
      * Initialise the JavaScript for the general editing. (JavaScript for popups
      * is handled with the specific code for those.)
      *
-     * @param stdClass $course the course settings from the database.
-     * @param stdClass $quiz the quiz settings from the database.
+     * @param \stdClass $course the course settings from the database.
+     * @param \stdClass $quiz the quiz settings from the database.
+     * @return bool Always returns true
      */
     protected function initialise_editing_javascript($course, $quiz) {
 
@@ -916,8 +916,8 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Return the contents of the question bank, to be displayed in the question-bank pop-up.
      *
-     * @param quiz_question_bank_view $questionbank the question bank view object.
-     * @param array $pagevars the variables from {@link question_edit_setup()}.
+     * @param \quiz_question_bank_view $questionbank the question bank view object.
+     * @param array $pagevars the variables from {@link \question_edit_setup()}.
      * @return string HTML to output / send back in response to an AJAX request.
      */
     public function question_bank_contents(\quiz_question_bank_view $questionbank, array $pagevars) {

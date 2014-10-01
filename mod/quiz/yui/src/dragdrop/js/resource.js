@@ -110,7 +110,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
 
     drag_dropmiss: function(e) {
         // Missed the target, but we assume the user intended to drop it
-        // on the last last ghost node location, e.drag and e.drop should be
+        // on the last ghost node location, e.drag and e.drop should be
         // prepared by global_drag_dropmiss parent so simulate drop_hit(e).
         this.drop_hit(e);
     },
