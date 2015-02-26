@@ -446,12 +446,17 @@ class quiz_attempt {
     /** @var int maximum number of slots in the quiz for the review page to default to show all. */
     const MAX_SLOTS_FOR_DEFAULT_REVIEW_SHOW_ALL = 50;
 
-    // Basic data.
+    /** @var quiz object containing the quiz settings. */
     protected $quizobj;
+
+    /** @var stdClass the quiz_attempts row. */
     protected $attempt;
 
     /** @var question_usage_by_activity the question usage for this quiz attempt. */
     protected $quba;
+
+    /** @var array of quiz_slots rows. */
+    protected $slots;
 
     /** @var array page no => array of slot numbers on the page in order. */
     protected $pagelayout;
@@ -539,6 +544,12 @@ class quiz_attempt {
      * Parse attempt->layout to populate the other arrays the represent the layout.
      */
     protected function determine_layout() {
+        global $DB;
+
+        $this->slots = $DB->get_records('quiz_slots',
+                array('quizid' => $this->get_quizid()), 'slot',
+                'slot, page, requireprevious, questionid, maxmark');
+
         $this->pagelayout = array();
 
         // Break up the layout string into pages.
@@ -987,6 +998,19 @@ class quiz_attempt {
     }
 
     /**
+     * Checks whether it requires previous question. If the previous question is not completed
+     * return a message in descripyiom question type format, otherwise returns null
+     *
+     * @param int $slot
+     */
+    public function is_blocked_by_previous_question($slot) {
+        return $this->slots[$slot]->requireprevious &&
+                !$this->quba->get_question_state($slot - 1)->is_finished() &&
+                $this->quba->can_question_finish_during_attempt($slot - 1);
+    }
+
+    /**
+     * Get the displayed question number for a slot.
      * @param int $slot the number used to identify this question within this attempt.
      * @return string the displayed question number for the question in this slot.
      *      For example '1', '2', '3' or 'i'.
@@ -1169,36 +1193,6 @@ class quiz_attempt {
     }
 
     /**
-     * Return slot object for the given slotnumber in a given quizid
-     *
-     * @param int $quizid
-     * @param int $slotnumber
-     */
-    public function get_slot_object($quizid, $slotnumber) {
-        global $DB;
-        return $DB->get_record('quiz_slots', array('slot' => $slotnumber, 'quizid' => $quizid));
-    }
-
-    /**
-     * Checks whether it requires previous question. If the previous question is not completed
-     * return a message in descripyiom question type format, otherwise returns null
-     *
-     * @param int $slot
-     */
-    public function require_previous_question($slot) {
-        $quiz = $this->get_quiz();
-        $currentslot = $this->get_slot_object($quiz->id, $slot);
-        $previousslot = $this->get_slot_object($quiz->id, $currentslot->slot - 1);
-
-        if ($currentslot->requireprevious && $previousslot) {
-            if ($this->get_question_status($previousslot->slot, false) == 'Not yet answered') {
-                return $this->quba->replace_question_with_a_description_qtye($currentslot);
-            }
-        }
-        return null;
-    }
-
-    /**
      * @param int $slot indicates which question to link to.
      * @param int $page if specified, the URL of this particular page of the attempt, otherwise
      * the URL will go to the first page.  If -1, deduce $page from $slot.
@@ -1285,9 +1279,61 @@ class quiz_attempt {
      * @return string HTML for the question in its current state.
      */
     public function render_question($slot, $reviewing, $thispageurl = null) {
+        if ($this->is_blocked_by_previous_question($slot)) {
+            $placeholderqa = $this->make_blocked_question_placeholder($slot);
+
+            $displayoptions = $this->get_display_options($reviewing);
+            $displayoptions->manualcomment = question_display_options::HIDDEN;
+            $displayoptions->history = question_display_options::HIDDEN;
+            $displayoptions->readonly = true;
+
+            return html_writer::div($placeholderqa->render($displayoptions,
+                    $this->get_question_number($slot)),
+                    'mod_quiz-blocked_question_warning');
+        }
+
         return $this->quba->render_question($slot,
                 $this->get_display_options_with_edit_link($reviewing, $slot, $thispageurl),
                 $this->get_question_number($slot));
+    }
+
+    /**
+     * Create a fake question to be displayed in place of a question that is blocked
+     * until the previous question has been answered.
+     *
+     * @param unknown $slot int slot number of the question to replace.
+     * @return question_definition the placeholde question.
+     */
+    protected function make_blocked_question_placeholder($slot) {
+        $replacedquestion = $this->get_question_attempt($slot)->get_question();
+
+        question_bank::load_question_definition_classes('description');
+        $question = new qtype_description_question();
+        $question->id = $replacedquestion->id;
+        $question->category = null;
+        $question->parent = 0;
+        $question->qtype = question_bank::get_qtype('description');
+        $question->name = '';
+        $question->questiontext = get_string('questiondependsonprevious', 'quiz');
+        $question->questiontextformat = FORMAT_HTML;
+        $question->generalfeedback = '';
+        $question->defaultmark = $this->quba->get_question_max_mark($slot);
+        $question->length = $replacedquestion->length;
+        $question->penalty = 0;
+        $question->stamp = '';
+        $question->version = 0;
+        $question->hidden = 0;
+        $question->timecreated = null;
+        $question->timemodified = null;
+        $question->createdby = null;
+        $question->modifiedby = null;
+
+        $placeholderqa = new question_attempt($question, $this->quba->get_id(),
+                null, $this->quba->get_question_max_mark($slot));
+        $placeholderqa->set_slot($slot);
+        $placeholderqa->start($this->get_quiz()->preferredbehaviour, 1);
+        $placeholderqa->set_flagged($this->is_question_flagged($slot));
+        return $placeholderqa;
     }
 
     /**
