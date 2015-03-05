@@ -696,11 +696,16 @@ table.quizreviewsummary td.cell {
     margin: 0 2px;
 }
 
+#page-mod-quiz-edit ul.slots li.section li.activity .question_dependency_wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+#page-mod-quiz-edit ul.slots li.section li.activity .question_dependency_wrapper .currentlink,
 #page-mod-quiz-edit ul.slots li.section li.activity .question_dependency_icon {
-    -position: relative;
-    vertical-align: top;
-    margin-left: 5px;
-    margin-right: 5px;
+    position: relative;
+    left: 15px;
+    top: -1em;
 }
 
 #page-mod-quiz-edit ul.slots li.section li.activity .activityinstance {

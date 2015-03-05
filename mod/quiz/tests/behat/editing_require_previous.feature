@@ -25,11 +25,7 @@ Feature: Edit quiz page - pagination
     And I follow "Edit quiz"
 
   @javascript
-  Scenario: There is no dependency setting on question in the quiz.
-  I can add or remove dependency to a given question by clicking on  "Add question dependency"
-  or "Remove question dependency" icons. Then I can attempt the quiz and see the effect of the
-  dependency settings.
-
+  Scenario: A question can require that the previous question has been completed.
     Then I should see "Editing quiz: Quiz 1"
 
     # Add the first true false question.
@@ -51,9 +47,8 @@ Feature: Edit quiz page - pagination
       | Feedback for the response 'True'.  | So you think it is true                 |
       | Feedback for the response 'False'. | So you think it is false                |
     And I should see "TF 001"
-    #And I should not see "Add question dependency" "link" in the "TF 001" "table_row"
     And I should see "TF 002"
-    And I follow "Add question dependency"
+    And I follow "Require that the previous question is complete"
 
     # Add the third true false question.
     And I add a "True/False" question to the "Quiz 1" quiz with:
@@ -70,7 +65,7 @@ Feature: Edit quiz page - pagination
     # Attempt the quiz
     And I follow "Quiz 1"
     When I press "Preview quiz now"
-    And I should see "You have to complete the previous question first, then you would be able to see the content of this question."
+    And I should see "This question cannot be attempted until the previous question has been completed."
 
     # Back to the quiz editing page
     And I follow "Quiz 1"
@@ -80,4 +75,4 @@ Feature: Edit quiz page - pagination
     And I follow "Quiz 1"
     When I press "Continue the last preview"
     And I press "Start a new preview"
-    And I should not see "You have to complete the previous question first, then you would be able to see the content of this question."
+    And I should not see "This question cannot be attempted until the previous question has been completed."

@@ -9,7 +9,7 @@
  */
 
 // The CSS classes we use.
-    var CSS = {
+var CSS = {
         ACTIVITYINSTANCE : 'activityinstance',
         AVAILABILITYINFODIV : 'div.availabilityinfo',
         CONTENTWITHOUTLINK : 'contentwithoutlink',
@@ -22,7 +22,6 @@
         JOIN: 'page_join',
         MODINDENTCOUNT : 'mod-indent-',
         MODINDENTHUGE : 'mod-indent-huge',
-        MODULEIDPREFIX : 'slot-',
         PAGE: 'page',
         SECTIONHIDDENCLASS : 'hidden',
         SECTIONIDPREFIX : 'section-',
@@ -56,7 +55,6 @@
         PAGELI : 'li.page',
         SECTIONUL : 'ul.section',
         SHOW : 'a.' + CSS.SHOW,
-        SHOWHIDE : 'a.editing_showhide',
         SLOTLI : 'li.slot',
         SUMMARKS : '.mod_quiz_summarks'
     },

@@ -11,7 +11,7 @@ YUI.add('moodle-mod_quiz-toolboxes', function (Y, NAME) {
  */
 
 // The CSS classes we use.
-    var CSS = {
+var CSS = {
         ACTIVITYINSTANCE : 'activityinstance',
         AVAILABILITYINFODIV : 'div.availabilityinfo',
         CONTENTWITHOUTLINK : 'contentwithoutlink',
@@ -24,7 +24,6 @@ YUI.add('moodle-mod_quiz-toolboxes', function (Y, NAME) {
         JOIN: 'page_join',
         MODINDENTCOUNT : 'mod-indent-',
         MODINDENTHUGE : 'mod-indent-huge',
-        MODULEIDPREFIX : 'slot-',
         PAGE: 'page',
         SECTIONHIDDENCLASS : 'hidden',
         SECTIONIDPREFIX : 'section-',
@@ -58,7 +57,6 @@ YUI.add('moodle-mod_quiz-toolboxes', function (Y, NAME) {
         PAGELI : 'li.page',
         SECTIONUL : 'ul.section',
         SHOW : 'a.' + CSS.SHOW,
-        SHOWHIDE : 'a.editing_showhide',
         SLOTLI : 'li.slot',
         SUMMARKS : '.mod_quiz_summarks'
     },
@@ -276,7 +274,6 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
      */
     initializer: function() {
         M.mod_quiz.quizbase.register_module(this);
-        BODY.delegate('key', this.handle_data_action, 'down:enter', SELECTOR.ACTIVITYACTION, this);
         Y.delegate('click', this.handle_data_action, BODY, SELECTOR.ACTIVITYACTION, this);
     },
 
@@ -680,75 +677,6 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
 
         // Section Highlighting.
         Y.delegate('click', this.toggle_highlight, SELECTOR.PAGECONTENT, SELECTOR.SECTIONLI + ' ' + SELECTOR.HIGHLIGHT, this);
-
-        // Section Visibility.
-        Y.delegate('click', this.toggle_hide_section, SELECTOR.PAGECONTENT, SELECTOR.SECTIONLI + ' ' + SELECTOR.SHOWHIDE, this);
-    },
-
-    toggle_hide_section : function(e) {
-        // Prevent the default button action.
-        e.preventDefault();
-
-        // Get the section we're working on.
-        var section = e.target.ancestor(M.mod_quiz.format.get_section_selector(Y)),
-            button = e.target.ancestor('a', true),
-            hideicon = button.one('img'),
-
-        // The value to submit
-            value,
-
-        // The text for strings and images. Also determines the icon to display.
-            action,
-            nextaction;
-
-        if (!section.hasClass(CSS.SECTIONHIDDENCLASS)) {
-            section.addClass(CSS.SECTIONHIDDENCLASS);
-            value = 0;
-            action = 'hide';
-            nextaction = 'show';
-        } else {
-            section.removeClass(CSS.SECTIONHIDDENCLASS);
-            value = 1;
-            action = 'show';
-            nextaction = 'hide';
-        }
-
-        var newstring = M.util.get_string(nextaction + 'fromothers', 'format_' + this.get('format'));
-        hideicon.setAttrs({
-            'alt' : newstring,
-            'src'   : M.util.image_url('i/' + nextaction)
-        });
-        button.set('title', newstring);
-
-        // Change the highlight status
-        var data = {
-            'class' : 'section',
-            'field' : 'visible',
-            'id'    : Y.Moodle.core_course.util.section.getId(section.ancestor(M.mod_quiz.edit.get_section_wrapper(Y), true)),
-            'value' : value
-        };
-
-        var lightbox = M.util.add_lightbox(Y, section);
-        lightbox.show();
-
-        this.send_request(data, lightbox, function(response) {
-            var activities = section.all(SELECTOR.ACTIVITYLI);
-            activities.each(function(node) {
-                var button;
-                if (node.one(SELECTOR.SHOW)) {
-                    button = node.one(SELECTOR.SHOW);
-                } else {
-                    button = node.one(SELECTOR.HIDE);
-                }
-                var activityid = Y.Moodle.mod_quiz.util.slot.getId(node);
-
-                // NOTE: resourcestotoggle is returned as a string instead
-                // of a Number so we must cast our activityid to a String.
-                if (Y.Array.indexOf(response.resourcestotoggle, "" + activityid) !== -1) {
-                    M.mod_quiz.resource_toolbox.handle_resource_dim(button, node, action);
-                }
-            }, this);
-        });
     },
 
     /**
@@ -814,9 +742,6 @@ Y.extend(SECTIONTOOLBOX, TOOLBOX, {
         },
         quizid : {
             'value' : 0
-        },
-        format : {
-            'value' : 'topics'
         }
     }
 });
