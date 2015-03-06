@@ -153,7 +153,7 @@ Feature: Edit quizzes where some questions require the previous one to have been
     Then "be attempted" "link" should not be visible
 
   @javascript
-  Scenario: When questoins are reordered, the dependency icons are updated correctly
+  Scenario: When questions are reordered, the dependency icons are updated correctly
     Given the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | preferredbehaviour |
       | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |

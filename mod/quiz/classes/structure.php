@@ -162,19 +162,32 @@ class structure {
      * @return bool can this question require the previous one.
      */
     public function can_question_depend_on_previous_slot($slotnumber) {
-        if ($slotnumber == 1) {
-            return false;
-        }
-        if ($this->get_question_type_for_slot($slotnumber - 1) == 'random') {
+        return $slotnumber > 1 && $this->can_finish_during_the_attempt($slotnumber - 1);
+    }
+
+    /**
+     * Whether it would be possible for the question in this slot to finish during
+     * the attempt. Note that the answer is not exact, becuase of random questoins.
+     * @param int $slotnumber the index of the slot in question.
+     * @return bool can this question finish naturally during the attempt?
+     */
+    public function can_finish_during_the_attempt($slotnumber) {
+        if ($this->get_question_type_for_slot($slotnumber) == 'random') {
             return true;
+        }
+
+        if (isset($this->slotsinorder[$slotnumber]->canfinish)) {
+            return $this->slotsinorder[$slotnumber]->canfinish;
         }
 
         $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $this->quizobj->get_context());
         $tempslot = $quba->add_question(\question_bank::load_question(
-                $this->slotsinorder[$slotnumber - 1]->questionid));
+                $this->slotsinorder[$slotnumber]->questionid));
         $quba->set_preferred_behaviour($this->quizobj->get_quiz()->preferredbehaviour);
         $quba->start_all_questions();
-        return $quba->can_question_finish_during_attempt($tempslot);
+
+        $this->slotsinorder[$slotnumber]->canfinish = $quba->can_question_finish_during_attempt($tempslot);
+        return $this->slotsinorder[$slotnumber]->canfinish;
     }
 
     /**

@@ -179,8 +179,6 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                     if (M.core.actionmenu && M.core.actionmenu.instance) {
                         M.core.actionmenu.instance.hideMenu();
                     }
-                } else {
-                    window.location.reload(true);
                 }
             });
 
@@ -390,8 +388,6 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
                     Y.Moodle.mod_quiz.util.page.remove(page, true);
                 }
                 this.reorganise_edit_page();
-            } else {
-                window.location.reload(true);
             }
         });
 
@@ -425,8 +421,6 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         this.send_request(data, spinner, function(response) {
             if (response.hasOwnProperty('requireprevious')) {
                 Y.Moodle.mod_quiz.util.slot.updateDependencyIcon(activity, response.requireprevious);
-            } else {
-                // window.location.reload(true);
             }
         });
 
@@ -443,6 +437,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         Y.Moodle.mod_quiz.util.slot.reorderSlots();
         Y.Moodle.mod_quiz.util.slot.reorderPageBreaks();
         Y.Moodle.mod_quiz.util.page.reorderPages();
+        Y.Moodle.mod_quiz.util.slot.updateAllDependencyIcons();
     },
 
     NAME : 'mod_quiz-resource-toolbox',

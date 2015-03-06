@@ -374,7 +374,8 @@ class edit_renderer extends \plugin_renderer_base {
         $questionclasses = 'activity ' . $qtype . ' qtype_' . $qtype . ' slot';
 
         $output .= html_writer::tag('li', $questionhtml . $joinhtml,
-                array('class' => $questionclasses, 'id' => 'slot-' . $structure->get_slot_id_for_slot($slot)));
+                array('class' => $questionclasses, 'id' => 'slot-' . $structure->get_slot_id_for_slot($slot),
+                        'data-canfinish' => $structure->can_finish_during_the_attempt($slot)));
 
         return $output;
     }
