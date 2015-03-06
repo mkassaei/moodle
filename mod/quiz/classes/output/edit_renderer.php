@@ -706,28 +706,20 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function question_dependency_icon($structure, $slot) {
-        if (!$structure->can_question_depend_on_previous_slot($slot)) {
-            return '';
-        }
-
-        $url = new \moodle_url('questiondependency.php',
-                array('cmid' => $structure->get_cmid(), 'quizid' => $structure->get_quizid(),
-                'slotid' => $structure->get_slot_id_for_slot($slot), 'sesskey' => sesskey()));
-
         $a = array(
             'thisq' => $structure->get_displayed_number_for_slot($slot),
-            'previousq' => $structure->get_displayed_number_for_slot($slot - 1),
+            'previousq' => $structure->get_displayed_number_for_slot(max($slot - 1, 1)),
         );
         if ($structure->is_question_dependent_on_previous_slot($slot)) {
             $title = get_string('questiondependencyremove', 'quiz', $a);
             $image = $this->pix_icon('t/locked', get_string('questiondependsonprevious', 'quiz'),
                     'moodle', array('title' => ''));
-            $action = 'linkpage'; // TODO
+            $action = 'removedependency';
         } else {
             $title = get_string('questiondependencyadd', 'quiz', $a);
             $image = $this->pix_icon('t/unlocked', get_string('questiondependencyfree', 'quiz'),
                     'moodle', array('title' => ''));
-            $action = 'unlinkpage'; // TODO
+            $action = 'adddependency';
         }
 
         // Disable the link if quiz has attempts.
@@ -735,9 +727,13 @@ class edit_renderer extends \plugin_renderer_base {
         if (!$structure->can_be_edited()) {
             $disabled = 'disabled';
         }
-        return html_writer::span($this->action_link($url, $image, null, array('title' => $title,
-                'class' => 'question_dependency_icon', 'disabled' => $disabled, 'data-action' => $action)),
-                'question_dependency_wrapper');
+        $extraclass = '';
+        if (!$structure->can_question_depend_on_previous_slot($slot)) {
+            $extraclass = ' question_dependency_cannot_depend';
+        }
+        return html_writer::span($this->action_link('#', $image, null, array('title' => $title,
+                'class' => 'cm-edit-action', 'disabled' => $disabled, 'data-action' => $action)),
+                'question_dependency_wrapper' . $extraclass);
     }
 
     /**
@@ -989,6 +985,10 @@ class edit_renderer extends \plugin_renderer_base {
                 'dragtostart',
                 'numquestionsx',
                 'removepagebreak',
+                'questiondependencyadd',
+                'questiondependencyfree',
+                'questiondependencyremove',
+                'questiondependsonprevious',
         ), 'quiz');
 
         foreach (\question_bank::get_all_qtypes() as $qtype => $notused) {

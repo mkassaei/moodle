@@ -21,7 +21,7 @@ Feature: Edit quizzes where some questions require the previous one to have been
 
   @javascript
   Scenario: The first question cannot depend on the previous (whatever is in the DB)
-    When the following "activities" exist:
+    Given the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | preferredbehaviour |
       | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
     And the following "questions" exist:
@@ -33,12 +33,12 @@ Feature: Edit quizzes where some questions require the previous one to have been
     And I follow "Course 1"
     And I follow "Quiz 1"
     And I follow "Edit quiz"
-    Then "be attempted" "link" should not exist
+    Then "be attempted" "link" should not be visible
     # The text "be attempted" is used as a relatively unique string in both the add and remove links.
 
   @javascript
   Scenario: If the second question depends on the first, that is shown
-    When the following "activities" exist:
+    Given the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | preferredbehaviour |
       | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
     And the following "questions" exist:
@@ -56,7 +56,7 @@ Feature: Edit quizzes where some questions require the previous one to have been
 
   @javascript
   Scenario: The second question can be set to depend on the first
-    When the following "activities" exist:
+    Given the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | preferredbehaviour |
       | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
     And the following "questions" exist:
@@ -72,13 +72,13 @@ Feature: Edit quizzes where some questions require the previous one to have been
     And I follow "Course 1"
     And I follow "Quiz 1"
     And I follow "Edit quiz"
-    And I follow "No restriction on when question 2 can be attempted • Click to change"
+    When I follow "No restriction on when question 2 can be attempted • Click to change"
     Then "Question 2 cannot be attempted until the previous question 1 has been completed • Click to change" "link" should be visible
     And "No restriction on when question 3 can be attempted • Click to change" "link" should be visible
 
   @javascript
   Scenario: A question that did depend on the previous can be un-linked
-    When the following "activities" exist:
+    Given the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | preferredbehaviour |
       | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
     And the following "questions" exist:
@@ -94,13 +94,13 @@ Feature: Edit quizzes where some questions require the previous one to have been
     And I follow "Course 1"
     And I follow "Quiz 1"
     And I follow "Edit quiz"
-    And I follow "Question 3 cannot be attempted until the previous question 2 has been completed • Click to change"
+    When I follow "Question 3 cannot be attempted until the previous question 2 has been completed • Click to change"
     Then "Question 2 cannot be attempted until the previous question 1 has been completed • Click to change" "link" should be visible
     And "No restriction on when question 3 can be attempted • Click to change" "link" should be visible
 
   @javascript
   Scenario: Question dependency cannot apply to deferred feedback quizzes so UI is hidden
-    When the following "activities" exist:
+    Given the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | preferredbehaviour |
       | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | deferredfeedback  |
     And the following "questions" exist:
@@ -114,11 +114,11 @@ Feature: Edit quizzes where some questions require the previous one to have been
     And I follow "Course 1"
     And I follow "Quiz 1"
     And I follow "Edit quiz"
-    Then "be attempted" "link" should not exist
+    Then "be attempted" "link" should not be visible
 
   @javascript
   Scenario: A question can never depend on an essay
-    When the following "activities" exist:
+    Given the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | preferredbehaviour |
       | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
     And the following "questions" exist:
@@ -132,11 +132,11 @@ Feature: Edit quizzes where some questions require the previous one to have been
     And I follow "Course 1"
     And I follow "Quiz 1"
     And I follow "Edit quiz"
-    Then "be attempted" "link" should not exist
+    Then "be attempted" "link" should not be visible
 
   @javascript
   Scenario: A question can never depend on a description
-    When the following "activities" exist:
+    Given the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | preferredbehaviour |
       | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
     And the following "questions" exist:
@@ -150,4 +150,27 @@ Feature: Edit quizzes where some questions require the previous one to have been
     And I follow "Course 1"
     And I follow "Quiz 1"
     And I follow "Edit quiz"
-    Then "be attempted" "link" should not exist
+    Then "be attempted" "link" should not be visible
+
+  @javascript
+  Scenario: When questoins are reordered, the dependency icons are updated correctly
+    Given the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | preferredbehaviour |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
+    And the following "questions" exist:
+      | questioncategory | qtype       | name | questiontext    |
+      | Test questions   | truefalse   | TF1  | First question  |
+      | Test questions   | truefalse   | TF2  | Second question |
+      | Test questions   | truefalse   | TF3  | Third question  |
+    And quiz "Quiz 1" contains the following questions:
+      | question | page | requireprevious |
+      | TF1      | 1    | 0               |
+      | TF2      | 1    | 1               |
+      | TF3      | 1    | 1               |
+    And I follow "Course 1"
+    And I follow "Quiz 1"
+    And I follow "Edit quiz"
+    When I move "Question 1" to "After Question 3" in the quiz by clicking the move icon
+    Then "Question 2 cannot be attempted until the previous question 1 has been completed • Click to change" "link" should be visible
+    And "No restriction on when question 3 can be attempted • Click to change" "link" should be visible
+    And "be attempted" "link" in the "TF2" "list_item" should not be visible

@@ -162,8 +162,11 @@ class structure {
      * @return bool can this question require the previous one.
      */
     public function can_question_depend_on_previous_slot($slotnumber) {
-        if ($slotnumber == 1 || $this->get_question_type_for_slot($slotnumber - 1) == 'random') {
+        if ($slotnumber == 1) {
             return false;
+        }
+        if ($this->get_question_type_for_slot($slotnumber - 1) == 'random') {
+            return true;
         }
 
         $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $this->quizobj->get_context());
@@ -777,21 +780,13 @@ class structure {
     }
 
     /**
-     * Change require previous for a slot..
-     * @param \stdClass $slot row from the quiz_slots table.
+     * Set whether the question in a particular slot requires the previous one.
+     * @param int $slotid id of slot.
+     * @param bool $requireprevious if true, set this question to require the previous one.
      */
-    public function update_question_dependency($slot) {
+    public function update_question_dependency($slotid, $requireprevious) {
         global $DB;
-        $trans = $DB->start_delegated_transaction();
-
-        // Swap dependency setting.
-        if ($slot->requireprevious == 1) {
-            $slot->requireprevious = 0;
-        } else {
-            $slot->requireprevious = 1;
-        }
-        $DB->update_record('quiz_slots', $slot);
-        $trans->allow_commit();
+        $DB->set_field('quiz_slots', 'requireprevious', $requireprevious, array('id' => $slotid));
     }
 
     /**
