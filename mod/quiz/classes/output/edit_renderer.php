@@ -714,14 +714,20 @@ class edit_renderer extends \plugin_renderer_base {
                 array('cmid' => $structure->get_cmid(), 'quizid' => $structure->get_quizid(),
                 'slotid' => $structure->get_slot_id_for_slot($slot), 'sesskey' => sesskey()));
 
+        $a = array(
+            'thisq' => $structure->get_displayed_number_for_slot($slot),
+            'previousq' => $structure->get_displayed_number_for_slot($slot - 1),
+        );
         if ($structure->is_question_dependent_on_previous_slot($slot)) {
-            $title = get_string('removequestiondependency', 'quiz');
-            $image = $this->pix_icon('t/locked', $title);
-            $action = 'linkpage';
+            $title = get_string('questiondependencyremove', 'quiz', $a);
+            $image = $this->pix_icon('t/locked', get_string('questiondependsonprevious', 'quiz'),
+                    'moodle', array('title' => ''));
+            $action = 'linkpage'; // TODO
         } else {
-            $title = get_string('addquestiondependency', 'quiz');
-            $image = $this->pix_icon('t/unlocked', $title);
-            $action = 'unlinkpage';
+            $title = get_string('questiondependencyadd', 'quiz', $a);
+            $image = $this->pix_icon('t/unlocked', get_string('questiondependencyfree', 'quiz'),
+                    'moodle', array('title' => ''));
+            $action = 'unlinkpage'; // TODO
         }
 
         // Disable the link if quiz has attempts.

@@ -1,8 +1,8 @@
 @mod @mod_quiz
 Feature: Attemp a quiz where some questions require that the previous question has been answered.
+  In order to complete a quiz where questions require previous ones to be complete
   As a student
-  In order to complete a quiz with question dependencies
-  I need to be able to attempt quizzes where some questions are initially hidden, and later revealed
+  I need later questions to appear once earlier ones have been answered.
 
   Background:
     Given the following "users" exist:
@@ -151,8 +151,8 @@ Feature: Attemp a quiz where some questions require that the previous question h
   @javascript
   Scenario: A questions not blocked if the previous one cannot finish, e.g. description (despite what is set in the DB).
     Given the following "questions" exist:
-      | questioncategory | qtype       | name | questiontext    |
-      | Test questions   | description | Info | Read me         |
+      | questioncategory | qtype       | name | questiontext   |
+      | Test questions   | description | Info | Read me        |
       | Test questions   | truefalse   | TF1  | First question |
     And the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | preferredbehaviour |

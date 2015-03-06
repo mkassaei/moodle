@@ -162,8 +162,16 @@ class structure {
      * @return bool can this question require the previous one.
      */
     public function can_question_depend_on_previous_slot($slotnumber) {
-        // TODO.
-        return $slotnumber > 1;
+        if ($slotnumber == 1 || $this->get_question_type_for_slot($slotnumber - 1) == 'random') {
+            return false;
+        }
+
+        $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $this->quizobj->get_context());
+        $tempslot = $quba->add_question(\question_bank::load_question(
+                $this->slotsinorder[$slotnumber - 1]->questionid));
+        $quba->set_preferred_behaviour($this->quizobj->get_quiz()->preferredbehaviour);
+        $quba->start_all_questions();
+        return $quba->can_question_finish_during_attempt($tempslot);
     }
 
     /**

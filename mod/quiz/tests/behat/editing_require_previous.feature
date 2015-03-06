@@ -1,10 +1,9 @@
+@mod @mod_quiz
+Feature: Edit quizzes where some questions require the previous one to have been completed
+  In order to create quizzes where later questions can only be seen after earlier ones are answered
+  As a teacher
+  I need to be able to configure this on the Edit quiz page
 
-@mod @mod_quiz @questiondependency
-Feature: Edit quiz page - pagination
-  In order to build a quiz laid out in pages with n question(s) on each page, where n >=1.
-  I need to be able to add and remove question dependency on any qualified question
-  in quiz editing page.
-  
   Background:
     Given the following "users" exist:
       | username | firstname | lastname | email               |
@@ -15,64 +14,140 @@ Feature: Edit quiz page - pagination
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
-    And the following "activities" exist:
-      | activity   | name   | intro              | course | idnumber |
-      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    |
+    And the following "question categories" exist:
+      | contextlevel | reference | name           |
+      | Course       | C1        | Test questions |
+    And I log in as "teacher1"
 
-    When I log in as "teacher1"
+  @javascript
+  Scenario: The first question cannot depend on the previous (whatever is in the DB)
+    When the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | preferredbehaviour |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
+    And the following "questions" exist:
+      | questioncategory | qtype       | name | questiontext    |
+      | Test questions   | truefalse   | TF1  | First question  |
+    And quiz "Quiz 1" contains the following questions:
+      | question | page | requireprevious |
+      | TF1      | 1    | 1               |
     And I follow "Course 1"
     And I follow "Quiz 1"
     And I follow "Edit quiz"
+    Then "be attempted" "link" should not exist
+    # The text "be attempted" is used as a relatively unique string in both the add and remove links.
 
   @javascript
-  Scenario: A question can require that the previous question has been completed.
-    Then I should see "Editing quiz: Quiz 1"
-
-    # Add the first true false question.
-    And I add a "True/False" question to the "Quiz 1" quiz with:
-      | Question name                      | TF 001                          |
-      | Question text                      | Answer the TF 001 question              |
-      | General feedback                   | Thank you, this is the general feedback |
-      | Correct answer                     | False                                   |
-      | Feedback for the response 'True'.  | So you think it is true                 |
-      | Feedback for the response 'False'. | So you think it is false                |
-    And I should see "TF 001"
-
-    # Add the second true false question.
-    And I add a "True/False" question to the "Quiz 1" quiz with:
-      | Question name                      | TF 002                          |
-      | Question text                      | Answer the TF 002 question              |
-      | General feedback                   | Thank you, this is the general feedback |
-      | Correct answer                     | False                                   |
-      | Feedback for the response 'True'.  | So you think it is true                 |
-      | Feedback for the response 'False'. | So you think it is false                |
-    And I should see "TF 001"
-    And I should see "TF 002"
-    And I follow "Require that the previous question is complete"
-
-    # Add the third true false question.
-    And I add a "True/False" question to the "Quiz 1" quiz with:
-      | Question name                      | TF 003                          |
-      | Question text                      | Answer the TF 003 question              |
-      | General feedback                   | Thank you, this is the general feedback |
-      | Correct answer                     | False                                   |
-      | Feedback for the response 'True'.  | So you think it is true                 |
-      | Feedback for the response 'False'. | So you think it is false                |
-    And I should see "TF 001"
-    And I should see "TF 002"
-    And I should see "TF 003"
-
-    # Attempt the quiz
+  Scenario: If the second question depends on the first, that is shown
+    When the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | preferredbehaviour |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
+    And the following "questions" exist:
+      | questioncategory | qtype       | name | questiontext    |
+      | Test questions   | truefalse   | TF1  | First question  |
+      | Test questions   | truefalse   | TF2  | Second question |
+    And quiz "Quiz 1" contains the following questions:
+      | question | page | requireprevious |
+      | TF1      | 1    | 0               |
+      | TF2      | 1    | 1               |
+    And I follow "Course 1"
     And I follow "Quiz 1"
-    When I press "Preview quiz now"
-    And I should see "This question cannot be attempted until the previous question has been completed."
+    And I follow "Edit quiz"
+    Then "This question cannot be attempted until the previous question has been completed." "link" should be visible
 
-    # Back to the quiz editing page
+  @javascript
+  Scenario: The second question can be set to depend on the first
+    When the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | preferredbehaviour |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
+    And the following "questions" exist:
+      | questioncategory | qtype       | name | questiontext    |
+      | Test questions   | truefalse   | TF1  | First question  |
+      | Test questions   | truefalse   | TF2  | Second question |
+      | Test questions   | truefalse   | TF3  | Third question  |
+    And quiz "Quiz 1" contains the following questions:
+      | question | page | requireprevious |
+      | TF1      | 1    | 0               |
+      | TF2      | 1    | 0               |
+      | TF3      | 1    | 0               |
+    And I follow "Course 1"
     And I follow "Quiz 1"
-    When I follow "Edit quiz"
-    Then I should see "Editing quiz: Quiz 1"
-    And I follow "Remove question dependency"
+    And I follow "Edit quiz"
+    And I follow "No restriction on when question 2 can be attempted • Click to change"
+    Then "Question 2 cannot be attempted until the previous question 1 has been completed • Click to change" "link" should be visible
+    And "No restriction on when question 3 can be attempted • Click to change" "link" should be visible
+
+  @javascript
+  Scenario: A question that did depend on the previous can be un-linked
+    When the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | preferredbehaviour |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
+    And the following "questions" exist:
+      | questioncategory | qtype       | name | questiontext    |
+      | Test questions   | truefalse   | TF1  | First question  |
+      | Test questions   | truefalse   | TF2  | Second question |
+      | Test questions   | truefalse   | TF3  | Third question  |
+    And quiz "Quiz 1" contains the following questions:
+      | question | page | requireprevious |
+      | TF1      | 1    | 0               |
+      | TF2      | 1    | 1               |
+      | TF3      | 1    | 1               |
+    And I follow "Course 1"
     And I follow "Quiz 1"
-    When I press "Continue the last preview"
-    And I press "Start a new preview"
-    And I should not see "This question cannot be attempted until the previous question has been completed."
+    And I follow "Edit quiz"
+    And I follow "Question 3 cannot be attempted until the previous question 2 has been completed • Click to change"
+    Then "Question 2 cannot be attempted until the previous question 1 has been completed • Click to change" "link" should be visible
+    And "No restriction on when question 3 can be attempted • Click to change" "link" should be visible
+
+  @javascript
+  Scenario: Question dependency cannot apply to deferred feedback quizzes so UI is hidden
+    When the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | preferredbehaviour |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | deferredfeedback  |
+    And the following "questions" exist:
+      | questioncategory | qtype       | name | questiontext    |
+      | Test questions   | truefalse   | TF1  | First question  |
+      | Test questions   | truefalse   | TF2  | Second question |
+    And quiz "Quiz 1" contains the following questions:
+      | question | page | requireprevious |
+      | TF1      | 1    | 0               |
+      | TF2      | 1    | 1               |
+    And I follow "Course 1"
+    And I follow "Quiz 1"
+    And I follow "Edit quiz"
+    Then "be attempted" "link" should not exist
+
+  @javascript
+  Scenario: A question can never depend on an essay
+    When the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | preferredbehaviour |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
+    And the following "questions" exist:
+      | questioncategory | qtype       | name  | questiontext   |
+      | Test questions   | essay       | Story | First question |
+      | Test questions   | truefalse   | TF1   | First question |
+    And quiz "Quiz 1" contains the following questions:
+      | question | page | requireprevious |
+      | Story    | 1    | 0               |
+      | TF1      | 1    | 0               |
+    And I follow "Course 1"
+    And I follow "Quiz 1"
+    And I follow "Edit quiz"
+    Then "be attempted" "link" should not exist
+
+  @javascript
+  Scenario: A question can never depend on a description
+    When the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | preferredbehaviour |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  |
+    And the following "questions" exist:
+      | questioncategory | qtype       | name | questiontext   |
+      | Test questions   | description | Info | Read me        |
+      | Test questions   | truefalse   | TF1  | First question |
+    And quiz "Quiz 1" contains the following questions:
+      | question | page | requireprevious |
+      | Info     | 1    | 0               |
+      | TF1      | 1    | 0               |
+    And I follow "Course 1"
+    And I follow "Quiz 1"
+    And I follow "Edit quiz"
+    Then "be attempted" "link" should not exist
