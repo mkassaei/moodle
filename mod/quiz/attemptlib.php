@@ -1004,7 +1004,9 @@ class quiz_attempt {
      * @param int $slot
      */
     public function is_blocked_by_previous_question($slot) {
-        return $this->slots[$slot]->requireprevious &&
+        return $slot > 1 && $this->slots[$slot]->requireprevious &&
+                !$this->get_quiz()->shufflequestions &&
+                $this->get_navigation_method() != QUIZ_NAVMETHOD_SEQ &&
                 !$this->quba->get_question_state($slot - 1)->is_finished() &&
                 $this->quba->can_question_finish_during_attempt($slot - 1);
     }

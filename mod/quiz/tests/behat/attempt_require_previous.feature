@@ -103,17 +103,63 @@ Feature: Attemp a quiz where some questions require that the previous question h
     And the state of "Second question" question is shown as "Not answered"
 
   @javascript
-  Scenario: A questions not blocked in a deferred feedback quiz (despite what is set in the DB).
+  Scenario: A questions cannot be blocked in a deferred feedback quiz (despite what is set in the DB).
     Given the following "questions" exist:
       | questioncategory | qtype       | name  | questiontext    |
       | Test questions   | truefalse   | TF1   | First question  |
       | Test questions   | truefalse   | TF2   | Second question |
     And the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | preferredbehaviour |
-      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | deferredfeedback  |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | deferredfeedback   |
     And quiz "Quiz 1" contains the following questions:
       | question | page | requireprevious |
       | TF1      | 1    | 0               |
+      | TF2      | 1    | 1               |
+
+    When I log in as "student"
+    And I follow "Course 1"
+    And I follow "Quiz 1"
+    And I press "Attempt quiz now"
+
+    Then I should see "First question"
+    And I should see "Second question"
+    And I should not see "This question cannot be attempted until the previous question has been completed."
+
+  @javascript
+  Scenario: A questions cannot be blocked in a shuffled quiz (despite what is set in the DB).
+    Given the following "questions" exist:
+      | questioncategory | qtype       | name  | questiontext    |
+      | Test questions   | truefalse   | TF1   | First question  |
+      | Test questions   | truefalse   | TF2   | Second question |
+    And the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | preferredbehaviour | shufflequestions | questionsperpage |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  | 1                | 2                |
+    And quiz "Quiz 1" contains the following questions:
+      | question | page | requireprevious |
+      | TF1      | 1    | 1               |
+      | TF2      | 1    | 1               |
+
+    When I log in as "student"
+    And I follow "Course 1"
+    And I follow "Quiz 1"
+    And I press "Attempt quiz now"
+
+    Then I should see "First question"
+    And I should see "Second question"
+    And I should not see "This question cannot be attempted until the previous question has been completed."
+
+  @javascript
+  Scenario: A questions cannot be blocked in sequential quiz (despite what is set in the DB).
+    Given the following "questions" exist:
+      | questioncategory | qtype       | name  | questiontext    |
+      | Test questions   | truefalse   | TF1   | First question  |
+      | Test questions   | truefalse   | TF2   | Second question |
+    And the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | preferredbehaviour | navmethod  |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | immediatefeedback  | sequential |
+    And quiz "Quiz 1" contains the following questions:
+      | question | page | requireprevious |
+      | TF1      | 1    | 1               |
       | TF2      | 1    | 1               |
 
     When I log in as "student"

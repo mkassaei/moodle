@@ -166,12 +166,18 @@ class structure {
     }
 
     /**
-     * Whether it would be possible for the question in this slot to finish during
-     * the attempt. Note that the answer is not exact, becuase of random questoins.
+     * Whether it is possible for another question to depend on this one finishing.
+     * Note that the answer is not exact, because of random questions, and sometimes
+     * questions cannot be depended upon because of quiz options.
      * @param int $slotnumber the index of the slot in question.
      * @return bool can this question finish naturally during the attempt?
      */
     public function can_finish_during_the_attempt($slotnumber) {
+        if ($this->quizobj->get_quiz()->shufflequestions ||
+                $this->quizobj->get_navigation_method() == QUIZ_NAVMETHOD_SEQ) {
+            return false;
+        }
+
         if ($this->get_question_type_for_slot($slotnumber) == 'random') {
             return true;
         }
