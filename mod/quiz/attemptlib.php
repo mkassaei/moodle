@@ -998,10 +998,10 @@ class quiz_attempt {
     }
 
     /**
-     * Checks whether it requires previous question. If the previous question is not completed
-     * return a message in descripyiom question type format, otherwise returns null
+     * Checks whether the question in this slot requires the previous question to have been completed.
      *
-     * @param int $slot
+     * @param int $slot the number used to identify this question within this attempt.
+     * @return bool whether the previous question must have been completed before this one can be seen.
      */
     public function is_blocked_by_previous_question($slot) {
         return $slot > 1 && $this->slots[$slot]->requireprevious &&
