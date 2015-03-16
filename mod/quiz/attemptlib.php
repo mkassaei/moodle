@@ -482,6 +482,8 @@ class quiz_attempt {
      *      of the state of each question. Else just set up the basic details of the attempt.
      */
     public function __construct($attempt, $quiz, $cm, $course, $loadquestions = true) {
+        global $DB;
+
         $this->attempt = $attempt;
         $this->quizobj = new quiz($quiz, $cm, $course);
 
@@ -490,6 +492,10 @@ class quiz_attempt {
         }
 
         $this->quba = question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+        $this->slots = $DB->get_records('quiz_slots',
+                array('quizid' => $this->get_quizid()), 'slot',
+                'slot, page, requireprevious, questionid, maxmark');
+
         $this->determine_layout();
         $this->number_questions();
     }
@@ -544,12 +550,6 @@ class quiz_attempt {
      * Parse attempt->layout to populate the other arrays the represent the layout.
      */
     protected function determine_layout() {
-        global $DB;
-
-        $this->slots = $DB->get_records('quiz_slots',
-                array('quizid' => $this->get_quizid()), 'slot',
-                'slot, page, requireprevious, questionid, maxmark');
-
         $this->pagelayout = array();
 
         // Break up the layout string into pages.
