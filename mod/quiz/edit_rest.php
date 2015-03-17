@@ -121,6 +121,7 @@ switch($requestmethod) {
                     case 'updatedependency':
                         require_capability('mod/quiz:manage', $modcontext);
                         $slot = $structure->get_slot_by_id($id);
+                        $value = (bool) $value;
                         $structure->update_question_dependency($slot->id, $value);
                         echo json_encode(array('requireprevious' => $value));
                         break;
