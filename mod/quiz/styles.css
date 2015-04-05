@@ -550,6 +550,11 @@ table.quizreviewsummary td.cell {
     position: relative;
 }
 
+#page-mod-quiz-edit ul.section li.pagenumber:first-child .add-menu-outer ul.menu li:first-child,
+#page-mod-quiz-edit .last-add-menu .add-menu-outer ul.menu li:first-child {
+    display: none;
+}
+
 #page-mod-quiz-edit .last-add-menu {
     position: relative;
     height: 1.5em;
