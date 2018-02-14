@@ -38,6 +38,12 @@ $sortby     = optional_param('sortby', 'lastname', PARAM_ALPHA);
 $sorthow    = optional_param('sorthow', 'ASC', PARAM_ALPHA);
 $eval       = optional_param('eval', null, PARAM_PLUGIN);
 
+$searchoptions = new stdClass();
+$searchoptions->idnumber = optional_param('idnumber', null, PARAM_RAW);
+$searchoptions->fname    = optional_param('fname', null, PARAM_RAW);
+$searchoptions->lname    = optional_param('lname', null, PARAM_RAW);
+$searchoptions->filter   = optional_param('filter', workshop_search::NO_FILTER, PARAM_INT);
+
 if ($id) {
     $cm             = get_coursemodule_from_id('workshop', $id, 0, false, MUST_EXIST);
     $course         = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -224,7 +230,7 @@ case workshop::PHASE_SUBMISSION:
         print_collapsible_region_start('', 'workshop-viewlet-allsubmissions', get_string('submissionsreport', 'workshop'));
 
         $perpage = get_user_preferences('workshop_perpage', 10);
-        $data = $workshop->prepare_grading_report_data($USER->id, $groupid, $page, $perpage, $sortby, $sorthow);
+        $data = $workshop->prepare_grading_report_data($USER->id, $groupid, $page, $perpage, $sortby, $sorthow, $searchoptions);
         if ($data) {
             $countparticipants = $workshop->count_participants();
             $countsubmissions = $workshop->count_submissions(array_keys($data->grades), $groupid);
@@ -254,6 +260,7 @@ case workshop::PHASE_SUBMISSION:
             echo $output->render(new workshop_grading_report($data, $reportopts));
             echo $output->render($pagingbar);
             echo $output->perpage_selector($perpage);
+            echo $output->workshop_search_form();
         } else {
             echo html_writer::tag('div', get_string('nothingfound', 'workshop'), array('class' => 'nothingfound'));
         }
@@ -290,7 +297,7 @@ case workshop::PHASE_ASSESSMENT:
     if (has_capability('mod/workshop:viewallassessments', $PAGE->context)) {
         $perpage = get_user_preferences('workshop_perpage', 10);
         $groupid = groups_get_activity_group($workshop->cm, true);
-        $data = $workshop->prepare_grading_report_data($USER->id, $groupid, $page, $perpage, $sortby, $sorthow);
+        $data = $workshop->prepare_grading_report_data($USER->id, $groupid, $page, $perpage, $sortby, $sorthow, $searchoptions);
         if ($data) {
             $showauthornames    = has_capability('mod/workshop:viewauthornames', $workshop->context);
             $showreviewernames  = has_capability('mod/workshop:viewreviewernames', $workshop->context);
@@ -316,6 +323,7 @@ case workshop::PHASE_ASSESSMENT:
             echo $output->render(new workshop_grading_report($data, $reportopts));
             echo $output->render($pagingbar);
             echo $output->perpage_selector($perpage);
+            echo $output->workshop_search_form();
             echo $output->box_end();
             print_collapsible_region_end();
         }
@@ -425,7 +433,7 @@ case workshop::PHASE_EVALUATION:
     if (has_capability('mod/workshop:viewallassessments', $PAGE->context)) {
         $perpage = get_user_preferences('workshop_perpage', 10);
         $groupid = groups_get_activity_group($workshop->cm, true);
-        $data = $workshop->prepare_grading_report_data($USER->id, $groupid, $page, $perpage, $sortby, $sorthow);
+        $data = $workshop->prepare_grading_report_data($USER->id, $groupid, $page, $perpage, $sortby, $sorthow, $searchoptions);
         if ($data) {
             $showauthornames    = has_capability('mod/workshop:viewauthornames', $workshop->context);
             $showreviewernames  = has_capability('mod/workshop:viewreviewernames', $workshop->context);
@@ -466,6 +474,7 @@ case workshop::PHASE_EVALUATION:
             echo $output->render(new workshop_grading_report($data, $reportopts));
             echo $output->render($pagingbar);
             echo $output->perpage_selector($perpage);
+            echo $output->workshop_search_form();
             echo $output->box_end();
             print_collapsible_region_end();
         }
@@ -557,7 +566,7 @@ case workshop::PHASE_CLOSED:
     if (has_capability('mod/workshop:viewallassessments', $PAGE->context)) {
         $perpage = get_user_preferences('workshop_perpage', 10);
         $groupid = groups_get_activity_group($workshop->cm, true);
-        $data = $workshop->prepare_grading_report_data($USER->id, $groupid, $page, $perpage, $sortby, $sorthow);
+        $data = $workshop->prepare_grading_report_data($USER->id, $groupid, $page, $perpage, $sortby, $sorthow, $searchoptions);
         if ($data) {
             $showauthornames    = has_capability('mod/workshop:viewauthornames', $workshop->context);
             $showreviewernames  = has_capability('mod/workshop:viewreviewernames', $workshop->context);
@@ -583,6 +592,7 @@ case workshop::PHASE_CLOSED:
             echo $output->render(new workshop_grading_report($data, $reportopts));
             echo $output->render($pagingbar);
             echo $output->perpage_selector($perpage);
+            echo $output->workshop_search_form();
             echo $output->box_end();
             print_collapsible_region_end();
         }

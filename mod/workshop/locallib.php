@@ -1992,7 +1992,7 @@ class workshop {
      * @param string $sorthow ASC|DESC
      * @return stdclass data for the renderer
      */
-    public function prepare_grading_report_data($userid, $groupid, $page, $perpage, $sortby, $sorthow) {
+    public function prepare_grading_report_data($userid, $groupid, $page, $perpage, $sortby, $sorthow, $searchoptions) {
         global $DB;
 
         $canviewall     = has_capability('mod/workshop:viewallassessments', $this->context, $userid);
@@ -2042,7 +2042,14 @@ class workshop {
                  LEFT JOIN {workshop_aggregations} ag ON (ag.userid = u.id AND ag.workshopid = :workshopid2)
                      WHERE u.id $participantids
                   ORDER BY $sqlsort";
-            $participants = $DB->get_records_sql($sql, $params, $page * $perpage, $perpage);
+
+            // If there is a search option get all participants.
+            if (workshop_search::workshop_has_search_options($searchoptions)) {
+                $participants = $DB->get_records_sql($sql, $params, $page);
+            } else {
+                $participants = $DB->get_records_sql($sql, $params, $page * $perpage, $perpage);
+            }
+
         } else {
             $participants = array();
         }
@@ -2064,7 +2071,6 @@ class workshop {
                 }
             }
         }
-
         // load the submissions details
         $submissions = $this->get_submissions(array_keys($participants));
 
@@ -2208,6 +2214,11 @@ class workshop {
         $data->totalcount = $numofparticipants;
         $data->maxgrade = $this->real_grade(100);
         $data->maxgradinggrade = $this->real_grading_grade(100);
+        if (workshop_search::workshop_has_search_options($searchoptions)) {
+            $data->searchoptions = (object)$searchoptions;
+        } else {
+            $data->searchoptions = null;
+        }
         return $data;
     }
 
@@ -4747,4 +4758,117 @@ class workshop_final_grades implements renderable {
 
     /** @var object the infor from the gradebook about the grade for assessment */
     public $assessmentgrade = null;
+}
+
+/**
+ * Class workshop_search
+ * @copyright 2018 The Open University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class workshop_search {
+    /** Do not apply any filter */
+    const NO_FILTER = 0;
+    /** Users who have submitted a submissions */
+    const SUBMISSION_SUBMITTED = 1;
+    /** Users who have not submitted any submissions */
+    const SUBMISSION_NOT_SUBMITTED = 2;
+
+    /**
+     * Process the search and filter options.
+     */
+    public static function workshop_process_search_options() {
+        global $CFG;
+        $id = optional_param('id', 0, PARAM_INT);
+        $cm = get_coursemodule_from_id('workshop', $id, 0, false, MUST_EXIST);
+
+        $newsearch = new stdClass();
+        $newsearch->id = $id;
+        $newsearch->idnumber = optional_param('idnumber', null, PARAM_RAW);
+        $newsearch->fname = optional_param('fname', null, PARAM_RAW);
+        $newsearch->lname = optional_param('lname', null, PARAM_RAW);
+        $newsearch->filter = optional_param('filter', self::NO_FILTER, PARAM_INT);
+
+        require_once($CFG->dirroot . '/mod/workshop/search_form.php');
+        $mform = new mod_workshop_search_form('view.php', array('id' => $newsearch->id), 'get');
+        $mform->set_data($newsearch);
+        if ($data = $mform->get_data()) {
+            $options = array('id' => $cm->id, 'filter' => $newsearch->filter,
+                    'idnumber' => $data->idnumber, 'fname' => $data->fname, 'lname' => $data->lname);
+            if ($data->submitbutton) {
+                return array($mform->render(), $options);
+            }
+        }
+        return array($mform->render(), array());
+    }
+
+    /**
+     * Return array of user ids.
+     * @param stdClass $options search and filter options
+     * @return array
+     */
+    public static function get_user_ids ($options) {
+        global $DB;
+        if (empty($options)) {
+            return array();
+        }
+        $idnumber = $options->idnumber ? $options->idnumber : null;
+        $fname = $options->fname ? $options->fname : null;
+        $lname = $options->lname ? $options->lname : null;
+
+        if (empty($idnumber) && empty($fname) && empty($lname)) {
+            return array();
+        }
+        if ($idnumber) {
+            $sql = "SELECT u.id
+                    FROM {user} u
+                    WHERE LOWER(u.idnumber) like LOWER('$idnumber%')";
+            $users = $DB->get_records_sql($sql);
+        } else if (!empty($fname) && !empty($lname)) {
+            $sql = "SELECT u.id
+                    FROM {user} u
+                    WHERE LOWER(u.firstname) like LOWER('$fname%')
+                    AND LOWER(u.lastname) like LOWER('$lname%')";
+            $users = $DB->get_records_sql($sql);
+        } else if ($fname) {
+            $sql = "SELECT u.id
+                    FROM {user} u
+                    WHERE LOWER(u.firstname) like LOWER('$fname%')";
+            $users = $DB->get_records_sql($sql);
+        } else if ($lname) {
+            $sql = "SELECT u.id
+                    FROM {user} u
+                    WHERE LOWER(u.lastname) like LOWER('$lname%')";
+            $users = $DB->get_records_sql($sql);
+        }
+        if ($users) {
+            return array_keys($users);
+        }
+        return array();
+    }
+
+
+    /**
+     * Check whether any search and filter criteria is present.
+     * @param stdClass $options search and filter options
+     * @return bool
+     */
+    public static function workshop_has_search_options($options) {
+        if (empty($options)) {
+            return false;
+        }
+        if (!empty($options->idnumber)) {
+            return true;
+        }
+        if (!empty($options->fname)) {
+            return true;
+        }
+        if (!empty($options->lname)) {
+            return true;
+        }
+        if ($options->filter > 0) {
+            return true;
+        }
+        return false;
+    }
+
 }

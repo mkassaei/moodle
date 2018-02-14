@@ -419,6 +419,7 @@ class mod_workshop_renderer extends plugin_renderer_base {
         $options    = $gradingreport->get_options();
         $grades     = $data->grades;
         $userinfo   = $data->userinfo;
+        $searchoptions = $data->searchoptions;
 
         if (empty($grades)) {
             return '';
@@ -462,7 +463,31 @@ class mod_workshop_renderer extends plugin_renderer_base {
         $table->colclasses  = array();
         $table->data        = array();
 
+        if (workshop_search::workshop_has_search_options($searchoptions)) {
+            $userids = workshop_search::get_user_ids($searchoptions);
+        }
         foreach ($grades as $participant) {
+            if (workshop_search::workshop_has_search_options($searchoptions)) {
+                // Filter the search result by selected idnumber, fname, lname.
+                if (!empty($userids)) {
+                    if (!in_array($participant->userid, $userids)) {
+                        continue;
+                    }
+                }
+                // Filter the search result by selected filter.
+                if ($searchoptions->filter !== workshop_search::NO_FILTER) {
+                    if ($searchoptions->filter === workshop_search::SUBMISSION_SUBMITTED) {
+                        if (!$participant->submissionid) {
+                            continue;
+                        }
+                    }
+                    if ($searchoptions->filter === workshop_search::SUBMISSION_NOT_SUBMITTED) {
+                        if ($participant->submissionid) {
+                            continue;
+                        }
+                    }
+                }
+            }
             $numofreceived  = count($participant->reviewedby);
             $numofgiven     = count($participant->reviewerof);
             $published      = $participant->submissionpublished;
@@ -810,6 +835,23 @@ class mod_workshop_renderer extends plugin_renderer_base {
 
         return $this->output->container($this->output->render($select), 'perpagewidget');
     }
+
+    /**
+     * Return the html of the search form.
+     * @return string|void
+     */
+    public function workshop_search_form() {
+        global $PAGE;
+        if (has_capability('mod/workshop:viewallsubmissions', $PAGE->context)) {
+            $html = print_collapsible_region_start('', 'workshop-viewlet-viewallsubmissions',
+                    get_string('searchandfilteroptions', 'workshop'), true, false);
+            list($searchform, $notused) = workshop_search::workshop_process_search_options();
+            $html .= $searchform;
+            $html .= print_collapsible_region_end(true);
+            return $html;
+        }
+    }
+
 
     /**
      * Renders the user's final grades
