@@ -119,9 +119,8 @@ class qtype_ddimageortext_edit_form extends qtype_ddtoimage_edit_form_base {
         $params = array('maxsizes' => $maxsizes,
                         'topnode' => 'fieldset#id_previewareaheader');
 
-        $PAGE->requires->yui_module('moodle-qtype_ddimageortext-form',
-                                        'M.qtype_ddimageortext.init_form',
-                                        array($params));
+        $PAGE->requires->js_call_amd('qtype_ddimageortext/form', 'init', array($params));
+        //$PAGE->requires->yui_module('moodle-qtype_ddimageortext-form', 'M.qtype_ddimageortext.init_form', array($params));
     }
 
     // Drag items.
