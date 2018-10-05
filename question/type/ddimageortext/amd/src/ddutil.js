@@ -443,13 +443,9 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             //t.reposition_drags_for_form(topnode);
             t.init_drops(topnode);
             t.update_padding_sizes_all(topnode);
-
-            console.log(t.drag_item_homes(topnode));
-            console.log('t.drag_item_homes(topnode)');
-
-            //t.set_options_for_drag_item_selectors();
             t.setOptionsForDragItemSelectors();
-            t.setup_form_events(topnode);
+            t.setupFormEvents(t.topNode);
+            //t.setup_form_events(topnode);
             // Y.later(500, this, this.reposition_drags_for_form, [], true);
         },
 

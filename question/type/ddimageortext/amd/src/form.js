@@ -31,7 +31,6 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
         topNode: null,
         backgroundImage: null,
         dragItemsArea: null,
-        dragItemHomes: null,
         maxSizes:null,
         afterimageloaddone: false,
         fp: null, // Object containing functions associated with the file picker.
@@ -52,28 +51,19 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
             t.fp = t.filePickers();
             t.topNode = $(t.params.topnode);
             t.dragItemsArea = $(t.topNode).find('div.dragitems');
-            t.dragItemHomes = $(t.topNode).find('div.dragitems .draghome');
-
             //u.formInit(t.topNode);
-            //var dragItems = $('fieldset#id_draggableitemheader').find('div.fcontainer').children();
-            //console.log($(dragItems));
-            //$('div.droparea .dragitems').append(dragItems);
-            // u.setDrags(t.topNode);
-            // u.setDrops(t.params);
 
             t.setupPreviewArea(t.topNode);
             u.update_padding_sizes_all(t.topNode);
             u.setOptionsForDragItemSelectors();
-            //u.setupFormEvents(t.topNode);
-            u.setup_form_events(t.topNode);
+            u.setupFormEvents(t.topNode);
+            //u.setup_form_events(t.topNode);
             u.whenImageReady(t.topNode, t.maxSizes);
             u.loadDragHomes(t.topNode);
             u.after_all_images_loaded(t.topNode);
             //u.create_all_drag_and_drops(t.topNode);
             t.update_visibility_of_file_pickers();
             //t.draw_dd_area();
-            //console.log(u.initDrags(t.topNode));
-            //console.log('u.initDrags(t.topNode)');
         },
         update_visibility_of_file_pickers: function() {
             for (var i = 0; i < t.form.getFormValue('noitems', []); i++) {
