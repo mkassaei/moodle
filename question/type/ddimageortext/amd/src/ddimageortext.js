@@ -96,7 +96,7 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
             M.util.js_pending(t.pendingId);
             t.topNode = $(params['topnode']);
             t.params = params;
-            t.initQuestion(t.topNode);
+            t.initQuestion(t.topNode, params['readonly']);
             M.util.js_complete(t.pendingId);
         },
 
@@ -112,27 +112,20 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
 
         /**
          * Initialise question.
-         * @param topNode
+         * @param topnode
          */
-        initQuestion: function (topNode) {
+        initQuestion: function (topnode, readonly) {
             // Return if question has been initialised.
-            if ($(topNode).data('initialised') === 1 ) {
+            if ($(topnode).data('initialised') === 1 ) {
                 return;
             }
             //u.load_bg_img(topnode, url);
-            u.poll_for_image_load(null, t.topNode, false, 10, t.create_all_drag_and_drops);
-            //t.doc.bgImg().after('load', this.poll_for_image_load, this,
-            //     false, 10, this.create_all_drag_and_drops);
-            //t.doc.dragItemHomes().after('load', this.poll_for_image_load, this,
-            //     false, 10, this.create_all_drag_and_drops);
-
-            //t.setPaddingSizesAll(topNode);
-            //t.cloneDragItems(topNode);
-            //t.updateDragsPositions(topNode);
-            //t.updateOnResize(topNode);
-            //t.makeDropZones(topNode);
-            // Remember that the question has been initialised.
-            $(topNode).data('initialised', 1);
+            u.update_padding_sizes_all(topnode);
+            u.poll_for_image_load(null, topnode, false, 10, u.create_all_drag_and_drops(topnode, readonly));
+            //u.bg_img(topnode).after('load', u.poll_for_image_load(this, topnode, false, 10, u.create_all_drag_and_drops(topnode, readonly)));
+            //u.drag_item_homes(topnode).after('load', u.poll_for_image_load(this, topnode, false, 10, u.create_all_drag_and_drops(topnode, readonly)));
+            u.update_padding_sizes_all(topnode);
+            $(topnode).data('initialised', 1);
         },
         poll_for_image_load: function(e, waitforimageconstrain, pause, doafterwords) {
             if (t.afterimageloaddone) {
@@ -191,16 +184,17 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
                 return;
             }
         },
-        create_all_drag_and_drops: function() {
-            t.init_drops();
-            t.setPaddingSizesAll(t.doc.topNode);
+        xxcreate_all_drag_and_drops: function(topnode) {
+            u.init_drops(topnode);
+            //t.setPaddingSizesAll(topnode);
+            u.update_padding_sizes_all(topnode);
             var i = 0;
-            $(t.doc.dragItemHomes()).each(function(index, dragitemhome) {
-                var dragitemno = Number(t.doc.get_classname_numeric_suffix(dragitemhome, 'dragitemhomes'));
-                var choice = t.doc.get_classname_numeric_suffix(dragitemhome, 'choice');
-                var group = t.doc.get_classname_numeric_suffix(dragitemhome, 'group');
-                var groupsize = t.doc.drop_zone_group(group).size();
-                var dragnode = t.doc.clone_new_drag_item(i, dragitemno);
+            $(u.drag_item_homes(topnode)).each(function(index, dragitemhome) {
+                var dragitemno = Number(u.getClassnameNumericSuffix(dragitemhome, 'dragitemhomes'));
+                var choice = u.getClassnameNumericSuffix(dragitemhome, 'choice');
+                var group = u.getClassnameNumericSuffix(dragitemhome, 'group');
+                var groupsize = u.drop_zone_group(topnode, group).length;
+                var dragnode = u.clone_new_drag_item(topnode, i, dragitemno);
                 i++;
                 if (!this.get('readonly')) {
                     this.doc.draggable_for_question(dragnode, group, choice);
@@ -234,14 +228,15 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
             M.util.js_complete(t.pendingId);
         },
 
-        init_drops: function() {
-            var dropareas = $(t.doc.topNode()).one('div.dropzones');
+        init_drops: function(topnode) {
+            var dropareas = $(topnode).find('div.dropzones');
             var groupnodes = {};
             for (var groupno = 1; groupno <= 8; groupno++) {
                 var groupnode = $('<div class = "dropzonegroup' + groupno + '"></div>');
                 dropareas.append(groupnode);
                 groupnodes[groupno] = groupnode;
             }
+            return;
             // var drop_hit_handler = function(e) {
             //     var drag = e.drag.get('node');
             //     var drop = e.drop.get('node');

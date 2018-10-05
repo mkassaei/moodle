@@ -203,6 +203,7 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                 }
             }
         },
+
         draggable_for_form: function(drag) {
             var dd = new Y.DD.Drag({
                 node: drag,
@@ -271,7 +272,7 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             return $(topnode.find('div.dragitems')).find('.dragitems' + dragitemno);
         },
         drop_zones: function(topnode) {
-            return topnode.find('div.dropzones div.dropzone');
+            return $(topnode.find('div.dropzones div.dropzone'));
         },
         drop_zone_group: function(topnode, groupno) {
             return $(topnode.find('div.dropzones div.group' + groupno));
@@ -285,7 +286,49 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             });
             M.util.js_complete(t.pendingid);
         },
-        reposition_drag_for_form: function(topnode, drag, draginstanceno) {
+        reposition_drags_for_question: function(topnode, dotimeout) {
+            t.drag_items(topnode).removeClass('placed');
+            t.drag_items(topnode).each(function(index, dragitem) {
+
+                // TODO: use a backToOrigin function instead.
+                // if (dragitem.dd !== undefined) {
+                //     dragitem.dd.detachAll('drag:start');
+                // }
+            });
+            t.drop_zones(topnode).each(function(index, dropzone) {
+                var relativexy = $(dropzone).data('xy');
+                $(dropzone).offset(t.convert_to_window_xy(relativexy));
+                var inputcss = 'input#' + $(dropzone).data('inputid');
+                var input = topnode.one(inputcss);
+                var choice = input.val();
+                if (choice !== "") {
+                    var dragitem = t.get_unplaced_choice_for_drop(choice, $(dropzone));
+                    if (dragitem !== null) {
+                        dragitem.offset(dropzone.offset());
+                        dragitem.addClass('placed');
+                        // TODO: use the new DD functionality here
+                        // if (dragitem.dd !== undefined) {
+                        //     dragitem.dd.once('drag:start', function(e, input) {
+                        //         input.set('value', '');
+                        //         e.target.get('node').removeClass('placed');
+                        //     }, this, input);
+                        // }
+                    }
+                }
+            });
+            t.drag_items(topnode).each(function(index, dragitem) {
+                if (!$(dragitem).hasClass('placed') && !$(dragitem).hasClass('yui3-dd-dragging')) {
+                    var dragitemhome = $(t.drag_item_home($(dragitem).data(topnode, 'dragitemno')));
+                    $(dragitem).offset(dragitemhome.offset());
+                }
+            });
+            if (dotimeout) {
+                //TODO: If I need ths, do it more efficiently
+                //setTimeout(t.reposition_drags_for_question(topnode), 1000);
+            }
+        },
+
+        xxreposition_drag_for_form: function(topnode, drag, draginstanceno) {
             drag = $(t.drag_item(topnode, draginstanceno));
             console.log(drag);
             console.log('drag ddddd ' + draginstanceno);
@@ -586,6 +629,142 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
         formInit: function (topnode) {
            t.create_all_drag_and_drops(topnode); 
         },
+        create_all_drag_and_drops: function(topnode, readonly) {
+            t.init_drops(topnode);
+            //t.setPaddingSizesAll(topnode);
+            t.update_padding_sizes_all(topnode);
+            var i = 0;
+            $(t.drag_item_homes(topnode)).each(function(index, dragitemhome) {
+                var dragitemno = Number(t.getClassnameNumericSuffix($(dragitemhome), 'dragitemhomes'));
+                var choice = t.getClassnameNumericSuffix($(dragitemhome), 'choice');
+                var group = t.getClassnameNumericSuffix($(dragitemhome), 'group');
+                var groupsize = t.drop_zone_group(topnode, group).length;
+                var dragnode = t.clone_new_drag_item(topnode, i, dragitemno);
+                i++;
+                if (!readonly) {
+                    t.draggable_for_question(dragnode, group, choice);
+                }
+                if (dragnode.hasClass('infinite')) {
+                    var dragstocreate = groupsize - 1;
+                    while (dragstocreate > 0) {
+                        dragnode = this.doc.clone_new_drag_item(i, dragitemno);
+                        i++;
+                        if (!readonly) {
+                            t.draggable_for_question(dragnode, group, choice);
+
+                            // Prevent scrolling whilst dragging on Adroid devices.
+                            //this.prevent_touchmove_from_scrolling(dragnode);
+                        }
+                        dragstocreate--;
+                    }
+                }
+            });
+            //t.reposition_drags_for_question(topnode, false);
+            if (!readonly) {
+                t.drop_zones(topnode).css('tabIndex', 0);
+                t.drop_zones(topnode).each( function(e) {
+                        e.on('dragchange', t.drop_zone_key_press(e));
+                    });
+            }
+            M.util.js_complete(t.pendingId);
+        },
+        drop_zone_key_press: function(e) {
+            switch (e.direction) {
+                case 'next' :
+                    t.place_next_drag_in(e.target);
+                    break;
+                case 'previous' :
+                    t.place_previous_drag_in(e.target);
+                    break;
+                case 'remove' :
+                    t.remove_drag_from_drop(e.target);
+                    break;
+            }
+            e.preventDefault();
+            //t.reposition_drags_for_question(topnode);
+        },
+        place_next_drag_in: function(drop) {
+            t.search_for_unplaced_drop_choice(drop, 1);
+        },
+        place_previous_drag_in: function(drop) {
+            t.search_for_unplaced_drop_choice(drop, -1);
+        },
+        search_for_unplaced_drop_choice: function(drop, direction) {
+            var next;
+            var current = this.current_drag_in_drop(drop);
+            if ('' === current) {
+                if (direction === 1) {
+                    next = 1;
+                } else {
+                    next = 1;
+                    var groupno = drop.getData('group');
+                    this.doc.drag_items_in_group(groupno).each(function(drag) {
+                        next = Math.max(next, drag.getData('choice'));
+                    }, this);
+                }
+            } else {
+                next = +current + direction;
+            }
+            var drag;
+            do {
+                if (this.get_choices_for_drop(next, drop).size() === 0) {
+                    this.remove_drag_from_drop(drop);
+                    return;
+                } else {
+                    drag = this.get_unplaced_choice_for_drop(next, drop);
+                }
+                next = next + direction;
+            } while (drag === null);
+            this.place_drag_in_drop(drag, drop);
+        },
+
+        init_drops: function(topnode) {
+            var dropareas = $(topnode).find('div.dropzones');
+            var groupnodes = {};
+            for (var groupno = 1; groupno <= 8; groupno++) {
+                var groupnode = $('<div class = "dropzonegroup' + groupno + '"></div>');
+                dropareas.append(groupnode);
+                groupnodes[groupno] = groupnode;
+            }
+            return;
+            // var drop_hit_handler = function(e) {
+            //     var drag = e.drag.get('node');
+            //     var drop = e.drop.get('node');
+            //     if (Number(drop.getData('group')) === drag.getData('group')) {
+            //         this.place_drag_in_drop(drag, drop);
+            //     }
+            // };
+            for (var dropno in this.get('drops')) {
+                var drop = this.get('drops')[dropno];
+                var nodeclass = 'dropzone group' + drop.group + ' place' + dropno;
+                var title = drop.text.replace('"', '\"');
+                if (!title) {
+                    title = M.util.get_string('blank', 'qtype_ddimageortext');
+                }
+                var dropnodehtml = '<div title="' + title + '" class="' + nodeclass + '">' +
+                    '<span class="accesshide">' + title + '</span>&nbsp;</div>';
+                var dropnode = Y.Node.create(dropnodehtml);
+                groupnodes[drop.group].append(dropnode);
+                dropnode.setStyles({'opacity': 0.5});
+                dropnode.setData('xy', drop.xy);
+                dropnode.setData('place', dropno);
+                dropnode.setData('inputid', drop.fieldname.replace(':', '_'));
+                dropnode.setData('group', drop.group);
+                // var dropdd = new Y.DD.Drop({
+                //     node: dropnode, groups: [drop.group]});
+                // dropdd.on('drop:hit', drop_hit_handler, this);
+            }
+        },
+        draggable_for_question: function(drag, group, choice) {
+            // new Y.DD.Drag({
+            //     node: drag,
+            //     dragMode: 'point',
+            //     groups: [group]
+            // }).plug(Y.Plugin.DDConstrained, {constrain2node: topnode});
+            drag.data('group', group);
+            drag.data('choice', choice);
+        },
+
         setup_form_events: function(topnode) {
             // Events triggered by changes to form data.
             // X and y coordinates.
@@ -594,8 +773,6 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                 var draginstanceno = t.form.fromNameWithIndex(name).indexes[0];
                 var fromform = [t.form.getFormValue('drops', [draginstanceno, 'xleft']),
                     t.form.getFormValue('drops', [draginstanceno, 'ytop'])];
-                console.log(fromform);
-                console.log('fromform 222');
                 var constrainedxy = t.constrain_xy(draginstanceno, fromform);
                 t.form.getFormValue('drops', [draginstanceno, 'xleft'], constrainedxy[0]);
                 t.form.getFormValue('drops', [draginstanceno, 'ytop'], constrainedxy[1]);
@@ -604,7 +781,7 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             $('fieldset#id_dropzoneheader select').on('change', function (e) {
                 var name = e.target.attr('name');
                 var draginstanceno = t.form.fromNameWithIndex(name).indexes[0];
-                var old = t.st.drag_item(draginstanceno);
+                var old = t.drag_item(topnode, draginstanceno);
                 if (old !== null) {
                     old.remove(true);
                 }
@@ -660,7 +837,7 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
 
             }
         },
-        init_drops: function(topnode) {
+        xxinit_drops: function(topnode) {
             var dropareas = $(topnode.find('div.dropzones'));
             var groupnodes = {};
             for (var groupno = 1; groupno <= 8; groupno++) {
@@ -1029,8 +1206,9 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                     t.polltimer.cancel();
                     t.polltimer = null;
                 }
-                $(t.st.drag_item_homes()).detach('load', t.poll_for_image_load);
-                $(t.st.bg_img()).detach('load', t.poll_for_image_load);
+                var pollarguments = [e, topnode, waitforimageconstrain, pause, doafterwords];
+                $(t.drag_item_homes(topnode)).detach('load', t.poll_for_image_load(pollarguments));
+                $(t.bg_img(topnode)).detach('load', t.poll_for_image_load(pollarguments));
                 if (pause !== 0) {
                     //Y.later(pause, this, doafterwords);
                 } else {
@@ -1038,7 +1216,8 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                 }
                 t.afterimageloaddone = true;
             } else if (t.polltimer === null) {
-                var pollarguments = [null, waitforimageconstrain, pause, doafterwords];
+                console.log('t.polltimer is null *************');
+                //var pollarguments = [null, waitforimageconstrain, pause, doafterwords];
                 //this.polltimer =
                 //    Y.later(1000, this, this.poll_for_image_load, pollarguments, true);
             }
