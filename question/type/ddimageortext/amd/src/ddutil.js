@@ -36,6 +36,55 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
          * drops contains al the place holders
          */
         drops: [],
+        afterimageloaddone: false,
+
+        // aDrag: function(topnode) {
+        //     // Drag constructor method.
+        //
+        //     return {
+        //         Drag: function (groupno, no, choiceno, instanceno, infinite) {
+        //             this._groupno = groupno;
+        //             this._no = no;
+        //             this._choiceno = choiceno;
+        //             this._instanceno = instanceno;
+        //             this._infinite = infinite;
+        //         },
+        //         //
+        //     Drag.prototype.getGroupNo = function () {
+        //         return this._groupno;
+        //     },
+        //     Drag.prototype.getNo = function () {
+        //         return this._no;
+        //     },
+        //     Drag.prototype.getChoiceNo = function () {
+        //         return this._choiceno;
+        //     },
+        //     Drag.prototype.getInstanceNo = function () {
+        //         return this._instanceno;
+        //     },
+        //     Drag.prototype.getInfinite = function () {
+        //         return this._infinite;
+        //     },
+        //     }
+        // },
+
+        /**
+         *
+         * @param topnode
+         * @param groupno
+         * @param no
+         * @param choice
+         * @param instanceno
+         * @returns {{setId: setId}}
+         */
+        drag: function (topnode, groupno, no, choice, instanceno) {
+            // TODO:
+            return {
+                set: function (val) {
+                    id = val;
+                }
+            }
+        },
 
         drop : function () {
             // Set default values;
@@ -44,15 +93,15 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             var xy = [0, 0];
             return {
                 setId: function (val) {
-                    //TODO: validity check.
+                    // TODO: validity check.
                     id = val;
                 },
                 setDragId: function (val) {
-                    //TODO: validity check.
+                    // TODO: validity check.
                     dragId = val;
                 },
                 setLeftTop: function (arr) {
-                    //TODO: validity check.
+                    // TODO: validity check.
                     if (!isArray(arr)) {
                         console.log(arr + " is not an array!");
                     } else {
@@ -74,20 +123,12 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             var drags = $('fieldset#id_draggableitemheader').find('.fcontainer').children();
             var types = $('fieldset#id_draggableitemheader').find('.fcontainer').find('select.dragitemtype');
             var draghomes = $(t.drag_item_homes(topnode));
-            console.log('ggg');
-            console.log(draghomes);
-            console.log(drags);
-            console.log(types);
-            console.log('draghomes --- drags --- types');
 
             // get the shufflesanswers value for the drags.
             for (var i = 0; i < drags.length; i++) {
                 var shuffle = $(drags[i]).find('input#id_shuffleanswers').val();
 
                 var drag = $(drags[i]).find('div#fgroup_id_drags_' + i);
-                console.log(drag);
-                console.log('drag in loop');
-
                 var group = 0;
                 var type = $(drags[i]).find('select.dragitemtype').val();
                 if ($(drags[i]).find('select.draggroup').val() !== undefined) {
@@ -96,29 +137,14 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                 var infinite = $(drags[i]).find('input#id_drags_' + '_infinite').val();
                 t.drags.group = $(drags[i]);
                 //t.drags.group = $(drags[i]);
-                console.log(type);
-                console.log(group);
-                console.log(infinite);
-                console.log($(drags[i]));
-                console.log('--------------');
-                //console.log($(drags[i]).find('select.draggroup'));
-                //console.log($(drags[i]).find('select.draggroup').val());
-                //var e = document.getElementById("ddlViewBy");
-                //var g = e.options[e.selectedIndex].value;
-
             }
             t.drags = drags;
             t.drags.shuffle = $(drags[0]).find('input#id_shuffleanswers').val();
-            console.log(t.drags.shuffle);
-            console.log(t.drags);
-            console.log('ggg');
         },
 
         setDrops: function (params) {
             //return params.drops;
             var drops = $('fieldset#id_dropzoneheader').find('.fcontainer').children();
-            console.log('pppp');
-            console.log(drops);
             for (var i = 0; i < drops.length; i++) {
                 console.log(drops[i]);
                 console.log(t.getDropValues(i));
@@ -189,13 +215,16 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                             var xy = t.convert_to_window_xy(topnode, [values[0], values[1]]);
                             drag.css(
                                 {
+                                    // TODO: xy should be exact after conversion.
+                                    // 'left' : xy[0],
+                                    // 'top' : xy[1],
                                     'left' : xy[0] - 285,
                                     'top' : xy[1] + 80,
                                     'visibility': 'visible',
                                     'position': 'absolute'
                                 }
                             );
-                            //t.reposition_drag_for_form(topnode, $(drag), t.getDragInstance(drag));
+                            t.reposition_drag_for_form(topnode, t.getDragInstance(drag));
                         }
                         drag.on('mousedown touchstart', t.mouseDownOrTouchStart(topnode, drag));
                         // TODO: see: t.st.draggable_for_form(drag);
@@ -251,8 +280,8 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             $('fieldset#id_previewplaceholder').append(dropbgarea);
         },
         drag_items: function(topnode) {
-            return $(topnode.find('div.dragitems .drag'));
-            //return $($(topnode.find('div.dragitems')).find('.drag'));
+            //return $(topnode.find('div.dragitems .drag'));
+            return $($(topnode.find('div.dragitems')).find('.drag'));
         },
         drag_item: function(topnode, draginstanceno) {
             return $($(topnode.find('div.dragitems')).find('.draginstance' + draginstanceno));
@@ -278,13 +307,45 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             return $(topnode.find('div.dropzones div.group' + groupno));
         },
 
+        update_visibility_of_file_pickers: function() {
+            for (var i = 0; i < t.form.getFormValue('noitems', []); i++) {
+                if ('image' === t.form.getFormValue('drags', [i, 'dragitemtype'])) {
+                    $('input#id_dragitem_' + i).parent().parent().css('display', 'block');
+                } else {
+                    $('input#id_dragitem_' + i).parent().parent().css('display', 'none');
+                }
+            }
+        },
+        constrain_image_size: function(e, imagetype) {
+            var reduceby = Math.max(e.target.width / 't.params.maxsizes.' + imagetype + '.width',
+                e.target.height / 't.params.maxsizes.' + imagetype + '.height');
+            if (reduceby > 1) {
+                e.target.css('width', Math.floor(e.target.width / reduceby));
+            }
+            $(e.target).addClass('constrained');
+            $(e.target).detach('load', t.constrain_image_size(e, imagetype));
+        },
+
         reposition_drags_for_form: function(topnode) {
             $(t.drag_items(topnode)).each(function(index, drag) {
                 var draginstanceno = $(drag).data('draginstanceno');
-                t.reposition_drag_for_form(topnode, $(drag), draginstanceno);
+                t.reposition_drag_for_form(topnode, draginstanceno);
 
             });
             M.util.js_complete(t.pendingid);
+        },
+        reposition_drag_for_form: function(topnode, draginstanceno) {
+            var drag = t.drag_item(topnode, draginstanceno);
+            if (null !== drag && !drag.hasClass('yui3-dd-dragging')) {
+                var fromform = [t.form.getFormValue('drops', [draginstanceno, 'xleft']),
+                    t.form.getFormValue('drops', [draginstanceno, 'ytop'])];
+                if (fromform[0] === '' && fromform[1] === '') {
+                    var dragitemno = drag.data('dragitemno');
+                    drag.offset($(t.drag_item_home(topnode, dragitemno)).offset());
+                } else {
+                    drag.offset(t.convert_to_window_xy(topnode, fromform));
+                }
+            }
         },
         reposition_drags_for_question: function(topnode, dotimeout) {
             t.drag_items(topnode).removeClass('placed');
@@ -327,32 +388,6 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                 //setTimeout(t.reposition_drags_for_question(topnode), 1000);
             }
         },
-
-        xxreposition_drag_for_form: function(topnode, drag, draginstanceno) {
-            drag = $(t.drag_item(topnode, draginstanceno));
-            console.log(drag);
-            console.log('drag ddddd ' + draginstanceno);
-
-            //if (null !== drag && !drag.hasClass('yui3-dd-dragging')) {
-            if (null !== drag) {
-                var fromform = [t.form.getFormValue('drops', [draginstanceno, 'xleft']),
-                t.form.getFormValue('drops', [draginstanceno, 'ytop'])];
-                console.log(fromform);
-                console.log('fromform 111');
-
-                if (fromform[0] === '' && fromform[1] === '') {
-                    var dragitemno = drag.data('dragitemno');
-                    drag.offset($(t.drag_item_home(dragitemno)).offset());
-                } else {
-                    var xy = t.convert_to_window_xy(topnode, fromform);
-                    console.log(xy);
-                    console.log('xy---xy');
-
-                    drag.offset(xy);
-                    //drag.offset(t.convert_to_window_xy(topnode, fromform));
-                }
-            }
-        },
         update_padding_sizes_all: function(topnode) {
             for (var groupno = 1; groupno <= 8; groupno++) {
                 t.update_padding_size_for_group(topnode, groupno);
@@ -373,12 +408,8 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                     $(item).css('padding', margintopbottom + 'px ' + marginleftright + 'px ' +
                         margintopbottom + 'px ' + marginleftright + 'px');
                 });
-                //var dropZoneGroup = $(topnode).find('div.dropzones div.group' + groupno)
-                var dropZoneGroup = t.drop_zone_group(topnode, groupno);
+                var dropZoneGroup = $(t.drop_zone_group(topnode, groupno));
                 dropZoneGroup.css({'width': maxwidth + 10, 'height': maxheight + 10});
-                console.log(dropZoneGroup);
-                console.log('dropZoneGroup dddggg');
-
             }
         },
 
@@ -430,17 +461,17 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
          */
         loadPreviewImage: function(topnode, maxsize) {
             var bgimageurl = t.fp.file('bgimage').href;
-            t.bgImg = topnode.find('.dropbackground');
+            t.bgImg = $(topnode.find('.dropbackground'));
             //t.bgImg.one('load', t.afterImageLoaded(topnode, maxsize));
             //t.bgImg.one('load', t.after_all_images_loaded(topnode));
             t.bgImg.attr('src', bgimageurl);
             t.bgImg.css({'border': '1px solid #000', 'max-width': 'none'});
         },
         after_all_images_loaded: function(topnode) {
-            //t.reposition_drags_for_form(topnode);
+            t.reposition_drags_for_form(topnode);
             t.update_padding_sizes_all(topnode);
             t.update_drag_instances(topnode);
-            //t.reposition_drags_for_form(topnode);
+            t.reposition_drags_for_form(topnode);
             t.init_drops(topnode);
             t.update_padding_sizes_all(topnode);
             t.setOptionsForDragItemSelectors();
@@ -626,16 +657,23 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
            t.create_all_drag_and_drops(topnode); 
         },
         create_all_drag_and_drops: function(topnode, readonly) {
-            t.init_drops(topnode);
-            //t.setPaddingSizesAll(topnode);
-            t.update_padding_sizes_all(topnode);
+            //t.init_drops(topnode);
             var i = 0;
             $(t.drag_item_homes(topnode)).each(function(index, dragitemhome) {
                 var dragitemno = Number(t.getClassnameNumericSuffix($(dragitemhome), 'dragitemhomes'));
                 var choice = t.getClassnameNumericSuffix($(dragitemhome), 'choice');
                 var group = t.getClassnameNumericSuffix($(dragitemhome), 'group');
-                var groupsize = t.drop_zone_group(topnode, group).length;
-                var dragnode = t.clone_new_drag_item(topnode, i, dragitemno);
+                var groupsize = $(t.drop_zone_group(topnode, group)).length;
+                var dragnode = $(t.clone_new_drag_item(topnode, i, dragitemno));
+                dragnode.css('width', $(dragitemhome).width());
+                dragnode.offset($(dragitemhome).offset());
+                dragnode.offset($(dragitemhome).offset());
+
+                console.log($(dragitemhome).width());
+                console.log($(dragitemhome).offset());
+                console.log(dragnode);
+                console.log('dragnode ----------------');
+
                 i++;
                 if (!readonly) {
                     t.draggable_for_question(dragnode, group, choice);
@@ -643,7 +681,7 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                 if (dragnode.hasClass('infinite')) {
                     var dragstocreate = groupsize - 1;
                     while (dragstocreate > 0) {
-                        dragnode = this.doc.clone_new_drag_item(i, dragitemno);
+                        dragnode = t.clone_new_drag_item(i, dragitemno);
                         i++;
                         if (!readonly) {
                             t.draggable_for_question(dragnode, group, choice);
@@ -655,7 +693,7 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                     }
                 }
             });
-            //t.reposition_drags_for_question(topnode, false);
+            t.reposition_drags_for_question(topnode, false);
             if (!readonly) {
                 t.drop_zones(topnode).css('tabIndex', 0);
                 t.drop_zones(topnode).each( function(e) {
@@ -723,15 +761,19 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                 groupnodes[groupno] = groupnode;
             }
             return;
-            // var drop_hit_handler = function(e) {
-            //     var drag = e.drag.get('node');
-            //     var drop = e.drop.get('node');
-            //     if (Number(drop.getData('group')) === drag.getData('group')) {
-            //         this.place_drag_in_drop(drag, drop);
-            //     }
-            // };
-            for (var dropno in this.get('drops')) {
-                var drop = this.get('drops')[dropno];
+            var drop_hit_handler = function(e) {
+                console.log(e);
+                console.log('eeeeeeeeeeeee');
+                var drag = e.drag.get('node');
+                var drop = e.drop.get('node');
+                if (Number(drop.data('group')) === drag.data('group')) {
+                    //t.place_drag_in_drop(drag, drop);
+                    console.log(e);
+                }
+            };
+            console.log(groupnodes);
+            for (var dropno in $('drops')) {
+                var drop = $('drops')[dropno];
                 var nodeclass = 'dropzone group' + drop.group + ' place' + dropno;
                 var title = drop.text.replace('"', '\"');
                 if (!title) {
@@ -797,6 +839,7 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             });
             // Change in Drop zones section - manual changes to coordinates.
             $('fieldset#id_dropzoneheader').on('change', 'input', function() {
+                t.setOptionsForDragItemSelectors();
                 //t.addDropzones();
             });
         },
@@ -833,38 +876,6 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
 
             }
         },
-        xxinit_drops: function(topnode) {
-            var dropareas = $(topnode.find('div.dropzones'));
-            var groupnodes = {};
-            for (var groupno = 1; groupno <= 8; groupno++) {
-                var groupnode = $('<div class = "dropzonegroup' + groupno + '"></div>');
-                dropareas.append(groupnode);
-                groupnodes[groupno] = groupnode;
-            }
-            console.log(groupnodes);
-            console.log('groupnodes ---');
-            //for (var dropno in this.get('drops')) {
-            //     var dop = $('drops')[dropno];
-            //     var nodeclass = 'dropzone group' + drop.group + ' place' + dropno;
-            //     var title = drop.text.replace('"', '\"');
-            //     if (!title) {
-            //         title = M.util.get_string('blank', 'qtype_ddimageortext');
-            //     }
-            //     var dropnodehtml = '<div title="' + title + '" class="' + nodeclass + '">' +
-            //         '<span class="accesshide">' + title + '</span>&nbsp;</div>';
-            //     var dropnode = Y.Node.create(dropnodehtml);
-            //     groupnodes[drop.group].append(dropnode);
-            //     dropnode.setStyles({'opacity': 0.5});
-            //     dropnode.setData('xy', drop.xy);
-            //     dropnode.setData('place', dropno);
-            //     dropnode.setData('inputid', drop.fieldname.replace(':', '_'));
-            //     dropnode.setData('group', drop.group);
-            //     // var dropdd = new Y.DD.Drop({
-            //     //     node: dropnode, groups: [drop.group]});
-            //     // dropdd.on('drop:hit', drop_hit_handler, this);
-            // }
-        },
-
 
         /**
          * Utility to get the file name and url from the filepicker.
@@ -898,8 +909,6 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             };
         },
 
-
-
         file_pickers: function() {
             var draftitemidstoname;
             var nametoparentnode;
@@ -916,8 +925,6 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                 file: function(name) {
                     var parentnode = nametoparentnode[name];
                     var fileanchor = parentnode.find('div.filepicker-filelist a');
-                    console.log(fileanchor);
-                    console.log('ffffffffffffffffff fileanchor');
                     if (fileanchor) {
                         return {href: fileanchor.find('href'), name: fileanchor.html()};
                     } else {
@@ -930,6 +937,7 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             };
             return toreturn;
         },
+
         reset_drag_xy: function(draginstanceno) {
             t.form.setFormValue('drops', [draginstanceno, 'xleft'], '');
             t.form.setFormValue('drops', [draginstanceno, 'ytop'], '');
@@ -943,9 +951,9 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
         constrain_xy: function(topnode, draginstanceno, bgimgxy) {
             var drag = $(t.drag_item(topnode, draginstanceno));
             var xleftconstrained =
-                Math.min(bgimgxy[0], parseInt($(t.bg_img(topnode)).css('width')) - drag.width());
+                Math.min(bgimgxy[0], $(t.bg_img(topnode)).width() - drag.width());
             var ytopconstrained =
-                Math.min(bgimgxy[1], parseInt($(t.bg_img(topnode)).css('height')) - drag.height());
+                Math.min(bgimgxy[1], $(t.bg_img(topnode)).height() - drag.height());
             xleftconstrained = Math.max(xleftconstrained, 0);
             ytopconstrained = Math.max(ytopconstrained, 0);
             return [xleftconstrained, ytopconstrained];
@@ -954,12 +962,12 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             console.log(windowxy);
             console.log($(t.bg_img(topnode)).offset().top);
             console.log('windowxy ----');
-            return [Number(windowxy[0]) - parseInt($(t.bg_img(topnode)).offset().left) - 1,
-                Number(windowxy[1]) - parseInt($(t.bg_img(topnode)).offset().top) - 1];
+            return [Number(windowxy[0]) - $(t.bg_img(topnode)).offset().left - 1,
+                Number(windowxy[1]) - $(t.bg_img(topnode)).offset().top - 1];
         },
         convert_to_window_xy: function(topnode, bgimgxy) {
-            return [Number(bgimgxy[0]) + parseInt($(t.bg_img(topnode)).offset().left) - 1,
-                Number(bgimgxy[1]) + parseInt($(t.bg_img(topnode)).offset().top) - 1];
+            return [Number(bgimgxy[0]) + $(t.bg_img(topnode)).offset().left - 1,
+                Number(bgimgxy[1]) + $(t.bg_img(topnode)).offset().top - 1];
         },
 
         /**
@@ -1011,6 +1019,7 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
             console.log(dragProxy);
             console.log(xy);
             console.log('onMoveForm xy');
+            t.set_drag_xy(topnode, draginfo.instanceno, xy);
         },
 
         /**
@@ -1216,66 +1225,6 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                 //var pollarguments = [null, waitforimageconstrain, pause, doafterwords];
                 //this.polltimer =
                 //    Y.later(1000, this, this.poll_for_image_load, pollarguments, true);
-            }
-        },
-
-
-        xxxpoll_for_image_load: function(e, waitforimageconstrain, pause, doafterwords) {
-            if (t.afterimageloaddone) {
-                return;
-            }
-            var bgDone = $(t.doc.bgImg()).attr('complete');
-            console.log(bgDone);
-            console.log('0000000000000000  bgDone');
-
-            if (waitforimageconstrain) {
-                bgDone = bgDone && t.doc.bgImg().hasClass('constrained');
-            }
-            //console.log($(t.doc.dragItemHomes()));
-            //var alldragsLoaded = null;
-            //$(t.doc.dragItemHomes()).each(function(index, dragitemhome) {
-            var alldragsLoaded = $(t.doc.dragItemHomes()).each(function(dragitemhome) {
-                // in 'some' loop returning true breaks the loop and is passed as return value from
-                // 'some' else returns false. Can be though of as equivalent to ||.
-                console.log($(dragitemhome));
-                console.log('dragitemhome');
-                if ($(dragitemhome).attr('tagName') !== 'IMG') {
-                    return false;
-                }
-                var done = $(dragitemhome).attr('complete');
-                console.log('1111111111111111111 done');
-                console.log(done);
-                console.log('1111111111111111111 done');
-
-                if (waitforimageconstrain) {
-                    done = done && $(dragitemhome).hasClass('constrained');
-                }
-                return !done;
-            });
-            return;
-            console.log(alldragsLoaded);
-            console.log(bgDone);
-            console.log('22222222222222222 bgDone');
-            if (bgDone && alldragsLoaded) {
-                if (t.polltimer !== null) {
-                    t.polltimer.cancel();
-                    t.polltimer = null;
-                }
-                $(t.doc.dragItemHomes()).detach('load', t.poll_for_image_load);
-                t.doc.bgImg().detach('load', t.poll_for_image_load);
-                if (pause !== 0) {
-                    Y.later(pause, this, doafterwords);
-                } else {
-                    doafterwords.call(this);
-                }
-                t.afterimageloaddone = true;
-            } else if (t.polltimer === null) {
-                var count = 0;
-                setTimeout(t.poll_for_image_load(null, waitforimageconstrain, pause, doafterwords), 1000);
-                if (t.afterimageloaddone) {
-                    return;
-                }
-                return;
             }
         }
     };

@@ -46,45 +46,27 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
             t.pendingid = 'qtype_ddimageortext-form-' + Math.random().toString(36).slice(2); // Random string.
             M.util.js_pending(t.pendingid);
             t.params = params;
-            t.bgImg = t.params.maxsizes.bgimage;
             t.maxSizes = t.params.maxsizes;
+            t.bgImg = t.params.maxsizes.bgimage;
+            console.log(t.bgImg);
+            console.log('t.bgImg---');
+
             t.fp = t.filePickers();
             t.topNode = $(t.params.topnode);
             t.dragItemsArea = $(t.topNode).find('div.dragitems');
             //u.formInit(t.topNode);
 
-            t.setupPreviewArea(t.topNode);
+            u.setupPreviewArea(t.topNode);
             u.update_padding_sizes_all(t.topNode);
             u.setOptionsForDragItemSelectors();
             u.setupFormEvents(t.topNode);
-            //u.setup_form_events(t.topNode);
             u.whenImageReady(t.topNode, t.maxSizes);
             u.loadDragHomes(t.topNode);
             u.after_all_images_loaded(t.topNode);
+            u.update_visibility_of_file_pickers();
             //u.create_all_drag_and_drops(t.topNode);
-            t.update_visibility_of_file_pickers();
             //t.draw_dd_area();
         },
-        update_visibility_of_file_pickers: function() {
-            for (var i = 0; i < t.form.getFormValue('noitems', []); i++) {
-                if ('image' === t.form.getFormValue('drags', [i, 'dragitemtype'])) {
-                    $('input#id_dragitem_' + i).parent().parent().css('display', 'block');
-                } else {
-                    $('input#id_dragitem_' + i).parent().parent().css('display', 'none');
-                }
-            }
-        },
-        constrain_image_size: function(e, imagetype) {
-            var reduceby = Math.max(e.target.width / 't.params.maxsizes.' + imagetype + '.width',
-                e.target.height / 't.params.maxsizes.' + imagetype + '.height');
-            if (reduceby > 1) {
-                e.target.css('width', Math.floor(e.target.width / reduceby));
-            }
-            $(e.target).addClass('constrained');
-            //$(e.target).detach('load', t.constrain_image_size(e, imagetype));
-        },
-
-
         set_options_for_drag_item_selectors: function() {
             var dragitemsoptions = {'0': ''};
             for (var i = 0; i < t.form.getFormValue('noitems', []); i++) {
@@ -195,7 +177,7 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
             var xleftconstrained =
                 Math.min(bgimgxy[0], t.bgImg.css('width') - drag.get('offsetWidth'));
             var ytopconstrained =
-                Math.min(bgimgxy[1], t.st.bg_img().get('height') - drag.get('offsetHeight'));
+                Math.min(bgimgxy[1], t.bg_img().height() - drag.offset().top);
             xleftconstrained = Math.max(xleftconstrained, 0);
             ytopconstrained = Math.max(ytopconstrained, 0);
             return [xleftconstrained, ytopconstrained];
@@ -222,7 +204,7 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
          */
         filepickerOnChange: function() {
             console.log($('form.mform'));
-            t.loadPreviewImage();
+            u.loadPreviewImage();
             //$('form.mform').on('change', '#id_bgimage', t.loadPreviewImage());
         },
         /**
@@ -232,7 +214,7 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
             var bgimageurl = t.fp.file('bgimage').href;
             t.bgImg = $(t.params.topnode).find('.dropbackground');
             //t.bgImg.one('load', t.afterImageLoaded());
-            t.bgImg.one('load', t.after_all_images_loaded());
+            //t.bgImg.one('load', t.after_all_images_loaded());
             t.bgImg.attr('src', bgimageurl);
             t.bgImg.css(
                 {
@@ -395,14 +377,14 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
          * @param {string} dropzoneNo
          * @returns {string} coords
          */
-        getCoords: function(dropzoneNo) {
+        xxxgetCoords: function(dropzoneNo) {
             var coords = t.form.getFormValue('drops', [dropzoneNo, 'coords']);
             return coords.replace(new RegExp("\\s*", 'g'), '');
         },
         /**
          * Add html for the preview area.
          */
-        setupPreviewArea: function(topnode) {
+        xxxsetupPreviewArea: function(topnode) {
             t.topNode.find('div.fcontainer').append(
                 '<div class="ddarea">' +
                     '<div class="droparea"><img class="dropbackground" /></div>' +
@@ -417,7 +399,7 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
         /**
          * Events linked to form actions.
          */
-        setupFormEvents: function() {
+        xxxsetupFormEvents: function() {
             // Changes to labels in the Markers section.
             $('fieldset#id_draggableitemheader').on('change', 'input', function() {
                 t.set_options_for_drag_item_selectors();

@@ -119,12 +119,62 @@ define(['jquery', 'qtype_ddimageortext/ddutil'], function ($, u) {
             if ($(topnode).data('initialised') === 1 ) {
                 return;
             }
+            // Drag constructor method.
+            var Drag = function (groupno, no, choiceno, instanceno, infinite) {
+                this._groupno = groupno;
+                this._no = no;
+                this._choiceno = choiceno;
+                this._instanceno = instanceno;
+                this._infinite = infinite;
+            }
+            Drag.prototype.getGroupNo = function () {
+                return this._groupno;
+            }
+            Drag.prototype.getNo = function () {
+                return this._no;
+            }
+            Drag.prototype.getChoiceNo = function () {
+                return this._choiceno;
+            }
+            Drag.prototype.getInstanceNo = function () {
+                return this._instanceno;
+            }
+            Drag.prototype.getInfinite = function () {
+                return this._infinite;
+            }
+            var drag = new Drag(1, 3, 4, 0, false);
+            console.log(Drag);
+            console.log(drag.getGroupNo());
+            console.log(drag.getNo());
+            console.log(drag.getChoiceNo());
+            console.log(drag.getInstanceNo());
+            console.log(drag.getInfinite());
+
+            u.setDrops(t.params);
+            console.log('ddddddddddddddddddd');
+
             //u.load_bg_img(topnode, url);
             u.update_padding_sizes_all(topnode);
+            u.update_drag_instances(topnode);
+            var dragitems = $('div.ddarea').find('.dragitems');
+            console.log(dragitems);
+            console.log(dragitems.children());
+            console.log(dragitems.children().length);
+
+
+
+            console.log('dragitems *******************');
+
             u.poll_for_image_load(null, topnode, false, 10, u.create_all_drag_and_drops(topnode, readonly));
-            //u.bg_img(topnode).after('load', u.poll_for_image_load(this, topnode, false, 10, u.create_all_drag_and_drops(topnode, readonly)));
-            //u.drag_item_homes(topnode).after('load', u.poll_for_image_load(this, topnode, false, 10, u.create_all_drag_and_drops(topnode, readonly)));
-            u.update_padding_sizes_all(topnode);
+            //u.create_all_drag_and_drops(topnode, readonly);
+            //u.bg_img(topnode).after(u.poll_for_image_load(null, topnode, false, 10, u.create_all_drag_and_drops(topnode, readonly)));
+            //u.update_padding_sizes_all(topnode);
+            //u.drag_item_homes(topnode).after(u.poll_for_image_load(this, topnode, false, 10, u.create_all_drag_and_drops(topnode, readonly)));
+            //u.whenImageReady(t.topNode, t.maxSizes);
+            //u.loadDragHomes(t.topNode);
+            //u.after_all_images_loaded(t.topNode);
+
+            //u.update_padding_sizes_all(topnode);
             $(topnode).data('initialised', 1);
         },
         poll_for_image_load: function(e, waitforimageconstrain, pause, doafterwords) {
