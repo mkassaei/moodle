@@ -657,7 +657,6 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
            t.create_all_drag_and_drops(topnode); 
         },
         create_all_drag_and_drops: function(topnode, readonly) {
-            //t.init_drops(topnode);
             var i = 0;
             $(t.drag_item_homes(topnode)).each(function(index, dragitemhome) {
                 var dragitemno = Number(t.getClassnameNumericSuffix($(dragitemhome), 'dragitemhomes'));
@@ -668,11 +667,11 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                 dragnode.css('width', $(dragitemhome).width());
                 dragnode.offset($(dragitemhome).offset());
                 dragnode.offset($(dragitemhome).offset());
-
-                console.log($(dragitemhome).width());
-                console.log($(dragitemhome).offset());
+                var values = t.getDropValues(t.getDragInstance(dragnode));
+                //var values = t.getDropValues(1);
                 console.log(dragnode);
-                console.log('dragnode ----------------');
+                console.log(values);
+                var xy = t.convert_to_window_xy(topnode, [values[0], values[1]]);
 
                 i++;
                 if (!readonly) {
@@ -685,14 +684,12 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
                         i++;
                         if (!readonly) {
                             t.draggable_for_question(dragnode, group, choice);
-
-                            // Prevent scrolling whilst dragging on Adroid devices.
-                            //this.prevent_touchmove_from_scrolling(dragnode);
                         }
                         dragstocreate--;
                     }
                 }
             });
+            t.init_drops(topnode);
             t.reposition_drags_for_question(topnode, false);
             if (!readonly) {
                 t.drop_zones(topnode).css('tabIndex', 0);
@@ -753,7 +750,10 @@ define(['jquery', 'core/dragdrop'], function ($, dnd) {
         },
 
         init_drops: function(topnode) {
-            var dropareas = $(topnode).find('div.dropzones');
+            var dropareas = topnode.find('div.dropzones');
+            console.log(topnode);
+            console.log($(dropareas));
+            console.log('drops dddddddddddddd');
             var groupnodes = {};
             for (var groupno = 1; groupno <= 8; groupno++) {
                 var groupnode = $('<div class = "dropzonegroup' + groupno + '"></div>');
