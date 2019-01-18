@@ -387,7 +387,9 @@ $string['partiallycorrectfeedbackdefault'] = 'Your answer is partially correct.'
 $string['penaltyforeachincorrecttry'] = 'Penalty for each incorrect try';
 $string['penaltyforeachincorrecttry_help'] = 'When questions are run using the \'Interactive with multiple tries\' or \'Adaptive mode\' behaviour, so that the student will have several tries to get the question right, then this option controls how much they are penalised for each incorrect try.
 
-The penalty is a proportion of the total question grade, so if the question is worth three marks, and the penalty is 0.3333333, then the student will score 3 if they get the question right first time, 2 if they get it right second try, and 1 of they get it right on the third try.';
+The penalty is a proportion of the total question grade, so if the question is worth three marks, and the penalty is 0.3333333, then the student will score 3 if they get the question right first time, 2 if they get it right second try, and 1 of they get it right on the third try.
+
+For some multi-part questions this scoring logic is applied separately to each part of the question. The details depend on the question type and can be complicated, but the principle is to give students credit for the knowledge they have demonstrated as fairly as possible.';
 $string['previewquestion'] = 'Preview question: {$a}';
 $string['privacy:metadata:database:question'] = 'The details about a specific question.';
 $string['privacy:metadata:database:question:createdby'] = 'The person who created the question.';
