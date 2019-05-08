@@ -1490,6 +1490,23 @@ class assign {
     }
 
     /**
+     * Display dataformt selector's form for grading table to be downloadable,
+     * so that users who can view grades are able to download the grading table.
+     * @param $gradingtable
+     *
+     */
+    private function allow_downloadability_for_grading_table ($gradingtable) {
+        global $COURSE;
+
+        if (!$this->can_view_grades()) {
+            return;
+        }
+        $download = optional_param('download', '', PARAM_ALPHA);
+        $gradingtable->is_downloading($download, $COURSE->shortname . '_'
+                . $this->get_instance()->name . '_' . $this->get_module_name() . '_' . $this->get_instance()->id);
+    }
+
+    /**
      * Save the attachments in the draft areas.
      *
      * @param stdClass $formdata
@@ -2427,6 +2444,7 @@ class assign {
         }
         $filter = get_user_preferences('assign_filter', '');
         $table = new assign_grading_table($this, 0, $filter, 0, false);
+        $this->allow_downloadability_for_grading_table($table);
 
         $useridlist = $table->get_column_data('userid');
 
@@ -4468,6 +4486,7 @@ class assign {
         // Load and print the table of submissions.
         if ($showquickgrading && $quickgrading) {
             $gradingtable = new assign_grading_table($this, $perpage, $filter, 0, true);
+            $this->allow_downloadability_for_grading_table($gradingtable);
             $table = $this->get_renderer()->render($gradingtable);
             $page = optional_param('page', null, PARAM_INT);
             $quickformparams = array('cm'=>$this->get_course_module()->id,
@@ -4479,6 +4498,7 @@ class assign {
             $o .= $this->get_renderer()->render(new assign_form('quickgradingform', $quickgradingform));
         } else {
             $gradingtable = new assign_grading_table($this, $perpage, $filter, 0, false);
+            $this->allow_downloadability_for_grading_table($gradingtable);
             $o .= $this->get_renderer()->render($gradingtable);
         }
 
