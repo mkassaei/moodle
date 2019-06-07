@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
 require_once($CFG->dirroot . '/group/lib.php');
+require_once($CFG->dirroot . '/mod/assign/tests/fixtures/testable_assign.php');
 
 /**
  * Class mod_assign_portfolio_caller_testcase

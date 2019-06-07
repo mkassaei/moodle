@@ -1234,3 +1234,7 @@
     padding: 0;
 }
 /** End of YUI tree fix **/
+
+#page-mod-assign-grading .inline-option {
+    margin-left: 5px;
+}

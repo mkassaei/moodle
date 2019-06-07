@@ -46,25 +46,47 @@ class mod_assign_grading_options_form extends moodleform {
 
         $mform->addElement('header', 'general', get_string('gradingoptions', 'assign'));
         // Visible elements.
-        $options = array(-1 => get_string('all'), 10 => '10', 20 => '20', 50 => '50', 100 => '100');
-        $maxperpage = get_config('assign', 'maxperpage');
-        if (isset($maxperpage) && $maxperpage != -1) {
-            unset($options[-1]);
-            foreach ($options as $val) {
-                if ($val > $maxperpage) {
-                    unset($options[$val]);
-                }
-            }
-        }
-        $mform->addElement('select', 'perpage', get_string('assignmentsperpage', 'assign'), $options, $dirtyclass);
-        $options = array('' => get_string('filternone', 'assign'),
-                         ASSIGN_FILTER_NOT_SUBMITTED => get_string('filternotsubmitted', 'assign'),
-                         ASSIGN_FILTER_SUBMITTED => get_string('filtersubmitted', 'assign'),
-                         ASSIGN_FILTER_REQUIRE_GRADING => get_string('filterrequiregrading', 'assign'),
-                         ASSIGN_FILTER_GRANTED_EXTENSION => get_string('filtergrantedextension', 'assign'));
+        $mform->addElement('text', 'perpage', get_string('assignmentsperpage', 'assign'), ['size' => '10']);
+        $mform->setType('perpage', PARAM_INT);
+
+        $checkboxes = [];
+        $checkboxes[] = $mform->createElement('checkbox', 'notsubmitted', null, get_string('filternotsubmitted', 'assign'),
+                $this->get_info($instance, 'notsubmitted'));
+        $checkboxes[] = $mform->createElement('checkbox', 'submitted', null, get_string('filtersubmitted', 'assign'),
+                $this->get_info($instance, 'submitted', 'inline-option'));
+        $checkboxes[] = $mform->createElement('checkbox', 'requiregrading', null, get_string('filterrequiregrading', 'assign'),
+                $this->get_info($instance, 'requiregrading', 'inline-option'));
+        $checkboxes[] = $mform->createElement('checkbox', 'grantedextension', null, get_string('filtergrantedextension', 'assign'),
+                $this->get_info($instance, 'grantedextension', 'inline-option'));
+        $mform->setDefault('notsubmitted', 1);
+        $mform->setDefault('submitted', 1);
+        $mform->setDefault('requiregrading', 1);
+        $mform->setDefault('grantedextension', 1);
+
+        $mform->disabledIf('requiregrading', 'submitted', 'notchecked');
+        $mform->disabledIf('grantedextension', 'notsubmitted', 'notchecked');
         if ($instance['submissionsenabled']) {
-            $mform->addElement('select', 'filter', get_string('filter', 'assign'), $options, $dirtyclass);
+            $mform->addGroup($checkboxes, 'checkboxes', get_string('showattemptsthatare', 'assign'), null, false);
         }
+        //$options = array(-1 => get_string('all'), 10 => '10', 20 => '20', 50 => '50', 100 => '100');
+        //$maxperpage = get_config('assign', 'maxperpage');
+        //if (isset($maxperpage) && $maxperpage != -1) {
+        //    unset($options[-1]);
+        //    foreach ($options as $val) {
+        //        if ($val > $maxperpage) {
+        //            unset($options[$val]);
+        //        }
+        //    }
+        //}
+        //$mform->addElement('select', 'perpage', get_string('assignmentsperpage', 'assign'), $options, $dirtyclass);
+        //$options = array('' => get_string('filternone', 'assign'),
+        //                 ASSIGN_FILTER_NOT_SUBMITTED => get_string('filternotsubmitted', 'assign'),
+        //                 ASSIGN_FILTER_SUBMITTED => get_string('filtersubmitted', 'assign'),
+        //                 ASSIGN_FILTER_REQUIRE_GRADING => get_string('filterrequiregrading', 'assign'),
+        //                 ASSIGN_FILTER_GRANTED_EXTENSION => get_string('filtergrantedextension', 'assign'));
+        //if ($instance['submissionsenabled']) {
+        //    $mform->addElement('select', 'filter', get_string('filter', 'assign'), $options, $dirtyclass);
+        //}
         if (!empty($instance['markingallocationopt'])) {
             $markingfilter = get_string('markerfilter', 'assign');
             $mform->addElement('select', 'markerfilter', $markingfilter, $instance['markingallocationopt'], $dirtyclass);
@@ -106,6 +128,25 @@ class mod_assign_grading_options_form extends moodleform {
 
         // Buttons.
         $this->add_action_buttons(false, get_string('updatetable', 'assign'));
+    }
+
+    /**
+     * Get information about the field and add appropriate attribute to it.
+     * @param $instacne, the object containing customdata.
+     * @param $fieldname, the name of the field in the form
+     * @param string $cssclass, css class
+     * @return array, a list of attributes-values
+     */
+    private function get_info($instacne, $fieldname, $cssclass = null) {
+        $info = [];
+        $info['id']="id_$fieldname";
+        if ($instacne[$fieldname] === 1) {
+            $info['checked']="checked";
+        }
+        if ($cssclass) {
+            $info['class']="$cssclass";
+        }
+        return $info;
     }
 }
 

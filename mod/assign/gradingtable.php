@@ -252,35 +252,29 @@ class assign_grading_table extends table_sql implements renderable {
 
         // The filters do not make sense when there are no submissions, so do not apply them.
         if ($this->assignment->is_any_submission_plugin_enabled()) {
-            if ($filter == ASSIGN_FILTER_SUBMITTED) {
-                $where .= ' AND (s.timemodified IS NOT NULL AND
-                                 s.status = :submitted) ';
+            // All options are ticked, display all users.
+            if ($filter->notsubmitted &&
+                $filter->submitted &&
+                $filter->requiregrading &&
+                $filter->grantedextension) {
+                // Display all. no option has been excluded.
+                print_object('all');
+
+            // Since the we display notsubmitted and submitted (all), requiregrading and grantedextension are not relevant.
+            } else if ($filter->notsubmitted && $filter->submitted) {
+                $where .= ' AND (s.timemodified IS NOT NULL) ';
                 $params['submitted'] = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
-
-            } else if ($filter == ASSIGN_FILTER_NOT_SUBMITTED) {
-                $where .= ' AND (s.timemodified IS NULL OR s.status <> :submitted) ';
+                print_object('notsubmitted and submitted and requiregrading');
+            //
+            } else if ($filter->notsubmitted) {
+                $where .= ' AND (s.timemodified IS NOT NULL AND s.status <> :submitted) ';
                 $params['submitted'] = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
-            } else if ($filter == ASSIGN_FILTER_REQUIRE_GRADING) {
-                $where .= ' AND (s.timemodified IS NOT NULL AND
-                                 s.status = :submitted AND
-                                 (s.timemodified >= g.timemodified OR g.timemodified IS NULL OR g.grade IS NULL';
-
-                // Assignment grade is set to the negative grade scale id when scales are used.
-                if ($this->assignment->get_instance()->grade < 0) {
-                    // Scale grades are set to -1 when not graded.
-                    $where .= ' OR g.grade = -1';
-                }
-
-                $where .= '))';
+                print_object('notsubmitted');
+            //
+            } else if ($filter->submitted) {
+                $where .= ' AND (s.timemodified IS NOT NULL AND s.status = :submitted) ';
                 $params['submitted'] = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
-
-            } else if ($filter == ASSIGN_FILTER_GRANTED_EXTENSION) {
-                $where .= ' AND uf.extensionduedate > 0 ';
-
-            } else if (strpos($filter, ASSIGN_FILTER_SINGLE_USER) === 0) {
-                $userfilter = (int) array_pop(explode('=', $filter));
-                $where .= ' AND (u.id = :userid)';
-                $params['userid'] = $userfilter;
+                print_object('submitted');
             }
         }
 

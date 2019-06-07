@@ -2425,7 +2425,13 @@ class assign {
             }
             return $SESSION->mod_assign_useridlist[$useridlistkey];
         }
-        $filter = get_user_preferences('assign_filter', '');
+        //$filter = get_user_preferences('assign_filter', '');
+        $filter = new stdClass();
+        $filter->notsubmitted = get_user_preferences('assign_notsubmitted');
+        $filter->submitted = get_user_preferences('assign_submitted');
+        $filter->requiregrading = get_user_preferences('assign_requiregrading');
+        $filter->grantedextension = get_user_preferences('assign_grantedextension');
+
         $table = new assign_grading_table($this, 0, $filter, 0, false);
 
         $useridlist = $table->get_column_data('userid');
@@ -4366,7 +4372,12 @@ class assign {
         $gradingmanager = get_grading_manager($this->get_context(), 'mod_assign', 'submissions');
 
         $perpage = $this->get_assign_perpage();
-        $filter = get_user_preferences('assign_filter', '');
+        //$filter = get_user_preferences('assign_filter', '');
+        $filter = new stdClass();
+        $filter->notsubmitted = get_user_preferences('assign_notsubmitted');
+        $filter->submitted = get_user_preferences('assign_submitted');
+        $filter->requiregrading = get_user_preferences('assign_requiregrading');
+        $filter->grantedextension = get_user_preferences('assign_grantedextension');
         $markerfilter = get_user_preferences('assign_markerfilter', '');
         $workflowfilter = get_user_preferences('assign_workflowfilter', '');
         $controller = $gradingmanager->get_active_controller();
@@ -4402,6 +4413,10 @@ class assign {
                                           'userid'=>$USER->id,
                                           'submissionsenabled'=>$this->is_any_submission_plugin_enabled(),
                                           'showquickgrading'=>$showquickgrading,
+                                          'notsubmitted'=> $filter->notsubmitted,
+                                          'submitted'=> $filter->submitted,
+                                          'requiregrading'=> $filter->requiregrading,
+                                          'grantedextension'=> $filter->grantedextension,
                                           'quickgrading'=>$quickgrading,
                                           'markingworkflowopt'=>$markingworkflowoptions,
                                           'markingallocationopt'=>$markingallocationoptions,
@@ -4434,7 +4449,10 @@ class assign {
 
         $gradingoptionsdata = new stdClass();
         $gradingoptionsdata->perpage = $perpage;
-        $gradingoptionsdata->filter = $filter;
+        $gradingoptionsdata->notsubmitted = $filter->notsubmitted;
+        $gradingoptionsdata->submitted = $filter->submitted;
+        $gradingoptionsdata->requiregrading = $filter->requiregrading;
+        $gradingoptionsdata->grantedextension = $filter->grantedextension;
         $gradingoptionsdata->markerfilter = $markerfilter;
         $gradingoptionsdata->workflowfilter = $workflowfilter;
         $gradingoptionsform->set_data($gradingoptionsdata);
@@ -6980,11 +6998,28 @@ class assign {
         // Get marking states to show in form.
         $markingworkflowoptions = $this->get_marking_workflow_filters();
 
+        //list($notsubmitted, $submitted, $requiregrading, $grantedextension) =
+        //        $this->get_filter_values();
+        //print_object($notsubmitted);
+        //print_object($submitted);
+        //print_object($requiregrading);
+        //print_object($grantedextension);
+
+        $filter = new stdClass();
+        $filter->notsubmitted = get_user_preferences('assign_notsubmitted');
+        $filter->submitted = get_user_preferences('assign_submitted');
+        $filter->requiregrading = get_user_preferences('assign_requiregrading');
+        $filter->grantedextension = get_user_preferences('assign_grantedextension');
+
         $gradingoptionsparams = array('cm'=>$this->get_course_module()->id,
                                       'contextid'=>$this->context->id,
                                       'userid'=>$USER->id,
                                       'submissionsenabled'=>$this->is_any_submission_plugin_enabled(),
                                       'showquickgrading'=>$showquickgrading,
+                                      'notsubmitted'=> $filter->notsubmitted,
+                                      'submitted'=> $filter->submitted,
+                                      'requiregrading'=> $filter->requiregrading,
+                                      'grantedextension'=> $filter->grantedextension,
                                       'quickgrading'=>false,
                                       'markingworkflowopt' => $markingworkflowoptions,
                                       'markingallocationopt' => $markingallocationoptions,
@@ -6994,8 +7029,25 @@ class assign {
         $mform = new mod_assign_grading_options_form(null, $gradingoptionsparams);
         if ($formdata = $mform->get_data()) {
             set_user_preference('assign_perpage', $formdata->perpage);
-            if (isset($formdata->filter)) {
-                set_user_preference('assign_filter', $formdata->filter);
+            if (isset($formdata->notsubmitted)) {
+                set_user_preference('assign_notsubmitted', $formdata->notsubmitted);
+            } else {
+                set_user_preference('assign_notsubmitted', 0);
+            }
+            if (isset($formdata->submitted)) {
+                set_user_preference('assign_submitted', $formdata->submitted);
+            } else {
+                set_user_preference('assign_submitted', 0);
+            }
+            if (isset($formdata->requiregrading)) {
+                set_user_preference('assign_requiregrading', $formdata->requiregrading);
+            } else {
+                set_user_preference('assign_requiregrading', 0);
+            }
+            if (isset($formdata->grantedextension)) {
+                set_user_preference('assign_grantedextension', $formdata->grantedextension);
+            } else {
+                set_user_preference('assign_grantedextension', 0);
             }
             if (isset($formdata->markerfilter)) {
                 set_user_preference('assign_markerfilter', $formdata->markerfilter);
@@ -9193,17 +9245,18 @@ class assign {
         return $markingworkflowoptions;
     }
 
+
     /**
      * Return array of valid search filters for the grading interface.
      *
      * @return array
      */
-    public function get_filters() {
+    public function xxx_not_needed_get_filters() {
         $filterkeys = [
-            ASSIGN_FILTER_SUBMITTED,
-            ASSIGN_FILTER_NOT_SUBMITTED,
-            ASSIGN_FILTER_REQUIRE_GRADING,
-            ASSIGN_FILTER_GRANTED_EXTENSION
+                ASSIGN_FILTER_SUBMITTED,
+                ASSIGN_FILTER_NOT_SUBMITTED,
+                ASSIGN_FILTER_REQUIRE_GRADING,
+                ASSIGN_FILTER_GRANTED_EXTENSION
         ];
 
         $current = get_user_preferences('assign_filter', '');
@@ -9211,18 +9264,32 @@ class assign {
         $filters = [];
         // First is always "no filter" option.
         array_push($filters, [
-            'key' => 'none',
-            'name' => get_string('filternone', 'assign'),
-            'active' => ($current == '')
+                'key' => 'none',
+                'name' => get_string('filternone', 'assign'),
+                'active' => ($current == '')
         ]);
 
         foreach ($filterkeys as $key) {
             array_push($filters, [
-                'key' => $key,
-                'name' => get_string('filter' . $key, 'assign'),
-                'active' => ($current == $key)
+                    'key' => $key,
+                    'name' => get_string('filter' . $key, 'assign'),
+                    'active' => ($current == $key)
             ]);
         }
+        return $filters;
+    }
+
+    /**
+     * Return array of valid search filters for the grading interface.
+     *
+     * @return array
+     */
+    public function get_filters() {
+        $filters = new stdClass();
+        $filters->notsubmitted = get_user_preferences('assign_notsubmitted');
+        $filters->submitted = get_user_preferences('assign_submitted');
+        $filters->requiregrading = get_user_preferences('assign_requiregrading');
+        $filters->grantedextension = get_user_preferences('assign_grantedextension');
         return $filters;
     }
 

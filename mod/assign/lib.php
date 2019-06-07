@@ -1744,6 +1744,12 @@ function mod_assign_user_preferences() {
         'type' => PARAM_ALPHA,
         'null' => NULL_NOT_ALLOWED,
         'default' => ''
+        //'default' => implide(',', [
+        //        ASSIGN_FILTER_NOT_SUBMITTED,
+        //        ASSIGN_FILTER_SUBMITTED,
+        //        ASSIGN_FILTER_REQUIRE_GRADING,
+        //        ASSIGN_FILTER_GRANTED_EXTENSION
+        //])
     );
     $preferences['assign_workflowfilter'] = array(
         'type' => PARAM_ALPHA,

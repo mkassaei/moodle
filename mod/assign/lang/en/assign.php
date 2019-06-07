@@ -477,6 +477,7 @@ $string['selectedusers'] = 'Selected users';
 $string['setmarkingworkflowstateforlog'] = 'Set marking workflow state : (id={$a->id}, fullname={$a->fullname}, state={$a->state}). ';
 $string['setmarkerallocationforlog'] = 'Set marking allocation : (id={$a->id}, fullname={$a->fullname}, marker={$a->marker}). ';
 $string['settings'] = 'Assignment settings';
+$string['showattemptsthatare'] = 'Show attempts that are';
 $string['showrecentsubmissions'] = 'Show recent submissions';
 $string['status'] = 'Status';
 $string['studentnotificationworkflowstateerror'] = 'Marking workflow state must be \'Released\' to notify students.';
