@@ -320,11 +320,25 @@ define(['jquery', 'core/dragdrop', 'core/key_codes'], function($, dragDrop, keys
         if (drag.length === 0) {
             this.setInputValue(this.getPlace(drop), 0);
         } else {
+            // Adjust for screen reader.
+            this.setDropToDragText(drag, drop);
+            this.setPlacedDragToBeIgnoredByScreenReader(drag);
+
             this.setInputValue(this.getPlace(drop), this.getChoice(drag));
             drag.removeClass('unplaced')
                 .addClass('placed inplace' + this.getPlace(drop));
             this.animateTo(drag, drop);
         }
+    };
+
+    DragDropToTextQuestion.prototype.setDropToDragText = function(drag, drop) {
+        var dtext = drag[0].innerHTML;
+        drop[0].innerHTML = '&nbsp;<span class="accesshide">' + dtext + '</span>';
+    };
+
+    DragDropToTextQuestion.prototype.setPlacedDragToBeIgnoredByScreenReader = function(drag) {
+        var dtext = drag[0].innerHTML;
+        drag[0].innerHTML = '&nbsp;<span aria-hidden="true">' + dtext + '</span>';
     };
 
     /**
