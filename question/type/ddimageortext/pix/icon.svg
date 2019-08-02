@@ -1,1 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" style="isolation:isolate" width="16" height="16" preserveAspectRatio="xMinYMid meet"><defs><clipPath id="a"><path d="M0 0h16v16H0z"/></clipPath></defs><g clip-path="url(#a)"><path d="M6.85 9.15v3.3h-1.6l2.8 2.8 2.6-2.8h-1.5v-3.3h3.3v1.5l2.8-2.6-2.8-2.8v1.6h-3.3v-3.3h1.5L7.95.75l-2.7 2.8h1.6v3.3h-3.3v-1.6l-2.8 2.8 2.8 2.6v-1.5h3.3zm.9-.9h.5v-.5h-.5v.5z"/></g></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 32 32" style="enable-background:new 0 0 32 32;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;}
+	.st1{fill:none;stroke:#231F20;stroke-width:4;stroke-miterlimit:10;}
+	.st2{fill:#231F20;}
+</style>
+<rect y="0" class="st0" width="32" height="32"/>
+<g>
+	<g>
+		<line class="st1" x1="16" y1="5.7" x2="16" y2="26.3"/>
+		<g>
+			<polygon class="st2" points="12,6.9 16,0 20,6.9 			"/>
+		</g>
+		<g>
+			<polygon class="st2" points="12,25.1 16,32 20,25.1 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line class="st1" x1="5.7" y1="16" x2="26.3" y2="16"/>
+		<g>
+			<polygon class="st2" points="6.9,20 0,16 6.9,12 			"/>
+		</g>
+		<g>
+			<polygon class="st2" points="25.1,20 32,16 25.1,12 			"/>
+		</g>
+	</g>
+</g>
+</svg>
