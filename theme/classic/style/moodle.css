@@ -16570,8 +16570,12 @@ div#dock {
   background-image: url([[pix:core|t/locked]]);
   background-color: #e9ecef; }
 
-.path-mod-quiz #mod_quiz_navblock .qnbutton.notanswered .trafficlight,
+.path-mod-quiz #mod_quiz_navblock .qnbutton.notanswered .trafficlight {
+  background-color: #d9534f;
+}
+
 .path-mod-quiz #mod_quiz_navblock .qnbutton.incorrect .trafficlight {
+  background-image: url([[pix:moodle|t/delete]]);
   background-color: #d9534f; }
 
 .path-mod-quiz #mod_quiz_navblock .qnbutton.partiallycorrect .trafficlight {
@@ -16581,6 +16585,7 @@ div#dock {
 .path-mod-quiz #mod_quiz_navblock .qnbutton.complete .trafficlight,
 .path-mod-quiz #mod_quiz_navblock .qnbutton.answersaved .trafficlight,
 .path-mod-quiz #mod_quiz_navblock .qnbutton.requiresgrading .trafficlight {
+  background-image: url([[pix:moodle|t/tag]]);/* This icon has the same colour and the background-color and appears in high-conttast only*/
   background-color: #868e96; }
 
 #page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer form input {
