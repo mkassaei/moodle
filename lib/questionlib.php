@@ -1441,6 +1441,7 @@ function question_category_options($contexts, $top = false, $currentcat = 0,
                 $cid = $category->id;
                 if ($currentcat != $cid || $currentcat == 0) {
                     $countstring = !empty($category->questioncount) ?
+                            (!empty($category->idnumber) ? " [" . $category->idnumber . "]" : '') .
                             " ($category->questioncount)" : '';
                     $categoriesarray[$contextstring][$cid] =
                             format_string($category->indentedname, true,

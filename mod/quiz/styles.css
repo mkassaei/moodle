@@ -1028,6 +1028,15 @@ table#categoryquestions {
     position: relative;
 }
 
+#categoryquestions .questionidnumber {
+    white-space: nowrap;
+    overflow: hidden;
+    zoom: 1;
+    position: relative;
+    padding: 0 2px 0 2px;
+    font-size: 75%;
+}
+
 #categoryquestions .questiontext p {
     margin: 0;
 }
