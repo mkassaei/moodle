@@ -72,6 +72,11 @@ class qtype_essay extends question_type {
         } else {
             $options->filetypeslist = $formdata->filetypeslist;
         }
+        if (!isset($formdata->maxbytes)) {
+            $options->maxbytes = get_config('qtype_essay', 'maxbytes');
+        } else {
+            $options->maxbytes = $formdata->maxbytes;
+        }
         $options->graderinfo = $this->import_or_save_files($formdata->graderinfo,
                 $context, 'qtype_essay', 'graderinfo', $formdata->id);
         $options->graderinfoformat = $formdata->graderinfo['format'];
@@ -93,6 +98,7 @@ class qtype_essay extends question_type {
         $question->responsetemplateformat = $questiondata->options->responsetemplateformat;
         $filetypesutil = new \core_form\filetypes_util();
         $question->filetypeslist = $filetypesutil->normalize_file_types($questiondata->options->filetypeslist);
+        $question->maxbytes = $questiondata->options->maxbytes;
     }
 
     public function delete_question($questionid, $contextid) {

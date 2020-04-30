@@ -67,5 +67,23 @@ function xmldb_qtype_essay_upgrade($oldversion) {
     // Automatically generated Moodle v3.8.0 release upgrade line.
     // Put any upgrade step following this.
 
+    $newversion = 2020071500;
+    if ($oldversion < $newversion) {
+
+        // Define field maxbytes to be added to qtype_essay_options.
+        $table = new xmldb_table('qtype_essay_options');
+        $field = new xmldb_field('maxbytes', XMLDB_TYPE_INTEGER, '10', null,
+            XMLDB_NOTNULL, null, '52428800', 'responsetemplateformat');
+
+        // Conditionally launch add field maxbytes.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Essay savepoint reached.
+        upgrade_plugin_savepoint(true, $newversion, 'qtype', 'essay');
+    }
+    // Automatically generated Moodle v3.9.0 release upgrade line.
+    // Put any upgrade step following this.
     return true;
 }
