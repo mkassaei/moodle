@@ -111,6 +111,8 @@ class restore_qtype_essay_plugin extends restore_qtype_plugin {
             $defaultoptions->responseformat = 'editor';
             $defaultoptions->responserequired = 1;
             $defaultoptions->responsefieldlines = 15;
+            $defaultoptions->minwordlimit = 0;
+            $defaultoptions->maxwordlimit = 0;
             $defaultoptions->attachments = 0;
             $defaultoptions->attachmentsrequired = 0;
             $defaultoptions->graderinfo = '';

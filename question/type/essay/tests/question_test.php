@@ -170,6 +170,25 @@ class qtype_essay_question_test extends advanced_testcase {
         $this->assertTrue($essay->is_complete_response(array('answer' => '0 times.')));
         $this->assertTrue($essay->is_complete_response(array('answer' => '0')));
 
+        // Test case for minimum and/or maximum word limit.
+        $response = [];
+        $response['answer'] = 'In this essay, I will be testing a function called check_input_word_count().';
+
+        $essay->minwordlimit = 50; // The answer is shorter than the required minimum word limit.
+        $this->assertFalse($essay->is_complete_response($response));
+
+        $essay->minwordlimit = 10; // The  word count  meets the required minimum word limit.
+        $this->assertTrue($essay->is_complete_response($response));
+
+        // The word count meets the required minimum  and maximum word limit.
+        $essay->minwordlimit = 10;
+        $essay->maxwordlimit = 15;
+        $this->assertTrue($essay->is_complete_response($response));
+
+        // Unset the minwordlimit/maxwordlimit variables to avoid the extra check in is_complete_response() for further tests.
+        unset($essay->minwordlimit);
+        unset($essay->maxwordlimit);
+
         // Test the case where two files are required.
         $essay->attachmentsrequired = 2;
 
@@ -236,7 +255,6 @@ class qtype_essay_question_test extends advanced_testcase {
         $essay->reponserequired = 1;
         $this->assertTrue($essay->is_complete_response(
                 array('attachments' => $attachments[1])));
-
     }
 
     /**
@@ -261,5 +279,52 @@ class qtype_essay_question_test extends advanced_testcase {
         $this->assertNull($options['filetypeslist']);
         $this->assertEquals('', $options['responsetemplate']);
         $this->assertEquals(FORMAT_MOODLE, $options['responsetemplateformat']);
+    }
+
+    public function test_get_validation_error_min_max_not_set() {
+        $question = test_question_maker::make_an_essay_question();
+        $response = ['answer' => 'In this essay, I will be testing a function called check_input_word_count().'];
+        $expected = null;
+        $this->assertEquals($expected, $question->get_validation_error($response));
+    }
+
+    public function test_get_validation_error_min_max_enabled_with_valid_input() {
+        $question = test_question_maker::make_an_essay_question();
+        $response = ['answer' => 'In this essay, I will be testing a function called check_input_word_count().'];
+        $question->minwordlimit = 10;
+        $question->maxwordlimit = 25;
+        $expected = null;
+        $this->assertEquals($expected, $question->get_validation_error($response));
+    }
+
+    public function test_get_validation_error_min_max_enabled_minlimit_not_reached() {
+        $question = test_question_maker::make_an_essay_question();
+        $response = ['answer' => 'In this essay, I will be testing a function called check_input_word_count().'];
+        $question->minwordlimit = 15;
+        $question->maxwordlimit = 25;
+        $expected = 'The required minimum word limit (15 words) has not been reached for this essay. ' .
+                    'Please amend your response and try again.';
+        $this->assertEquals($expected, $question->get_validation_error($response));
+    }
+
+    public function test_get_validation_error_min_max_enabled_maxlimit_exceeded() {
+        $question = test_question_maker::make_an_essay_question();
+        $response = ['answer' => 'In this essay, I will be testing a function called check_input_word_count().'];
+        $question->minwordlimit = 5;
+        $question->maxwordlimit = 12;
+        $expected = 'The required maximum word limit (12 words) has been exceeded for this essay. ' .
+                    'Please amend your response and try again.';
+        $this->assertEquals($expected, $question->get_validation_error($response));
+    }
+
+    public function test_get_validation_error_min_max_enabled_but_not_relevant_to_be_used() {
+        $question = test_question_maker::make_an_essay_question();
+        $response = ['answer' => 'In this essay, I will be testing a function called check_input_word_count().'];
+        $question->minwordlimit = 5;
+        $question->maxwordlimit = 12;
+        // Min/max word limits are set and valid, but they are not used, because Text input is optional.
+        $question->responserequired = 0;
+        $expected = null;
+        $this->assertEquals($expected, $question->get_validation_error($response));
     }
 }
