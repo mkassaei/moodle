@@ -123,7 +123,6 @@ class quiz_override_form extends moodleform {
             }
         } else {
             // User override.
-            // TODO Does not support custom user profile fields (MDL-70456).
             $userfieldsapi = \core_user\fields::for_identity($this->context, false)->with_userpic()->with_name();
             $extrauserfields = $userfieldsapi->get_required_fields([\core_user\fields::PURPOSE_IDENTITY]);
             if ($this->userid) {
