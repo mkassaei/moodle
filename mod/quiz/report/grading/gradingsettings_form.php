@@ -49,13 +49,13 @@ class quiz_grading_settings_form extends moodleform {
     /**
      * quiz_grading_settings_form constructor.
      *
-     * @param Array $hidden Array of options form.
+     * @param array $hidden Array of options form.
      * @param stdClass $counts object that stores the number of each type of attempt.
      * @param bool $shownames whether student names should be shown.
      * @param bool $showcustomfields whether custom field values should be shown.
      * @param stdClass $context context object.
      */
-    public function __construct($hidden, $counts, $shownames, $showcustomfields, $context) {
+    public function __construct(array $hidden, stdClass $counts, bool $shownames, bool $showcustomfields, stdClass $context) {
         global $CFG;
         $this->includeauto = !empty($hidden['includeauto']);
         $this->hidden = $hidden;

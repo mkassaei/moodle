@@ -686,13 +686,12 @@ class quiz_grading_report extends quiz_default_report {
     /**
      * Get question heading.
      *
-     * @param object $attempt an instance of quiz_attempt.
+     * @param stdClass $attempt An instance of quiz_attempt.
      * @param bool $shownames True to show the student first/lastnames.
-     * @param bool $showcustomfields whether custom field values should be shown.
-     * @return lang_string|string
-     * @throws coding_exception
+     * @param bool $showcustomfields Whether custom field values should be shown.
+     * @return string The string text for the question heading.
      */
-    protected function get_question_heading($attempt, $shownames, $showcustomfields) {
+    protected function get_question_heading(stdClass $attempt, bool $shownames, bool $showcustomfields): string {
         global $DB;
         $a = new stdClass();
         $a->attempt = $attempt->attempt;
