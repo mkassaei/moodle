@@ -54,6 +54,7 @@ class mod_quiz_mod_form extends moodleform_mod {
         self::$reviewfields = [
             'attempt'          => ['theattempt', 'quiz'],
             'correctness'      => ['whethercorrect', 'question'],
+            'maxmarks'         => ['maxmarks', 'quiz'],
             'marks'            => ['marks', 'quiz'],
             'specificfeedback' => ['specificfeedback', 'question'],
             'generalfeedback'  => ['generalfeedback', 'question'],
@@ -405,6 +406,7 @@ class mod_quiz_mod_form extends moodleform_mod {
 
         if ($whenname != 'during') {
             $mform->disabledIf('correctness' . $whenname, 'attempt' . $whenname);
+            $mform->disabledIf('marks' . $whenname, 'maxmarks' . $whenname);
             $mform->disabledIf('specificfeedback' . $whenname, 'attempt' . $whenname);
             $mform->disabledIf('generalfeedback' . $whenname, 'attempt' . $whenname);
             $mform->disabledIf('rightanswer' . $whenname, 'attempt' . $whenname);
