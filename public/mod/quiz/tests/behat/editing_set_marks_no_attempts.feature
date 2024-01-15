@@ -47,6 +47,18 @@ Feature: Edit quiz marks with no attempts
     And "li input[name=maxmark]" "css_element" should not exist
 
   @javascript
+  Scenario: Set the max mark for a question with language customisations.
+    Given the following "language customisations" exist:
+      | component       | stringid | value |
+      | core_langconfig | decsep   | ,     |
+    When I set the max mark for question "First question" to "7.0"
+    Then I should see "7,00"
+    And I should see "Total of marks: 10,00"
+    And I set the max mark for question "First question" to "1.0"
+    And I should see "1,00"
+    And I should see "Total of marks: 4,00"
+
+  @javascript
   Scenario: Set the overall Maximum grade.
     When I set the field "maxgrade" to "10.0"
     And I press "savechanges"
