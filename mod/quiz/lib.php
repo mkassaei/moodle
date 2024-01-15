@@ -1179,22 +1179,38 @@ function quiz_review_option_form_to_db($fromform, $field) {
 function mod_quiz_inplace_editable(string $itemtype, int $itemid, string $newvalue): \core\output\inplace_editable {
     global $DB;
 
+    // Work out which quiz and slot this is.
+    $slot = $DB->get_record('quiz_slots', ['id' => $itemid], '*', MUST_EXIST);
+    $quizobj = quiz_settings::create($slot->quizid);
+
+    // Validate the context, and check the required capability.
+    $context = $quizobj->get_context();
+    \core_external\external_api::validate_context($context);
+    require_capability('mod/quiz:manage', $context);
+
+    $structure = $quizobj->get_structure();
+
     if ($itemtype === 'slotdisplaynumber') {
-        // Work out which quiz and slot this is.
-        $slot = $DB->get_record('quiz_slots', ['id' => $itemid], '*', MUST_EXIST);
-        $quizobj = quiz_settings::create($slot->quizid);
-
-        // Validate the context, and check the required capability.
-        $context = $quizobj->get_context();
-        \core_external\external_api::validate_context($context);
-        require_capability('mod/quiz:manage', $context);
-
         // Update the value - truncating the size of the DB column.
-        $structure = $quizobj->get_structure();
         $structure->update_slot_display_number($itemid, core_text::substr($newvalue, 0, 16));
 
         // Prepare the element for the output.
         return $structure->make_slot_display_number_in_place_editable($itemid, $context);
+    }
+    if ($itemtype === 'slotmaxmark') {
+        if ($structure->update_slot_maxmark($slot, $newvalue)) {
+            // Grade has really changed.
+            $gradecalculator = $quizobj->get_grade_calculator();
+            quiz_delete_previews($quizobj->get_quiz());
+            $gradecalculator->recompute_quiz_sumgrades();
+            $gradecalculator->recompute_all_attempt_sumgrades();
+            $gradecalculator->recompute_all_final_grades();
+            quiz_update_grades($quizobj->get_quiz());
+        }
+
+        // Prepare the element for the output - reload structure to ensure totals are correct.
+        $structure = $quizobj->get_structure();
+        return $structure->make_slot_maxmark_in_place_editable($itemid, $context);
     }
 }
 

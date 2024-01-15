@@ -299,6 +299,7 @@ $string['editingquiz_help'] = 'When creating a quiz, the main concepts are:
 $string['editingquiz_link'] = 'mod/quiz/edit';
 $string['editingquizx'] = 'Editing quiz: {$a}';
 $string['editmaxmark'] = 'Edit maximum mark';
+$string['editmaxmarkhint'] = 'New value for {$a}';
 $string['editoverride'] = 'Edit override';
 $string['editqcats'] = 'Edit questions categories';
 $string['editquestion'] = 'Edit question';

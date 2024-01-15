@@ -189,6 +189,26 @@ class structure {
     }
 
     /**
+     * Make slot maxmark in place editable api call.
+
+     * @param int $slotid
+     * @param \context $context
+     * @return \core\output\inplace_editable
+     */
+    public function make_slot_maxmark_in_place_editable(int $slotid, \context $context): \core\output\inplace_editable {
+        $slot = $this->get_slot_by_id($slotid);
+        $editable = has_capability('mod/quiz:manage', $context);
+
+        // Get the current value.
+        $displayvalue = \html_writer::span(s($this->formatted_question_grade($slot->slot)),
+                '', ['data-sum-marks' => quiz_format_grade($this->get_quiz(), $this->get_quiz()->sumgrades)]);
+        return new inplace_editable('mod_quiz', 'slotmaxmark', $slotid,
+                $editable, $displayvalue, $slot->maxmark + 0,
+                get_string('editmaxmark', 'mod_quiz'),
+                get_string('editmaxmarkhint', 'mod_quiz', $displayvalue));
+    }
+
+    /**
      * Get the page a given slot is on.
      *
      * @param int $slotnumber the index of the slot in question.
@@ -1119,6 +1139,10 @@ class structure {
      */
     public function update_slot_maxmark($slot, $maxmark) {
         global $DB;
+
+        if (is_null($maxmark) || empty(trim($maxmark))) {
+            return false;
+        }
 
         if (abs($maxmark - $slot->maxmark) < 1e-7) {
             // Grade has not changed. Nothing to do.
