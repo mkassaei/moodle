@@ -36527,11 +36527,6 @@ img.userpicture {
   vertical-align: middle;
 }
 
-#page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer {
-  padding: 0.5em 0 0.5em 0.1em;
-  margin: 2px;
-}
-
 /* Override the color of the quiz attempt icons for accessibility. */
 #attemptsform .icon.text-success,
 .formulation .answer .icon.text-success {
